@@ -6,6 +6,80 @@ All notable changes to this project will be documented in this file.
 
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`__.
 
+3.74.2 - 2026-02-24
+-------------------
+Added
+~~~~~
+* Database Service
+
+  * Support for new optional parameter ``--dr-scan-listener-port-tcp-ssl`` for the following command:
+
+    * ``oci db exadata-infrastructure generate-recommended-vm-cluster-network``
+
+* Fleet Software Update service
+
+  * Support for change compartment of readiness check
+
+    * ``oci fleet-software-update fsu-readiness-check change-compartment``
+
+  * Support for creating readiness check
+
+    * ``oci fleet-software-update fsu-readiness-check create``
+
+  * Support for creating details of readiness check
+
+    * ``oci fleet-software-update fsu-readiness-check create-fsu-readiness-check-create-target-fsu-readiness-check-details``
+
+  * Support for deleting readiness check
+
+    * ``oci fleet-software-update fsu-readiness-check delete``
+
+  * Support for getting readiness check
+
+    * ``oci fleet-software-update fsu-readiness-check get``
+
+  * Support for updating readiness check
+
+    * ``oci fleet-software-update fsu-readiness-check update``
+
+  * Support for listing readiness check
+
+    * ``oci fleet-software-update fsu-readiness-check-summary list-fsu-readiness-checks``
+
+* DNS Service
+
+  * Support for new optional parameter ``--resolution-mode`` for the following commands:
+
+    * ``oci dns zone update``
+    * ``oci dns zone create``
+
+* MySQL Service
+
+  * Support for specifying DB system telemetry configuration in MySQL HeatWave Service
+
+    * ``oci mysql db-system create --telemetry-configuration``
+    * ``oci mysql db-system update --telemetry-configuration``
+    * ``oci mysql db-system import --telemetry-configuration``
+    * ``oci mysql db-system clone --telemetry-configuration``
+
+  * Support for retrieving DB system and Channel status (information about availability and operational indicators) in the MySQL HeatWave service.
+
+    * ``oci mysql db-system status generate``
+    * ``oci mysql db-system status get``
+    * ``oci mysql channel status generate``
+    * ``oci mysql channel status get``
+
+* Data Flow Service
+
+  * Support for new optional parameter ``--security-attributes`` for the following commands:
+    * ``oci data-flow private-endpoint create``
+    * ``oci data-flow private-endpoint update``
+
+  * Support for new optional parameters ``--log-compartment-id``, ``--log-display-name``, ``--log-group-id``, ``--log-retention-duration`` for the following commands:
+    * ``oci data-flow sql-endpoint create``
+    * ``oci data-flow sql-endpoint update``
+
+
 3.74.1 - 2026-02-17
 -------------------
 Added

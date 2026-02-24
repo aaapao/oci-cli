@@ -34,6 +34,10 @@ dbsystem_cli.db_system_root_group.add_command(dbsystem_cli.start_db_system)
 dbsystem_cli.db_system_root_group.add_command(dbsystem_cli.stop_db_system)
 dbsystem_cli.db_system_root_group.add_command(dbsystem_cli.update_db_system)
 
+# oci mysql db-system db-system-status -> oci mysql db-system status
+cli_util.rename_command(dbsystem_cli, dbsystem_cli.db_system_root_group, dbsystem_cli.db_system_status_group, "status")
+
+
 # oci mysql db-system heat-wave-cluster -> oci mysql db-system heatwave-cluster
 cli_util.rename_command(dbsystem_cli, dbsystem_cli.db_system_root_group, dbsystem_cli.heat_wave_cluster_group, "heatwave-cluster")
 

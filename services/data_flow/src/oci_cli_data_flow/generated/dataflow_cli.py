@@ -617,15 +617,18 @@ def create_pool(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_
 @cli_util.option('--scan-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""An array of fqdn/port pairs used to create private endpoint. Each object is a simple key-value pair with FQDN as key and port number as value. [ { fqdn: \"scan1.oracle.com\", port: \"1521\"}, { fqdn: \"scan2.oracle.com\", port: \"1521\" } ]
 
 This option is a JSON list with items of type Scan.  For documentation on Scan please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/dataflow/20200129/datatypes/Scan.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--security-attributes', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Security attributes for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].
+
+Example: `{\"Oracle-ZPR\": {\"MaxEgressCount\": {\"value\": \"42\", \"mode\": \"enforce\"}}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "CANCELLED", "CANCELLING", "FAILED", "INPROGRESS", "SUCCEEDED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state SUCCEEDED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'defined-tags': {'module': 'data_flow', 'class': 'dict(str, dict(str, object))'}, 'dns-zones': {'module': 'data_flow', 'class': 'list[string]'}, 'freeform-tags': {'module': 'data_flow', 'class': 'dict(str, string)'}, 'nsg-ids': {'module': 'data_flow', 'class': 'list[string]'}, 'scan-details': {'module': 'data_flow', 'class': 'list[Scan]'}})
+@json_skeleton_utils.get_cli_json_input_option({'defined-tags': {'module': 'data_flow', 'class': 'dict(str, dict(str, object))'}, 'dns-zones': {'module': 'data_flow', 'class': 'list[string]'}, 'freeform-tags': {'module': 'data_flow', 'class': 'dict(str, string)'}, 'nsg-ids': {'module': 'data_flow', 'class': 'list[string]'}, 'scan-details': {'module': 'data_flow', 'class': 'list[Scan]'}, 'security-attributes': {'module': 'data_flow', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'data_flow', 'class': 'dict(str, dict(str, object))'}, 'dns-zones': {'module': 'data_flow', 'class': 'list[string]'}, 'freeform-tags': {'module': 'data_flow', 'class': 'dict(str, string)'}, 'nsg-ids': {'module': 'data_flow', 'class': 'list[string]'}, 'scan-details': {'module': 'data_flow', 'class': 'list[Scan]'}}, output_type={'module': 'data_flow', 'class': 'PrivateEndpoint'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'data_flow', 'class': 'dict(str, dict(str, object))'}, 'dns-zones': {'module': 'data_flow', 'class': 'list[string]'}, 'freeform-tags': {'module': 'data_flow', 'class': 'dict(str, string)'}, 'nsg-ids': {'module': 'data_flow', 'class': 'list[string]'}, 'scan-details': {'module': 'data_flow', 'class': 'list[Scan]'}, 'security-attributes': {'module': 'data_flow', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'data_flow', 'class': 'PrivateEndpoint'})
 @cli_util.wrap_exceptions
-def create_private_endpoint(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, dns_zones, subnet_id, defined_tags, description, display_name, freeform_tags, max_host_count, nsg_ids, scan_details):
+def create_private_endpoint(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, dns_zones, subnet_id, defined_tags, description, display_name, freeform_tags, max_host_count, nsg_ids, scan_details, security_attributes):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
@@ -655,6 +658,9 @@ def create_private_endpoint(ctx, from_json, wait_for_state, max_wait_seconds, wa
 
     if scan_details is not None:
         _details['scanDetails'] = cli_util.parse_json_parameter("scan_details", scan_details)
+
+    if security_attributes is not None:
+        _details['securityAttributes'] = cli_util.parse_json_parameter("security_attributes", security_attributes)
 
     client = cli_util.build_client('data_flow', 'data_flow', ctx)
     result = client.create_private_endpoint(
@@ -855,6 +861,10 @@ def create_run(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_s
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags]. Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags]. Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--spark-advanced-configurations', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The Spark configuration passed to the running process. See https://spark.apache.org/docs/latest/configuration.html#available-properties. Example: { \"spark.app.name\" : \"My App Name\", \"spark.shuffle.io.maxRetries\" : \"4\" } Note: Not all Spark properties are permitted to be set.  Attempting to set a property that is not allowed to be overwritten will cause a 400 status to be returned.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--log-group-id', help=u"""The identifier of the log group used with the SQL Endpoint.""")
+@cli_util.option('--log-compartment-id', help=u"""The identifier of the log group compartment used with the SQL Endpoint.""")
+@cli_util.option('--log-display-name', help=u"""The friendly name of the log object used with the SQL Endpoint.""")
+@cli_util.option('--log-retention-duration', type=click.INT, help=u"""Log retention duration in days""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "CANCELLED", "CANCELLING", "FAILED", "INPROGRESS", "SUCCEEDED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state SUCCEEDED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
@@ -863,7 +873,7 @@ def create_run(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_s
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'driver-shape-config': {'module': 'data_flow', 'class': 'ShapeConfig'}, 'executor-shape-config': {'module': 'data_flow', 'class': 'ShapeConfig'}, 'freeform-tags': {'module': 'data_flow', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'data_flow', 'class': 'dict(str, dict(str, object))'}, 'spark-advanced-configurations': {'module': 'data_flow', 'class': 'dict(str, string)'}, 'network-configuration': {'module': 'data_flow', 'class': 'SqlEndpointNetworkConfiguration'}}, output_type={'module': 'data_flow', 'class': 'SqlEndpoint'})
 @cli_util.wrap_exceptions
-def create_sql_endpoint(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, display_name, sql_endpoint_version, driver_shape, executor_shape, min_executor_count, max_executor_count, metastore_id, lake_id, warehouse_bucket_uri, network_configuration, description, driver_shape_config, executor_shape_config, freeform_tags, defined_tags, spark_advanced_configurations):
+def create_sql_endpoint(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, display_name, sql_endpoint_version, driver_shape, executor_shape, min_executor_count, max_executor_count, metastore_id, lake_id, warehouse_bucket_uri, network_configuration, description, driver_shape_config, executor_shape_config, freeform_tags, defined_tags, spark_advanced_configurations, log_group_id, log_compartment_id, log_display_name, log_retention_duration):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
@@ -898,6 +908,18 @@ def create_sql_endpoint(ctx, from_json, wait_for_state, max_wait_seconds, wait_i
 
     if spark_advanced_configurations is not None:
         _details['sparkAdvancedConfigurations'] = cli_util.parse_json_parameter("spark_advanced_configurations", spark_advanced_configurations)
+
+    if log_group_id is not None:
+        _details['logGroupId'] = log_group_id
+
+    if log_compartment_id is not None:
+        _details['logCompartmentId'] = log_compartment_id
+
+    if log_display_name is not None:
+        _details['logDisplayName'] = log_display_name
+
+    if log_retention_duration is not None:
+        _details['logRetentionDuration'] = log_retention_duration
 
     client = cli_util.build_client('data_flow', 'data_flow', ctx)
     result = client.create_sql_endpoint(
@@ -2622,23 +2644,26 @@ def update_pool(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_in
 @cli_util.option('--scan-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""An array of fqdn/port pairs used to create private endpoint. Each object is a simple key-value pair with FQDN as key and port number as value. [ { fqdn: \"scan1.oracle.com\", port: \"1521\"}, { fqdn: \"scan2.oracle.com\", port: \"1521\" } ]
 
 This option is a JSON list with items of type Scan.  For documentation on Scan please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/dataflow/20200129/datatypes/Scan.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--security-attributes', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Security attributes for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].
+
+Example: `{\"Oracle-ZPR\": {\"MaxEgressCount\": {\"value\": \"42\", \"mode\": \"enforce\"}}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
 @cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "CANCELLED", "CANCELLING", "FAILED", "INPROGRESS", "SUCCEEDED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state SUCCEEDED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'defined-tags': {'module': 'data_flow', 'class': 'dict(str, dict(str, object))'}, 'dns-zones': {'module': 'data_flow', 'class': 'list[string]'}, 'freeform-tags': {'module': 'data_flow', 'class': 'dict(str, string)'}, 'nsg-ids': {'module': 'data_flow', 'class': 'list[string]'}, 'scan-details': {'module': 'data_flow', 'class': 'list[Scan]'}})
+@json_skeleton_utils.get_cli_json_input_option({'defined-tags': {'module': 'data_flow', 'class': 'dict(str, dict(str, object))'}, 'dns-zones': {'module': 'data_flow', 'class': 'list[string]'}, 'freeform-tags': {'module': 'data_flow', 'class': 'dict(str, string)'}, 'nsg-ids': {'module': 'data_flow', 'class': 'list[string]'}, 'scan-details': {'module': 'data_flow', 'class': 'list[Scan]'}, 'security-attributes': {'module': 'data_flow', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'data_flow', 'class': 'dict(str, dict(str, object))'}, 'dns-zones': {'module': 'data_flow', 'class': 'list[string]'}, 'freeform-tags': {'module': 'data_flow', 'class': 'dict(str, string)'}, 'nsg-ids': {'module': 'data_flow', 'class': 'list[string]'}, 'scan-details': {'module': 'data_flow', 'class': 'list[Scan]'}})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'data_flow', 'class': 'dict(str, dict(str, object))'}, 'dns-zones': {'module': 'data_flow', 'class': 'list[string]'}, 'freeform-tags': {'module': 'data_flow', 'class': 'dict(str, string)'}, 'nsg-ids': {'module': 'data_flow', 'class': 'list[string]'}, 'scan-details': {'module': 'data_flow', 'class': 'list[Scan]'}, 'security-attributes': {'module': 'data_flow', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.wrap_exceptions
-def update_private_endpoint(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, private_endpoint_id, defined_tags, description, display_name, dns_zones, freeform_tags, max_host_count, nsg_ids, scan_details, if_match):
+def update_private_endpoint(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, private_endpoint_id, defined_tags, description, display_name, dns_zones, freeform_tags, max_host_count, nsg_ids, scan_details, security_attributes, if_match):
 
     if isinstance(private_endpoint_id, six.string_types) and len(private_endpoint_id.strip()) == 0:
         raise click.UsageError('Parameter --private-endpoint-id cannot be whitespace or empty string')
     if not force:
-        if defined_tags or dns_zones or freeform_tags or nsg_ids or scan_details:
-            if not click.confirm("WARNING: Updates to defined-tags and dns-zones and freeform-tags and nsg-ids and scan-details will replace any existing values. Are you sure you want to continue?"):
+        if defined_tags or dns_zones or freeform_tags or nsg_ids or scan_details or security_attributes:
+            if not click.confirm("WARNING: Updates to defined-tags and dns-zones and freeform-tags and nsg-ids and scan-details and security-attributes will replace any existing values. Are you sure you want to continue?"):
                 ctx.abort()
 
     kwargs = {}
@@ -2671,6 +2696,9 @@ def update_private_endpoint(ctx, from_json, force, wait_for_state, max_wait_seco
 
     if scan_details is not None:
         _details['scanDetails'] = cli_util.parse_json_parameter("scan_details", scan_details)
+
+    if security_attributes is not None:
+        _details['securityAttributes'] = cli_util.parse_json_parameter("security_attributes", security_attributes)
 
     client = cli_util.build_client('data_flow', 'data_flow', ctx)
     result = client.update_private_endpoint(
@@ -2798,6 +2826,11 @@ def update_run(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_int
 @cli_util.option('--max-executor-count', type=click.INT, help=u"""The maximum number of executors.""")
 @cli_util.option('--metastore-id', help=u"""Metastore OCID""")
 @cli_util.option('--lake-id', help=u"""OCI lake OCID""")
+@cli_util.option('--log-group-id', help=u"""The identifier of the log group used with the SQL Endpoint.""")
+@cli_util.option('--log-compartment-id', help=u"""The identifier of the log group compartment used with the SQL Endpoint.""")
+@cli_util.option('--log-display-name', help=u"""The friendly name of the log object used with the SQL Endpoint.""")
+@cli_util.option('--log-retention-duration', type=click.INT, help=u"""Log retention duration in days""")
+@cli_util.option('--log-operation', type=custom_types.CliCaseInsensitiveChoice(["ENABLE", "DISABLE", "DELETE"]), help=u"""The log operation will be performed for the Sql Endpoint.""")
 @cli_util.option('--spark-advanced-configurations', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The Spark configuration passed to the running process. See https://spark.apache.org/docs/latest/configuration.html#available-properties. Example: { \"spark.app.name\" : \"My App Name\", \"spark.shuffle.io.maxRetries\" : \"4\" } Note: Not all Spark properties are permitted to be set.  Attempting to set a property that is not allowed to be overwritten will cause a 400 status to be returned.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
 @cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
@@ -2809,7 +2842,7 @@ def update_run(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_int
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'data_flow', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'data_flow', 'class': 'dict(str, string)'}, 'driver-shape-config': {'module': 'data_flow', 'class': 'ShapeConfig'}, 'executor-shape-config': {'module': 'data_flow', 'class': 'ShapeConfig'}, 'spark-advanced-configurations': {'module': 'data_flow', 'class': 'dict(str, string)'}})
 @cli_util.wrap_exceptions
-def update_sql_endpoint(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, sql_endpoint_id, defined_tags, freeform_tags, display_name, description, driver_shape, driver_shape_config, executor_shape, executor_shape_config, min_executor_count, max_executor_count, metastore_id, lake_id, spark_advanced_configurations, if_match):
+def update_sql_endpoint(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, sql_endpoint_id, defined_tags, freeform_tags, display_name, description, driver_shape, driver_shape_config, executor_shape, executor_shape_config, min_executor_count, max_executor_count, metastore_id, lake_id, log_group_id, log_compartment_id, log_display_name, log_retention_duration, log_operation, spark_advanced_configurations, if_match):
 
     if isinstance(sql_endpoint_id, six.string_types) and len(sql_endpoint_id.strip()) == 0:
         raise click.UsageError('Parameter --sql-endpoint-id cannot be whitespace or empty string')
@@ -2860,6 +2893,21 @@ def update_sql_endpoint(ctx, from_json, force, wait_for_state, max_wait_seconds,
 
     if lake_id is not None:
         _details['lakeId'] = lake_id
+
+    if log_group_id is not None:
+        _details['logGroupId'] = log_group_id
+
+    if log_compartment_id is not None:
+        _details['logCompartmentId'] = log_compartment_id
+
+    if log_display_name is not None:
+        _details['logDisplayName'] = log_display_name
+
+    if log_retention_duration is not None:
+        _details['logRetentionDuration'] = log_retention_duration
+
+    if log_operation is not None:
+        _details['logOperation'] = log_operation
 
     if spark_advanced_configurations is not None:
         _details['sparkAdvancedConfigurations'] = cli_util.parse_json_parameter("spark_advanced_configurations", spark_advanced_configurations)

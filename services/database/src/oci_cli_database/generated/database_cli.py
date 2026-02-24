@@ -21468,6 +21468,7 @@ def generate_autonomous_database_wallet(ctx, from_json, file, autonomous_databas
 @cli_util.option('--scan-listener-port-tcp', type=click.INT, help=u"""The SCAN TCPIP port. Default is 1521.""")
 @cli_util.option('--scan-listener-port-tcp-ssl', type=click.INT, help=u"""The SCAN TCPIP SSL port. Default is 2484.""")
 @cli_util.option('--dr-scan-listener-port-tcp', type=click.INT, help=u"""The DR SCAN TCPIP port. Default is 1521.""")
+@cli_util.option('--dr-scan-listener-port-tcp-ssl', type=click.INT, help=u"""The DR SCAN TCPIP SSL port. Default is 2484.""")
 @cli_util.option('--dns', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of DNS server IP addresses. Maximum of 3 allowed.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--ntp', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of NTP server IP addresses. Maximum of 3 allowed.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
@@ -21479,7 +21480,7 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'db-servers': {'module': 'database', 'class': 'list[string]'}, 'networks': {'module': 'database', 'class': 'list[InfoForNetworkGenDetails]'}, 'dns': {'module': 'database', 'class': 'list[string]'}, 'ntp': {'module': 'database', 'class': 'list[string]'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'database', 'class': 'VmClusterNetworkDetails'})
 @cli_util.wrap_exceptions
-def generate_recommended_vm_cluster_network(ctx, from_json, exadata_infrastructure_id, compartment_id, display_name, networks, db_servers, scan_listener_port_tcp, scan_listener_port_tcp_ssl, dr_scan_listener_port_tcp, dns, ntp, freeform_tags, defined_tags):
+def generate_recommended_vm_cluster_network(ctx, from_json, exadata_infrastructure_id, compartment_id, display_name, networks, db_servers, scan_listener_port_tcp, scan_listener_port_tcp_ssl, dr_scan_listener_port_tcp, dr_scan_listener_port_tcp_ssl, dns, ntp, freeform_tags, defined_tags):
 
     if isinstance(exadata_infrastructure_id, six.string_types) and len(exadata_infrastructure_id.strip()) == 0:
         raise click.UsageError('Parameter --exadata-infrastructure-id cannot be whitespace or empty string')
@@ -21503,6 +21504,9 @@ def generate_recommended_vm_cluster_network(ctx, from_json, exadata_infrastructu
 
     if dr_scan_listener_port_tcp is not None:
         _details['drScanListenerPortTcp'] = dr_scan_listener_port_tcp
+
+    if dr_scan_listener_port_tcp_ssl is not None:
+        _details['drScanListenerPortTcpSsl'] = dr_scan_listener_port_tcp_ssl
 
     if dns is not None:
         _details['dns'] = cli_util.parse_json_parameter("dns", dns)

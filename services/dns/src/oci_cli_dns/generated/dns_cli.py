@@ -701,9 +701,11 @@ def create_steering_policy(ctx, from_json, wait_for_state, max_wait_seconds, wai
 
 @steering_policy_attachment_group.command(name=cli_util.override('dns.create_steering_policy_attachment.command_name', 'create'), help=u"""Creates a new attachment between a steering policy and a domain, giving the policy permission to answer queries for the specified domain. A steering policy must be attached to a domain for the policy to answer DNS queries for that domain.
 
-For the purposes of access control, the attachment is automatically placed into the same compartment as the domain's zone. \n[Command Reference](createSteeringPolicyAttachment)""")
+For the purposes of access control, the attachment is automatically placed into the same compartment as the domain's zone.
+
+Attachments cannot be created for private zones. \n[Command Reference](createSteeringPolicyAttachment)""")
 @cli_util.option('--steering-policy-id', required=True, help=u"""The OCID of the attached steering policy.""")
-@cli_util.option('--zone-id', required=True, help=u"""The OCID of the attached zone.""")
+@cli_util.option('--zone-id', required=True, help=u"""The OCID of the attached zone. Must be a public zone.""")
 @cli_util.option('--domain-name', required=True, help=u"""The attached domain within the attached zone.""")
 @cli_util.option('--display-name', help=u"""A user-friendly name for the steering policy attachment. Does not have to be unique and can be changed. Avoid entering confidential information.""")
 @cli_util.option('--scope', type=custom_types.CliCaseInsensitiveChoice(["GLOBAL", "PRIVATE"]), help=u"""Specifies to operate only on resources that have a matching DNS scope.""")
@@ -1003,6 +1005,7 @@ This option is a JSON list with items of type ExternalMaster.  For documentation
 @cli_util.option('--external-downstreams', type=custom_types.CLI_COMPLEX_TYPE, help=u"""External secondary servers for the zone. This field is currently not supported when `zoneType` is `SECONDARY` or `scope` is `PRIVATE`.
 
 This option is a JSON list with items of type ExternalDownstream.  For documentation on ExternalDownstream please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/dns/20180115/datatypes/ExternalDownstream.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--resolution-mode', type=custom_types.CliCaseInsensitiveChoice(["STATIC", "TRANSPARENT", "RTYPE_TRANSPARENT"]), help=u"""The resolution mode of a zone defines behavior related to how query responses can be handled.""")
 @cli_util.option('--dnssec-state', type=custom_types.CliCaseInsensitiveChoice(["ENABLED", "DISABLED"]), help=u"""The state of DNSSEC on the zone.
 
 For DNSSEC to function, every parent zone in the DNS tree up to the top-level domain (or an independent trust anchor) must also have DNSSEC correctly set up. After enabling DNSSEC, you must add a DS record to the zone's parent zone containing the `KskDnssecKeyVersion` data. You can find the DS data in the `dsData` attribute of the `KskDnssecKeyVersion`. Then, use the `PromoteZoneDnssecKeyVersion` operation to promote the `KskDnssecKeyVersion`.
@@ -1029,7 +1032,7 @@ This parameter is deprecated and should be omitted.""")
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'freeform-tags': {'module': 'dns', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'dns', 'class': 'dict(str, dict(str, object))'}, 'external-masters': {'module': 'dns', 'class': 'list[ExternalMaster]'}, 'external-downstreams': {'module': 'dns', 'class': 'list[ExternalDownstream]'}}, output_type={'module': 'dns', 'class': 'Zone'})
 @cli_util.wrap_exceptions
-def create_zone_create_zone_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, name, freeform_tags, defined_tags, zone_type, external_masters, external_downstreams, dnssec_state, compartment_id, scope, view_id):
+def create_zone_create_zone_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, name, freeform_tags, defined_tags, zone_type, external_masters, external_downstreams, resolution_mode, dnssec_state, compartment_id, scope, view_id):
 
     kwargs = {}
     if compartment_id is not None:
@@ -1064,6 +1067,9 @@ def create_zone_create_zone_details(ctx, from_json, wait_for_state, max_wait_sec
 
     if external_downstreams is not None:
         _details['externalDownstreams'] = cli_util.parse_json_parameter("external_downstreams", external_downstreams)
+
+    if resolution_mode is not None:
+        _details['resolutionMode'] = resolution_mode
 
     if dnssec_state is not None:
         _details['dnssecState'] = dnssec_state
@@ -3225,7 +3231,7 @@ def update_domain_records(ctx, from_json, force, zone_name_or_id, domain, items,
 @cli_util.option('--attached-views', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The attached views. Views are evaluated in order.
 
 This option is a JSON list with items of type AttachedViewDetails.  For documentation on AttachedViewDetails please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/dns/20180115/datatypes/AttachedViewDetails.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--rules', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Rules for the resolver. Rules are evaluated in order.
+@cli_util.option('--rules', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Rules for the resolver. Rules are evaluated in order, and only the first matching rule will have its action applied.
 
 This option is a JSON list with items of type ResolverRuleDetails.  For documentation on ResolverRuleDetails please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/dns/20180115/datatypes/ResolverRuleDetails.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--if-match', help=u"""The `If-Match` header field makes the request method conditional on the existence of at least one current representation of the target resource, when the field-value is `*`, or having a current representation of the target resource that has an entity-tag matching a member of the list of entity-tags provided in the field-value.""")
@@ -3885,6 +3891,7 @@ Global secondary zones may have their external masters updated. For more informa
 @cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].
 
  **Example:** `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--resolution-mode', type=custom_types.CliCaseInsensitiveChoice(["STATIC", "TRANSPARENT", "RTYPE_TRANSPARENT"]), help=u"""The resolution mode of a zone defines behavior related to how query responses can be handled.""")
 @cli_util.option('--dnssec-state', type=custom_types.CliCaseInsensitiveChoice(["ENABLED", "DISABLED"]), help=u"""The state of DNSSEC on the zone.
 
 For DNSSEC to function, every parent zone in the DNS tree up to the top-level domain (or an independent trust anchor) must also have DNSSEC correctly set up. After enabling DNSSEC, you must add a DS record to the zone's parent zone containing the `KskDnssecKeyVersion` data. You can find the DS data in the `dsData` attribute of the `KskDnssecKeyVersion`. Then, use the `PromoteZoneDnssecKeyVersion` operation to promote the `KskDnssecKeyVersion`.
@@ -3920,7 +3927,7 @@ This parameter is deprecated and should be omitted.""")
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'freeform-tags': {'module': 'dns', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'dns', 'class': 'dict(str, dict(str, object))'}, 'external-masters': {'module': 'dns', 'class': 'list[ExternalMaster]'}, 'external-downstreams': {'module': 'dns', 'class': 'list[ExternalDownstream]'}}, output_type={'module': 'dns', 'class': 'Zone'})
 @cli_util.wrap_exceptions
-def update_zone(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, zone_name_or_id, freeform_tags, defined_tags, dnssec_state, external_masters, external_downstreams, if_match, if_unmodified_since, scope, view_id, compartment_id):
+def update_zone(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, zone_name_or_id, freeform_tags, defined_tags, resolution_mode, dnssec_state, external_masters, external_downstreams, if_match, if_unmodified_since, scope, view_id, compartment_id):
 
     if isinstance(zone_name_or_id, six.string_types) and len(zone_name_or_id.strip()) == 0:
         raise click.UsageError('Parameter --zone-name-or-id cannot be whitespace or empty string')
@@ -3949,6 +3956,9 @@ def update_zone(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_in
 
     if defined_tags is not None:
         _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    if resolution_mode is not None:
+        _details['resolutionMode'] = resolution_mode
 
     if dnssec_state is not None:
         _details['dnssecState'] = dnssec_state

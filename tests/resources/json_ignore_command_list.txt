@@ -25,8 +25,11 @@ rover, node, set-secrets
 rover, create-master-key-policy
 rover, device, data-sync, task, cancel
 rover, device, data-sync, task, get
+rover, device, data-sync, task, get-snapshot
 rover, device, data-sync, task, list
 rover, device, data-sync, task, start
+rover, device, data-sync, task-definition, change-compartment
+rover, device, data-sync, task-definition, change-state
 rover, device, data-sync, task-definition, create
 rover, device, data-sync, task-definition, delete
 rover, device, data-sync, task-definition, get

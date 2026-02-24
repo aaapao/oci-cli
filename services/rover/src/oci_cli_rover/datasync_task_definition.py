@@ -9,8 +9,8 @@ from oci_cli import cli_util, json_skeleton_utils, custom_types
 from oci_cli.aliasing import CommandGroupWithAlias
 from services.rover.src.oci_cli_rover.rover_utils import read_json_file, read_json_string, dispatch_datasync_request
 
-ROVER_DATASYNC_TASK_DEF_API_BASE_PATH = "/20201030/taskDefinitions"
-DATA_STORE_TYPE = ["OCI", "RED"]
+RESOURCE_TYPE = "TASK_DEF"
+DATA_STORE_TYPE = ["OCI", "RED", "EDGE"]
 
 
 @click.command('task-definition', cls=CommandGroupWithAlias, help="""Data Sync TaskDefinition CRUD operations.""")
@@ -23,7 +23,8 @@ def parse_definition_input(**kwargs):
     data = {
         "name": kwargs.get("name"),
         "rateLimit": kwargs.get("rate_limit"),
-        "syncOnCreate": kwargs.get("sync_on_create")
+        "syncOnCreate": kwargs.get("sync_on_create"),
+        "compartmentId": kwargs.get("compartment_id")
     }
 
     src_datastore_type = None
@@ -104,17 +105,29 @@ def parse_definition_input(**kwargs):
                  or via a local file, file://path-to/schedule-json-file.""")
 @json_skeleton_utils.json_skeleton_generation_handler(
     input_params_to_complex_types={
-        'source': {'module': 'rover', 'class': 'DataStore'},
-        'destination': {'module': 'rover', 'class': 'DataStore'},
-        'schedule': {'module': 'rover', 'class': 'DataSyncSchedule'}}
+        'source': {'module': 'task_definition', 'class': 'DataStore'},
+        'destination': {'module': 'task_definition', 'class': 'DataStore'},
+        'schedule': {'module': 'task_definition', 'class': 'DataSyncSchedule'}}
 )
 @cli_util.option('--name', type=str, required=True, help=u"""Short description of the Task Definition""")
+@cli_util.option('--edge-type', type=str, required=False,
+                 help=u"""If provided, it sets the target path to either a Rover RED or PCA device. (red/pca)""")
+@cli_util.option('--compartment-id', type=str, required=False, help=u"""CompartmentId for Converged Data Sync Task""")
 @cli_util.option('--rate-limit', type=str, required=False,
                  help=u"""If provided, it sets the data transfer rate limit for this task. Allowed values
                  are 50M, 100M, 250M, 500M, 1G, 2G, or 5G. Default to unlimited if not provided.""")
 @cli_util.option('--sync-on-create', type=bool, required=False,
                  help=u"""If present, the task will started right after its creation regardless if it's a scheduled task or not.""")
-@json_skeleton_utils.get_cli_json_input_option({})
+@click.option('--generate-full-command-json-input', is_flag=True, is_eager=True, expose_value=True,
+              callback=json_skeleton_utils.generate_json_skeleton_click_callback,
+              help="""Provide input to this command as a JSON document from a file using the file://path-to/file syntax.
+
+        The --generate-full-command-json-input option can be used to generate a sample json file to be used with this command option. The key names are pre-populated and match the command option names (converted to camelCase format, e.g. compartment-id --> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+
+        Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+
+        For examples on usage of this option, please see our "using CLI with advanced JSON options" link: https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions""")
+@json_skeleton_utils.json_skeleton_generation_handler()
 @cli_util.wrap_exceptions
 @cli_util.help_option
 def create_task_definition(ctx, **kwargs):
@@ -122,10 +135,12 @@ def create_task_definition(ctx, **kwargs):
     ctx.obj['config'] = config
 
     data = parse_definition_input(**kwargs)
+    edge_type = "red" if kwargs.get("edge_type") is None else kwargs.get("edge_type")
 
     # make API call
     dispatch_datasync_request(ctx,
-                              ROVER_DATASYNC_TASK_DEF_API_BASE_PATH,
+                              RESOURCE_TYPE,
+                              edge_type=edge_type,
                               http_method="POST",
                               data=data
                               )
@@ -133,8 +148,10 @@ def create_task_definition(ctx, **kwargs):
 
 @rover_datasync_task_definition_group.command(name="update", help=u"""Update TaskDefinition""")
 @click.pass_context
-@cli_util.option('--id', type=str, required=True,
+@cli_util.option('--task-definition-id', type=str, required=True,
                  help=u"""The ocid of the Task Definition to be updated.""")
+@cli_util.option('--edge-type', type=str, required=False,
+                 help=u"""If provided, it sets the target path to either a Rover RED or PCA device. (red/pca)""")
 @cli_util.option('--name', type=str, required=False, help=u"""Short description of the Task Definition""")
 @cli_util.option('--source', type=custom_types.CLI_COMPLEX_TYPE, required=False,
                  help=u"""Provide the details about the source datastore in JSON structure either in-line or
@@ -148,13 +165,21 @@ def create_task_definition(ctx, **kwargs):
 @cli_util.option('--rate-limit', type=str, required=False,
                  help=u"""If provided, it sets the data transfer rate limit for this task. Allowed values
                  are 50M, 100M, 250M, 500M, 1G, 2G, or 5G. Default to unlimited if not provided.""")
+@click.option('--generate-full-command-json-input', is_flag=True, is_eager=True, expose_value=True,
+              callback=json_skeleton_utils.generate_json_skeleton_click_callback,
+              help="""Provide input to this command as a JSON document from a file using the file://path-to/file syntax.
+
+        The --generate-full-command-json-input option can be used to generate a sample json file to be used with this command option. The key names are pre-populated and match the command option names (converted to camelCase format, e.g. compartment-id --> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+
+        Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+
+        For examples on usage of this option, please see our "using CLI with advanced JSON options" link: https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions""")
 @json_skeleton_utils.json_skeleton_generation_handler(
     input_params_to_complex_types={
-        'source': {'module': 'rover', 'class': 'DataStore'},
-        'destination': {'module': 'rover', 'class': 'DataStore'},
-        'schedule': {'module': 'rover', 'class': 'DataSyncSchedule'}}
+        'source': {'module': 'task_definition', 'class': 'DataStore'},
+        'destination': {'module': 'task_definition', 'class': 'DataStore'},
+        'schedule': {'module': 'task_definition', 'class': 'DataSyncSchedule'}}
 )
-@json_skeleton_utils.get_cli_json_input_option({})
 @cli_util.wrap_exceptions
 @cli_util.help_option
 def update_task_definition(ctx, **kwargs):
@@ -162,36 +187,54 @@ def update_task_definition(ctx, **kwargs):
     ctx.obj['config'] = config
 
     data = parse_definition_input(**kwargs)
+    edge_type = "red" if kwargs.get("edge_type") is None else kwargs.get("edge_type")
 
     # make API call
     dispatch_datasync_request(ctx,
-                              ROVER_DATASYNC_TASK_DEF_API_BASE_PATH,
-                              additional_url_path=kwargs.get("id"),
+                              RESOURCE_TYPE,
+                              edge_type=edge_type,
+                              additional_url_path=kwargs.get("task_definition_id"),
                               http_method="PUT",
                               data=data
                               )
 
 
 @rover_datasync_task_definition_group.command(name="get", help=u"""Get TaskDefinition""")
-@cli_util.option('--id', type=str, required=True,
-                 help=u"""Get the Task Definition specified by its ocid.""")
-@json_skeleton_utils.get_cli_json_input_option({})
-@cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@json_skeleton_utils.json_skeleton_generation_handler()
+@cli_util.option('--task-definition-id', type=str, required=True,
+                 help=u"""Get the Task Definition specified by its ocid.""")
+@cli_util.option('--edge-type', type=str, required=False,
+                 help=u"""If provided, it sets the target path to either a Rover RED or PCA device. (red/pca)""")
+@click.option('--generate-full-command-json-input', is_flag=True, is_eager=True, expose_value=True,
+              callback=json_skeleton_utils.generate_json_skeleton_click_callback,
+              help="""Provide input to this command as a JSON document from a file using the file://path-to/file syntax.
+
+        The --generate-full-command-json-input option can be used to generate a sample json file to be used with this command option. The key names are pre-populated and match the command option names (converted to camelCase format, e.g. compartment-id --> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+
+        Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+
+        For examples on usage of this option, please see our "using CLI with advanced JSON options" link: https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions""")
+@json_skeleton_utils.json_skeleton_generation_handler()
 @cli_util.wrap_exceptions
+@cli_util.help_option
 def get_task_definition(ctx, **kwargs):
     config = oci.config.from_file(file_location=ctx.obj['config_file'], profile_name=ctx.obj['profile'])
     ctx.obj['config'] = config
 
+    edge_type = "red" if kwargs.get("edge_type") is None else kwargs.get("edge_type")
+
     dispatch_datasync_request(ctx,
-                              ROVER_DATASYNC_TASK_DEF_API_BASE_PATH,
-                              additional_url_path=kwargs.get("id"),
+                              RESOURCE_TYPE,
+                              edge_type=edge_type,
+                              additional_url_path=kwargs.get("task_definition_id"),
                               http_method="GET",
                               )
 
 
 @rover_datasync_task_definition_group.command(name="list", help=u"""List TaskDefinitions""")
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler()
 @cli_util.option('--limit', type=int, required=False,
                  help=u"""Specify the number of task definitions to be retrieved. Default to 10 if not provided.""")
 @cli_util.option('--page', type=str, required=False,
@@ -201,11 +244,21 @@ def get_task_definition(ctx, **kwargs):
                  help=u"""One of the supported sort-by columns: name | timeCreated | sourceDataStore | sourceBucket | destinationBucket.""")
 @cli_util.option('--sort-order', type=str, required=False,
                  help=u"""Specifies how the returned list is sorted, ASC | DESC. The default sort is ASC and it's always on creation time.""")
-@json_skeleton_utils.get_cli_json_input_option({})
-@cli_util.help_option
-@click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.option('--compartment-id', type=str, required=False, help=u"""CompartmentId for Data Sync Task""")
+@cli_util.option('--edge-type', type=str, required=False,
+                 help=u"""If provided, it sets the target path to either a Rover RED or PCA device. (red/pca)""")
+@click.option('--generate-full-command-json-input', is_flag=True, is_eager=True, expose_value=True,
+              callback=json_skeleton_utils.generate_json_skeleton_click_callback,
+              help="""Provide input to this command as a JSON document from a file using the file://path-to/file syntax.
+
+        The --generate-full-command-json-input option can be used to generate a sample json file to be used with this command option. The key names are pre-populated and match the command option names (converted to camelCase format, e.g. compartment-id --> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+
+        Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+
+        For examples on usage of this option, please see our "using CLI with advanced JSON options" link: https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions""")
+@json_skeleton_utils.json_skeleton_generation_handler()
 @cli_util.wrap_exceptions
+@cli_util.help_option
 def list_task_definitions(ctx, **kwargs):
     config = oci.config.from_file(file_location=ctx.obj['config_file'], profile_name=ctx.obj['profile'])
     ctx.obj['config'] = config
@@ -228,10 +281,15 @@ def list_task_definitions(ctx, **kwargs):
     if sort_order and sort_order.upper() == 'DESC':
         reverse = True
 
-    # get all 10 items
+    params = {"compartmentId": kwargs.get("compartment_id")}
+    edge_type = "red" if kwargs.get("edge_type") is None else kwargs.get("edge_type")
+
+    # make API call
     all_items = dispatch_datasync_request(ctx,
-                                          ROVER_DATASYNC_TASK_DEF_API_BASE_PATH,
+                                          RESOURCE_TYPE,
+                                          edge_type=edge_type,
                                           http_method="GET",
+                                          params=params,
                                           print_response=False
                                           )
 
@@ -279,19 +337,104 @@ def list_task_definitions(ctx, **kwargs):
 
 
 @rover_datasync_task_definition_group.command(name="delete", help=u"""Delete TaskDefinition""")
-@cli_util.option('--id', type=str, required=True,
-                 help=u"""Delete the Task Definition specified by its ocid.""")
-@json_skeleton_utils.get_cli_json_input_option({})
-@cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.option('--task-definition-id', type=str, required=True,
+                 help=u"""Get the Task Definition specified by its ocid.""")
+@cli_util.option('--edge-type', type=str, required=False,
+                 help=u"""If provided, it sets the target path to either a Rover RED or PCA device. (red/pca)]""")
+@click.option('--generate-full-command-json-input', is_flag=True, is_eager=True, expose_value=True,
+              callback=json_skeleton_utils.generate_json_skeleton_click_callback,
+              help="""Provide input to this command as a JSON document from a file using the file://path-to/file syntax.
+
+        The --generate-full-command-json-input option can be used to generate a sample json file to be used with this command option. The key names are pre-populated and match the command option names (converted to camelCase format, e.g. compartment-id --> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+
+        Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+
+        For examples on usage of this option, please see our "using CLI with advanced JSON options" link: https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions""")
+@json_skeleton_utils.json_skeleton_generation_handler()
 @cli_util.wrap_exceptions
+@cli_util.help_option
 def delete_task_definition(ctx, **kwargs):
     config = oci.config.from_file(file_location=ctx.obj['config_file'], profile_name=ctx.obj['profile'])
     ctx.obj['config'] = config
 
+    edge_type = "red" if kwargs.get("edge_type") is None else kwargs.get("edge_type")
+
     dispatch_datasync_request(ctx,
-                              ROVER_DATASYNC_TASK_DEF_API_BASE_PATH,
-                              additional_url_path=kwargs.get("id"),
+                              RESOURCE_TYPE,
+                              edge_type=edge_type,
+                              additional_url_path=kwargs.get("task_definition_id"),
                               http_method="DELETE",
+                              )
+
+
+@rover_datasync_task_definition_group.command(name="change-state", help=u"""Change TaskDefinition State""")
+@click.pass_context
+@cli_util.option('--is-enabled', type=bool, required=True, help=u"""Set whether task definition enablement to true or false.""")
+@cli_util.option('--task-definition-id', type=str, required=True,
+                 help=u"""Change the Task Definition specified by its ocid.""")
+@cli_util.option('--edge-type', type=str, required=False,
+                 help=u"""If provided, it sets the target path to either a Rover RED or PCA device. (red/pca)""")
+@click.option('--generate-full-command-json-input', is_flag=True, is_eager=True, expose_value=True,
+              callback=json_skeleton_utils.generate_json_skeleton_click_callback,
+              help="""Provide input to this command as a JSON document from a file using the file://path-to/file syntax.
+
+        The --generate-full-command-json-input option can be used to generate a sample json file to be used with this command option. The key names are pre-populated and match the command option names (converted to camelCase format, e.g. compartment-id --> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+
+        Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+
+        For examples on usage of this option, please see our "using CLI with advanced JSON options" link: https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions""")
+@json_skeleton_utils.json_skeleton_generation_handler()
+@cli_util.wrap_exceptions
+@cli_util.help_option
+def change_state_task_definition(ctx, **kwargs):
+    config = oci.config.from_file(file_location=ctx.obj['config_file'], profile_name=ctx.obj['profile'])
+    ctx.obj['config'] = config
+
+    data = {"isEnabled": kwargs.get("is_enabled")}
+    edge_type = "red" if kwargs.get("edge_type") is None else kwargs.get("edge_type")
+
+    # make API call
+    dispatch_datasync_request(ctx,
+                              RESOURCE_TYPE,
+                              edge_type=edge_type,
+                              additional_url_path=kwargs.get("task_definition_id") + "/actions/changeState",
+                              http_method="POST",
+                              data=data
+                              )
+
+
+@rover_datasync_task_definition_group.command(name="change-compartment", help=u"""Change TaskDefinition CompartmentId""")
+@click.pass_context
+@cli_util.option('--compartment-id', type=str, required=True, help=u"""CompartmentId for Converged Data Sync Task""")
+@cli_util.option('--task-definition-id', type=str, required=True,
+                 help=u"""Change the Task Definition specified by its ocid.""")
+@cli_util.option('--edge-type', type=str, required=False,
+                 help=u"""If provided, it sets the target path to either a Rover RED or PCA device. (red/pca)""")
+@click.option('--generate-full-command-json-input', is_flag=True, is_eager=True, expose_value=True,
+              callback=json_skeleton_utils.generate_json_skeleton_click_callback,
+              help="""Provide input to this command as a JSON document from a file using the file://path-to/file syntax.
+
+        The --generate-full-command-json-input option can be used to generate a sample json file to be used with this command option. The key names are pre-populated and match the command option names (converted to camelCase format, e.g. compartment-id --> compartmentId), while the values of the keys need to be populated by the user before using the sample file as an input to this command. For any command option that accepts multiple values, the value of the key can be a JSON array.
+
+        Options can still be provided on the command line. If an option exists in both the JSON document and the command line then the command line specified value will be used.
+
+        For examples on usage of this option, please see our "using CLI with advanced JSON options" link: https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/cliusing.htm#AdvancedJSONOptions""")
+@json_skeleton_utils.json_skeleton_generation_handler()
+@cli_util.wrap_exceptions
+@cli_util.help_option
+def change_compartmentId_task_definition(ctx, **kwargs):
+    config = oci.config.from_file(file_location=ctx.obj['config_file'], profile_name=ctx.obj['profile'])
+    ctx.obj['config'] = config
+
+    data = {"compartmentId": kwargs.get("compartment_id")}
+    edge_type = "red" if kwargs.get("edge_type") is None else kwargs.get("edge_type")
+
+    # make API call
+    dispatch_datasync_request(ctx,
+                              RESOURCE_TYPE,
+                              edge_type=edge_type,
+                              additional_url_path=kwargs.get("task_definition_id") + "/actions/changeCompartment",
+                              http_method="POST",
+                              data=data
                               )
