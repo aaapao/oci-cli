@@ -2,6 +2,7 @@
 # Copyright (c) 2016, 2021, Oracle and/or its affiliates.  All rights reserved.
 # This software is dual-licensed to you under the Universal Permissive License (UPL) 1.0 as shown at https://oss.oracle.com/licenses/upl or Apache License 2.0 as shown at http://www.apache.org/licenses/LICENSE-2.0. You may choose either license.
 import json
+import os
 import random
 import re
 import string
@@ -10,13 +11,12 @@ import sys
 import time
 import click
 import six
-import os
 
 import oci
-from oci_cli import cli_util
-from oci.retry import DEFAULT_RETRY_STRATEGY, RetryStrategyBuilder
 from oci.object_storage import UploadManager, MultipartObjectAssembler
 from oci.util import Sentinel
+from oci_cli import cli_util
+from oci.retry import DEFAULT_RETRY_STRATEGY, RetryStrategyBuilder
 
 from services.object_storage.src.oci_cli_object_storage.object_storage_transfer_manager.wrapped_semaphore import \
     WrappedSemaphore
@@ -40,6 +40,11 @@ from pathlib import Path
 
 missing = Sentinel("Missing")
 
+ROVER_TASK_DEF = "/20201030/taskDefinitions"
+CONVERGED_TASK_DEF = "/20250305/dataSyncTaskDefinitions"
+ROVER_TASK = "/20201030/dataSyncTask"
+CONVERGED_TASK = "/20250305/dataSyncTasks"
+
 
 class RoverDiagAPI:
     def __init__(self, data=None, headers=None):
@@ -48,7 +53,6 @@ class RoverDiagAPI:
 
 
 def get_compute_image_helper(ctx, image_id):
-
     if isinstance(image_id, six.string_types) and len(image_id.strip()) == 0:
         raise click.UsageError('Parameter --image-id cannot be whitespace or empty string')
     ctx_endpoint = ctx.obj['endpoint']
@@ -581,8 +585,7 @@ def get_service_endpoint(ctx, endpoint_param_name):
     if ctx.obj['endpoint']:
         endpoint = ctx.obj['endpoint']
     if endpoint is None:
-        raise click.UsageError(
-            f'Error: Missing option --endpoint.\nINFO: set {endpoint_param_name} in oci_cli_rc file or add command line option --endpoint')
+        raise click.UsageError(f'Rover Service Endpoint Missing\nINFO: set {endpoint_param_name} in oci_cli_rc file or add command line option --endpoint')
     return endpoint
 
 
@@ -709,8 +712,7 @@ def monitor_bundle_state(requests_session, wait, url, params=None, debug=False):
 def dispatch_diag_request(ctx, additional_url_path="", params=None, basic_auth=False,
                           http_method=None, data=None, stream=False,
                           stream_file_location=None, wait=None):
-    url = get_service_endpoint(ctx,
-                               'diagnostics.endpoint') + ROVER_DIAGNOSTIC_BUNDLE_API_BASE_PATH + "/" + additional_url_path
+    url = get_service_endpoint(ctx, 'diagnostics.endpoint') + ROVER_DIAGNOSTIC_BUNDLE_API_BASE_PATH + "/" + additional_url_path
 
     with cli_util.build_raw_requests_session(ctx) as requests_session:
         # if basic_auth is needed we need to obtain the user/pass information from file
@@ -743,8 +745,7 @@ def dispatch_diag_request(ctx, additional_url_path="", params=None, basic_auth=F
                     else:
                         bundle_id = dict_from_response_body["id"]
 
-                    monitor_url = get_service_endpoint(ctx,
-                                                       'diagnostics.endpoint') + ROVER_DIAGNOSTIC_BUNDLE_API_BASE_PATH + "/" + bundle_id + "/actions/viewSummary"
+                    monitor_url = get_service_endpoint(ctx, 'diagnostics.endpoint') + ROVER_DIAGNOSTIC_BUNDLE_API_BASE_PATH + "/" + bundle_id + "/actions/viewSummary"
 
                     click.echo(cli_util.pretty_print_format(monitor_bundle_state(requests_session,
                                                                                  wait,
@@ -763,8 +764,27 @@ def dispatch_diag_request(ctx, additional_url_path="", params=None, basic_auth=F
             save_stream(response, stream_file_location)
 
 
-def dispatch_datasync_request(ctx, base_path, additional_url_path="", params=None, http_method=None, data=None,
+def construct_base_path(edge_type, resource_type):
+
+    if edge_type == "pca":
+        if resource_type == "TASK_DEF":
+            return CONVERGED_TASK_DEF
+        if resource_type == "TASK":
+            return CONVERGED_TASK
+    elif edge_type == "red":
+        if resource_type == "TASK_DEF":
+            return ROVER_TASK_DEF
+        if resource_type == "TASK":
+            return ROVER_TASK
+    else:
+        raise ValueError(f"Invalid param edge_type: {edge_type}")
+
+
+def dispatch_datasync_request(ctx, resource_type="", edge_type="", additional_url_path="", params=None, http_method=None, data=None,
                               print_response=True):
+
+    base_path = construct_base_path(edge_type.lower(), resource_type)
+
     url = get_service_endpoint(ctx, 'data-sync.endpoint') + base_path + "/" + additional_url_path
 
     with cli_util.build_raw_requests_session(ctx) as requests_session:
@@ -774,23 +794,22 @@ def dispatch_datasync_request(ctx, base_path, additional_url_path="", params=Non
         response = _make_rover_service_api_call(requests_session, http_method, url, params,
                                                 data, False, ctx.obj["debug"])
 
-        result_dict = {}
-        if response is not None:
-            result_dict['status'] = '{} {}'.format(response.status_code, response.reason)
-            result_dict['headers'] = {key: value for (key, value) in response.headers.items()}
+        result_dict = {
+            'status': '{} {}'.format(response.status_code, response.reason),
+            'headers': {key: value for (key, value) in response.headers.items()}
+        }
 
-            try:
-                dict_from_response_body = response.json()
-                result_dict['data'] = dict_from_response_body
-            except ValueError:
-                # We may not have gotten valid JSON. In that case, do our best and just display something
-                result_dict['data'] = response.text
+        try:
+            dict_from_response_body = response.json()
+            result_dict['data'] = dict_from_response_body
+        except ValueError:
+            # We may not have gotten valid JSON. In that case, do our best and just display something
+            result_dict['data'] = response.text
 
-            if print_response:
-                cli_util.render_response(RoverDiagAPI(data=result_dict["data"], headers=result_dict["headers"]), ctx)
+        if print_response:
+            cli_util.render_response(RoverDiagAPI(data=result_dict["data"], headers=result_dict["headers"]), ctx)
 
-            return result_dict["data"]
-        return None
+    return result_dict["data"]
 
 
 def read_json_file(filepath):

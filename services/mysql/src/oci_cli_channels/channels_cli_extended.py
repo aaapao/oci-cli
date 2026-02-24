@@ -13,8 +13,12 @@ import json
 # rename  oci mysql channel create-channel-create-channel-source-from-mysql-details -> oci mysql channel create-from-mysql
 cli_util.rename_command(channels_cli, channels_cli.channel_group, channels_cli.create_channel_create_channel_source_from_mysql_details, "create-from-mysql")
 
+# oci mysql channel channel-status -> oci mysql channel status
+cli_util.rename_command(channels_cli, channels_cli.channels_root_group, channels_cli.channel_status_group, "status")
 
 # flatten the single --target parameter into multiple individual --target* params
+
+
 @cli_util.copy_params_from_generated_command(channels_cli.create_channel_create_channel_source_from_mysql_details, params_to_exclude=['target'])
 @channels_cli.channel_group.command(name='create-from-mysql', help=channels_cli.create_channel_create_channel_source_from_mysql_details.help)
 @cli_util.option('--target-db-system-id', required=True, help=copy_help_from_generated_code(channels_cli.create_channel_create_channel_target_from_db_system_details, "target_db_system_id", remove_required=False))
@@ -130,3 +134,6 @@ channels_cli.channel_group.commands.pop(channels_cli.update_channel_update_chann
 # oci mysql channels channel -> oci mysql channel
 mysql_service_cli.mysql_service_group.commands.pop(channels_cli.channels_root_group.name)
 mysql_service_cli.mysql_service_group.add_command(channels_cli.channel_group)
+
+# add "oci mysql channels status" commands
+channels_cli.channel_group.add_command(channels_cli.channel_status_group)

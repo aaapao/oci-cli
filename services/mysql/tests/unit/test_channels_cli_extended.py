@@ -120,3 +120,20 @@ class TestChannelsCliExtend(unittest.TestCase):
         # test defined-tags warning with --force
         result = util.invoke_command(['mysql', 'channel', 'update-from-mysql', '--channel-id', 'dummy', '--defined-tags', 'dummy', '--force'])
         assert 'WARNING: Updates to freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue? [y/N]' not in result.output
+
+    def test_channel_status(self):
+        result = util.invoke_command(['mysql', 'channel', 'channel-status', 'generate',
+                                      '--channel-id', 'dummy'
+                                      ])
+        assert 'No such command' in result.output
+
+        result = util.invoke_command(['mysql', 'channel', 'status', 'generate'])
+        assert 'Error: Missing option(s) --channel-id.' in result.output
+
+        result = util.invoke_command(['mysql', 'channel', 'channel-status', 'get',
+                                      '--channel-id', 'dummy'
+                                      ])
+        assert 'No such command' in result.output
+
+        result = util.invoke_command(['mysql', 'channel', 'status', 'get'])
+        assert 'Error: Missing option(s) --channel-id.' in result.output
