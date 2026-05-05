@@ -6,7 +6,189 @@ All notable changes to this project will be documented in this file.
 
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`__.
 
-3.79.0 - 2026-04-09
+3.81.1 - 2026-05-05
+-------------------
+Added
+~~~~~
+* Support for large generic v4 and v5 unit shapes in the Generative AI service in Python SDK
+
+
+
+3.81.0 - 2026-04-28
+-------------------
+Added
+~~~~~
+* Support for new optional parameter ``--embed-contents`` in the Generative AI Inference service
+
+  * ``oci generative-ai-inference embed-text-result embed-text --embed-contents``
+
+* Redis service
+
+  * Support for OCI Cache Backup operations in the Redis service
+
+    * ``oci redis oci-cache-backup oci-cache-backup``
+    * ``oci redis oci-cache-backup oci-cache-backup-summary``
+
+  * Support for new optional parameters ``--backup-id`` and ``--import-from-object-storage-details``
+
+    * ``oci redis redis-cluster redis-cluster create --backup-id --import-from-object-storage-details``
+
+* Support for new optional parameter ``--migration-scope`` in the Database Migration service
+
+  * ``oci database-migration assessment create-assessment-create-my-sql-assessment-details --migration-scope``
+  * ``oci database-migration assessment create-assessment-create-oracle-assessment-details --migration-scope``
+  * ``oci database-migration assessment update-assessment-update-my-sql-assessment-details --migration-scope``
+  * ``oci database-migration assessment update-assessment-update-oracle-assessment-details --migration-scope``
+
+* Batch service
+
+  * Support for new optional parameters for improved failure and logging visibility (container creation and failure details)
+
+    * ``oci batch batch-context create-oci-logging-configuration --is-job-task-events-propagation-enabled``
+    * ``oci batch batch-context update --logging-configuration``
+
+  * Support for updating logging configuration
+
+    * ``oci batch batch-context update-oci-logging-configuration``
+
+  * Support for new optional parameters for group tasks (hierarchical task groupings with scoped dependencies)
+
+    * ``oci batch batch-task list --group-task-name, --hierarchy-view, --task-id, --type``
+    * ``oci batch batch-task list-batch-tasks --task-id``
+
+  * Support for new optional parameters for different shape types
+
+    * ``oci batch batch-context-shape-collection list --shape-type``
+    * ``oci batch batch-task-profile create --extended-information, --min-disk-size-in-gbs``
+
+  * Support for creating a batch task profile based on CPU architecture, CPU and GPU shape
+
+    * ``oci batch batch-task-profile create-cpu-architecture``
+    * ``oci batch batch-task-profile create-cpu-shape``
+    * ``oci batch batch-task-profile create-gpu-shape``
+
+* Key Management service
+
+  * Support for new optional parameter ``--audit-log-config``
+
+    * ``oci kms kms-hsm-cluster hsm-cluster create --audit-log-config``
+
+  * Support for Activity Logs in Dedicated KMS
+
+    * ``oci kms kms-hsm-cluster hsm-cluster disable-audit-mgmt-logging``
+    * ``oci kms kms-hsm-cluster hsm-cluster enable-audit-mgmt-logging``
+    * ``oci kms kms-hsm-cluster hsm-cluster initiate-audit-logging``
+    * ``oci kms kms-hsm-cluster hsm-cluster update-audit-logging-destination``
+
+* Support for vanity domain in the Fusion Applications service
+
+  * ``oci fusion-apps vanity-domain``
+  * ``oci fusion-apps vanity-domain-activity``
+
+* Java Management service
+
+  * Support for IPv6 dual stack endpoint in Java Downloads, Utils and Fleet
+
+    * ``oci jms --enable-dual-stack``
+    * ``oci jms-java-downloads --enable-dual-stack``
+    * ``oci jms-utils --enable-dual-stack``
+
+  * Support for new optional parameter ``--jre-security-status`` for listing Java installation usage summaries with JRE security status filter
+
+    * ``oci jms installation-usage summarize --jre-security-status``
+
+* Support for new optional parameter ``--is-inheritance-after-delete-enabled`` in the Cloud Guard service
+
+  * ``oci cloud-guard security-zone update --is-inheritance-after-delete-enabled``
+
+Changed
+~~~~~~~
+* ``--inputs`` is now an optional parameter in the Generative AI Inference service
+
+  * ``oci generative-ai-inference embed-text-result embed-text --inputs``
+
+* [BREAKING] Removed optional parameters ``--defined-tags`` and ``--freeform-tags`` from the Redis service
+
+  * ``oci redis redis-identity create-identity-token-details create-identity-token``
+
+* ``--min-memory-in-gbs`` and ``--min-ocpus`` are now optional parameters in the Batch service
+
+  * ``oci batch batch-task-profile create --min-memory-in-gbs --min-ocpus``
+
+
+
+3.80.0 - 2026-04-21
+-------------------
+Added
+~~~~~
+* Database service
+
+    * Support for ASM Diskgroup Resize for CloudVmCluster in the Exadata Database Service on Dedicated Infrastructure
+
+      * ``oci db cloud-vm-cluster create --reco-storage-percentage --sparse-storage-percentage``
+      * ``oci db cloud-vm-cluster update --data-storage-percentage --is-local-backup-enabled --is-sparse-diskgroup-enabled --reco-storage-percentage --sparse-storage-percentage``
+
+    * Support for ASM Diskgroup Resize for VmCluster in the Exadata Database Service on Cloud@Customer
+
+      * ``oci db vm-cluster create --data-storage-percentage --reco-storage-percentage --sparse-storage-percentage``
+      * ``oci db vm-cluster update --data-storage-percentage --is-local-backup-enabled --is-sparse-diskgroup-enabled --reco-storage-percentage --sparse-storage-percentage``
+
+  * Fusion Applications service
+
+    * Support for Email Subdomain, Marketing Brand, and Microsite commands
+
+      * ``oci fusion-apps email-subdomain``
+      * ``oci fusion-apps marketing-brand``
+      * ``oci fusion-apps microsite``
+
+  * GoldenGate service
+
+    * Support for new technology types
+
+      * ``oci goldengate connection create-kafka-connection --technology-type MICROSOFT_FABRIC_EVENTSTREAM``
+      * ``oci goldengate connection create-postgresql-connection --technology-type EDB_POSTGRES_ADVANCED_SERVER``
+      * ``oci goldengate connection create-postgresql-connection --technology-type YUGABYTE_DB``
+
+    * Support for new optional endpoint parameter for Google BigQuery connections
+
+      * ``oci goldengate connection create-google-big-query-connection --endpoint-parameterconflict``
+      * ``oci goldengate connection update-google-big-query-connection --endpoint-parameterconflict``
+
+    * Support for new optional endpoint parameter for Google Cloud Storage connections
+
+      * ``oci goldengate connection create-google-cloud-storage-connection --endpoint-parameterconflict``
+      * ``oci goldengate connection update-google-cloud-storage-connection --endpoint-parameterconflict``
+
+    * Support for migrating Connection Secret details
+      * ``oci goldengate connection migrate``
+      * ``oci goldengate connection migrate-connection-secret-migrate-connection-details``
+
+  * Functions service
+
+    * Support for Application logging configuration
+
+      * ``oci fn application create --logging``
+      * ``oci fn application update --logging``
+
+  * Usage service
+
+    * Support for ``USAGE_ONLY`` queryType
+
+      * ``oci usage-api usage-summary request-summarized-usages --query-type USAGE_ONLY``
+
+  * Compute GPU Memory Cluster service
+
+    * Support for Reserved Private IP Ids
+
+      * ``oci compute compute-gpu-memory-cluster create --private-ip-ids``
+      * ``oci compute compute-gpu-memory-cluster update --private-ip-ids``
+
+Changed
+~~~~~~~
+  - [BREAKING] GoldenGate service: --private-ip is no longer supported for connection creation commands
+
+
+3.79.0 - 2026-04-14
 -------------------
 Added
 ~~~~~

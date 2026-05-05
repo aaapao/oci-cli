@@ -22,7 +22,7 @@ def fusion_apps_root_group():
     pass
 
 
-@click.command(cli_util.override('fusion_apps.fusion_environment_family_group.command_name', 'fusion-environment-family'), cls=CommandGroupWithAlias, help="""Details of a Fusion environment family. An environment family is a logical grouping of environments. The environment family defines a set of characteristics that are shared across the environments to allow consistent management and maintenance across your production, test, and development environments. For more information, see [Planning an Environment Family].""")
+@click.command(cli_util.override('fusion_apps.fusion_environment_family_group.command_name', 'fusion-environment-family'), cls=CommandGroupWithAlias, help="""Details of a Fusion environment family. An environment family is a logical grouping of environments. The environment family defines a set of characteristics that are shared across the environments to allow consistent management and maintenance across your production, test, development, and demo environments. For more information, see [Planning an Environment Family].""")
 @cli_util.help_option_group
 def fusion_environment_family_group():
     pass
@@ -37,6 +37,18 @@ def refresh_activity_group():
 @click.command(cli_util.override('fusion_apps.update_refresh_activity_details_group.command_name', 'update-refresh-activity-details'), cls=CommandGroupWithAlias, help="""The information about scheduled refresh.""")
 @cli_util.help_option_group
 def update_refresh_activity_details_group():
+    pass
+
+
+@click.command(cli_util.override('fusion_apps.vanity_domain_activity_group.command_name', 'vanity-domain-activity'), cls=CommandGroupWithAlias, help="""Vanity Domain Activity resource""")
+@cli_util.help_option_group
+def vanity_domain_activity_group():
+    pass
+
+
+@click.command(cli_util.override('fusion_apps.microsite_group.command_name', 'microsite'), cls=CommandGroupWithAlias, help="""microsite details for a marketing brand""")
+@cli_util.help_option_group
+def microsite_group():
     pass
 
 
@@ -70,6 +82,18 @@ def data_masking_activity_group():
     pass
 
 
+@click.command(cli_util.override('fusion_apps.marketing_brand_group.command_name', 'marketing-brand'), cls=CommandGroupWithAlias, help="""marketing brand details for fusion environment""")
+@cli_util.help_option_group
+def marketing_brand_group():
+    pass
+
+
+@click.command(cli_util.override('fusion_apps.vanity_domain_group.command_name', 'vanity-domain'), cls=CommandGroupWithAlias, help="""Vanity Domain resource""")
+@cli_util.help_option_group
+def vanity_domain_group():
+    pass
+
+
 @click.command(cli_util.override('fusion_apps.work_request_error_group.command_name', 'work-request-error'), cls=CommandGroupWithAlias, help="""An error encountered while executing a work request.""")
 @cli_util.help_option_group
 def work_request_error_group():
@@ -100,6 +124,12 @@ def fusion_environment_family_limits_and_usage_group():
     pass
 
 
+@click.command(cli_util.override('fusion_apps.email_subdomain_group.command_name', 'email-subdomain'), cls=CommandGroupWithAlias, help="""email subdomain details for a marketing brand""")
+@cli_util.help_option_group
+def email_subdomain_group():
+    pass
+
+
 @click.command(cli_util.override('fusion_apps.scheduled_activity_group.command_name', 'scheduled-activity'), cls=CommandGroupWithAlias, help="""Details of scheduled activity.""")
 @cli_util.help_option_group
 def scheduled_activity_group():
@@ -109,16 +139,21 @@ def scheduled_activity_group():
 fusion_apps_root_group.add_command(fusion_environment_family_group)
 fusion_apps_root_group.add_command(refresh_activity_group)
 fusion_apps_root_group.add_command(update_refresh_activity_details_group)
+fusion_apps_root_group.add_command(vanity_domain_activity_group)
+fusion_apps_root_group.add_command(microsite_group)
 fusion_apps_root_group.add_command(work_request_log_entry_group)
 fusion_apps_root_group.add_command(work_request_group)
 fusion_apps_root_group.add_command(create_refresh_activity_details_group)
 fusion_apps_root_group.add_command(fusion_environment_group)
 fusion_apps_root_group.add_command(data_masking_activity_group)
+fusion_apps_root_group.add_command(marketing_brand_group)
+fusion_apps_root_group.add_command(vanity_domain_group)
 fusion_apps_root_group.add_command(work_request_error_group)
 fusion_apps_root_group.add_command(service_attachment_group)
 fusion_apps_root_group.add_command(fusion_environment_status_group)
 fusion_apps_root_group.add_command(time_available_for_refresh_group)
 fusion_apps_root_group.add_command(fusion_environment_family_limits_and_usage_group)
+fusion_apps_root_group.add_command(email_subdomain_group)
 fusion_apps_root_group.add_command(scheduled_activity_group)
 
 
@@ -304,11 +339,82 @@ def create_data_masking_activity(ctx, from_json, wait_for_state, max_wait_second
     cli_util.render_response(result, ctx)
 
 
+@email_subdomain_group.command(name=cli_util.override('fusion_apps.create_email_subdomain.command_name', 'create'), help=u"""Creates an email Subdomain for a brand \n[Command Reference](createEmailSubdomain)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--marketing-brand-id', required=True, help=u"""unique brand identifier""")
+@cli_util.option('--name', required=True, help=u"""email subdomain name""")
+@cli_util.option('--dns-management', required=True, help=u"""dns management type for email subdomain""")
+@cli_util.option('--certificate-management', required=True, help=u"""certificate management type for email subdomain""")
+@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Simple key-value pair that is applied without any predefined name, type or scope. Exists for cross-compatibility only. Example: `{\"bar-key\": \"value\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. Example: `{\"foo-namespace\": {\"bar-key\": \"value\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACTIVE", "INACTIVE"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACTIVE --wait-for-state INACTIVE would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'freeform-tags': {'module': 'fusion_apps', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'fusion_apps', 'class': 'dict(str, dict(str, object))'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'freeform-tags': {'module': 'fusion_apps', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'fusion_apps', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'fusion_apps', 'class': 'EmailSubdomain'})
+@cli_util.wrap_exceptions
+def create_email_subdomain(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, fusion_environment_id, marketing_brand_id, name, dns_management, certificate_management, freeform_tags, defined_tags):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(marketing_brand_id, six.string_types) and len(marketing_brand_id.strip()) == 0:
+        raise click.UsageError('Parameter --marketing-brand-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['name'] = name
+    _details['dnsManagement'] = dns_management
+    _details['certificateManagement'] = certificate_management
+
+    if freeform_tags is not None:
+        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
+
+    if defined_tags is not None:
+        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.create_email_subdomain(
+        fusion_environment_id=fusion_environment_id,
+        marketing_brand_id=marketing_brand_id,
+        create_email_subdomain_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_email_subdomain') and callable(getattr(client, 'get_email_subdomain')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+
+                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_email_subdomain(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
 @fusion_environment_group.command(name=cli_util.override('fusion_apps.create_fusion_environment.command_name', 'create'), help=u"""Creates a new FusionEnvironment. \n[Command Reference](createFusionEnvironment)""")
 @cli_util.option('--display-name', required=True, help=u"""FusionEnvironment Identifier can be renamed.""")
 @cli_util.option('--compartment-id', required=True, help=u"""The unique identifier (OCID) of the compartment where the Fusion Environment is located.""")
 @cli_util.option('--fusion-environment-family-id', required=True, help=u"""The unique identifier (OCID) of the Fusion Environment Family that the Fusion Environment belongs to.""")
-@cli_util.option('--fusion-environment-type', required=True, help=u"""The type of environment. Valid values are Production, Test, or Development.""")
+@cli_util.option('--fusion-environment-type', required=True, help=u"""The type of environment. Valid values are Production, Test, Development, or Demo.""")
 @cli_util.option('--create-fusion-environment-admin-user-details', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--maintenance-policy', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--kms-key-id', help=u"""byok kms keyId""")
@@ -318,7 +424,7 @@ def create_data_masking_activity(ctx, from_json, wait_for_state, max_wait_second
 @cli_util.option('--rules', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Rules.
 
 This option is a JSON list with items of type Rule.  For documentation on Rule please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/fusionapplications/20211201/datatypes/Rule.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--additional-egress-rules', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Additional egress rules that should be applied to the environment. Some standard ports are open for general use; see [Securing Network Access to a Fusion Applications Environment][iaas/Content/fusion-applications/plan-environment.htm#internet-cache]. If access to a non-standard port is required, however, they can be listed here.
+@cli_util.option('--additional-egress-rules', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Additional egress rules that should be applied to the environment. Some standard ports are open for general use; see [Securing Network Access to a Fusion Applications Environment]. If access to a non-standard port is required, however, they can be listed here.
 
 This option is a JSON list with items of type AdditionalEgressRule.  For documentation on AdditionalEgressRule please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/fusionapplications/20211201/datatypes/AdditionalEgressRule.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Simple key-value pair that is applied without any predefined name, type or scope. Exists for cross-compatibility only. Example: `{\"bar-key\": \"value\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
@@ -538,6 +644,139 @@ def create_fusion_environment_family(ctx, from_json, wait_for_state, max_wait_se
     cli_util.render_response(result, ctx)
 
 
+@marketing_brand_group.command(name=cli_util.override('fusion_apps.create_marketing_brand.command_name', 'create'), help=u"""Creates a marketing brand for fusion environment \n[Command Reference](createMarketingBrand)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--name', required=True, help=u"""marketing brand name for fusion environment""")
+@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Simple key-value pair that is applied without any predefined name, type or scope. Exists for cross-compatibility only. Example: `{\"bar-key\": \"value\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. Example: `{\"foo-namespace\": {\"bar-key\": \"value\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACTIVE", "INACTIVE"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACTIVE --wait-for-state INACTIVE would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'freeform-tags': {'module': 'fusion_apps', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'fusion_apps', 'class': 'dict(str, dict(str, object))'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'freeform-tags': {'module': 'fusion_apps', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'fusion_apps', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'fusion_apps', 'class': 'MarketingBrand'})
+@cli_util.wrap_exceptions
+def create_marketing_brand(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, fusion_environment_id, name, freeform_tags, defined_tags):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['name'] = name
+
+    if freeform_tags is not None:
+        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
+
+    if defined_tags is not None:
+        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.create_marketing_brand(
+        fusion_environment_id=fusion_environment_id,
+        create_marketing_brand_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_marketing_brand') and callable(getattr(client, 'get_marketing_brand')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+
+                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_marketing_brand(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@microsite_group.command(name=cli_util.override('fusion_apps.create_microsite.command_name', 'create'), help=u"""Creates a microsite for brand \n[Command Reference](createMicrosite)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--marketing-brand-id', required=True, help=u"""unique brand identifier""")
+@cli_util.option('--name', required=True, help=u"""microsite name""")
+@cli_util.option('--dns-management', required=True, help=u"""dns management type for email subdomain""")
+@cli_util.option('--certificate-management', required=True, help=u"""certificate management type for email subdomain""")
+@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Simple key-value pair that is applied without any predefined name, type or scope. Exists for cross-compatibility only. Example: `{\"bar-key\": \"value\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. Example: `{\"foo-namespace\": {\"bar-key\": \"value\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACTIVE", "INACTIVE"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACTIVE --wait-for-state INACTIVE would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'freeform-tags': {'module': 'fusion_apps', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'fusion_apps', 'class': 'dict(str, dict(str, object))'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'freeform-tags': {'module': 'fusion_apps', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'fusion_apps', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'fusion_apps', 'class': 'Microsite'})
+@cli_util.wrap_exceptions
+def create_microsite(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, fusion_environment_id, marketing_brand_id, name, dns_management, certificate_management, freeform_tags, defined_tags):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(marketing_brand_id, six.string_types) and len(marketing_brand_id.strip()) == 0:
+        raise click.UsageError('Parameter --marketing-brand-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['name'] = name
+    _details['dnsManagement'] = dns_management
+    _details['certificateManagement'] = certificate_management
+
+    if freeform_tags is not None:
+        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
+
+    if defined_tags is not None:
+        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.create_microsite(
+        fusion_environment_id=fusion_environment_id,
+        marketing_brand_id=marketing_brand_id,
+        create_microsite_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_microsite') and callable(getattr(client, 'get_microsite')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+
+                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_microsite(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
 @create_refresh_activity_details_group.command(name=cli_util.override('fusion_apps.create_refresh_activity.command_name', 'create-refresh-activity'), help=u"""Creates a new RefreshActivity. \n[Command Reference](createRefreshActivity)""")
 @cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
 @cli_util.option('--source-fusion-environment-id', required=True, help=u"""The [OCID] of the source environment""")
@@ -653,6 +892,218 @@ def create_service_attachment(ctx, from_json, wait_for_state, max_wait_seconds, 
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
                 click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@vanity_domain_group.command(name=cli_util.override('fusion_apps.create_vanity_domain.command_name', 'create'), help=u"""Create a VanityDomain \n[Command Reference](createVanityDomain)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--origin-cert-request-type', type=custom_types.CliCaseInsensitiveChoice(["REQUEST_CSR", "REQUEST_DV"]), help=u"""The origin request type for which the certificate is generated""")
+@cli_util.option('--cdn-cert-request-type', type=custom_types.CliCaseInsensitiveChoice(["REQUEST_CSR", "REQUEST_DV"]), help=u"""The cdn request type for which the certificate is generated""")
+@cli_util.option('--vanity-domain', help=u"""Vanity domain""")
+@cli_util.option('--dns-managed-by', type=custom_types.CliCaseInsensitiveChoice(["ORACLE_MANAGED", "CUSTOMER_MANAGED"]), help=u"""The dns is managed by the customer or Oracle""")
+@cli_util.option('--prefix', help=u"""The prefix value of the DnsPrefix. Can't be changed after creation""")
+@cli_util.option('--certificate-info', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--change-management-link', help=u"""The cm link that was used to create the DNS prefix""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'certificate-info': {'module': 'fusion_apps', 'class': 'CertificateInfo'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'certificate-info': {'module': 'fusion_apps', 'class': 'CertificateInfo'}}, output_type={'module': 'fusion_apps', 'class': 'VanityDomain'})
+@cli_util.wrap_exceptions
+def create_vanity_domain(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, fusion_environment_id, origin_cert_request_type, cdn_cert_request_type, vanity_domain, dns_managed_by, prefix, certificate_info, change_management_link):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+
+    if origin_cert_request_type is not None:
+        _details['originCertRequestType'] = origin_cert_request_type
+
+    if cdn_cert_request_type is not None:
+        _details['cdnCertRequestType'] = cdn_cert_request_type
+
+    if vanity_domain is not None:
+        _details['vanityDomain'] = vanity_domain
+
+    if dns_managed_by is not None:
+        _details['dnsManagedBy'] = dns_managed_by
+
+    if prefix is not None:
+        _details['prefix'] = prefix
+
+    if certificate_info is not None:
+        _details['certificateInfo'] = cli_util.parse_json_parameter("certificate_info", certificate_info)
+
+    if change_management_link is not None:
+        _details['changeManagementLink'] = change_management_link
+
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.create_vanity_domain(
+        fusion_environment_id=fusion_environment_id,
+        create_vanity_domain_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@vanity_domain_activity_group.command(name=cli_util.override('fusion_apps.create_vanity_domain_activity.command_name', 'create'), help=u"""Create a VanityDomainActivity \n[Command Reference](createVanityDomainActivity)""")
+@cli_util.option('--vanity-domain-id', required=True, help=u"""Vanity domain ID""")
+@cli_util.option('--time-scheduled', required=True, type=custom_types.CLI_DATETIME, help=u"""Activity start time""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
+@cli_util.option('--operation-type', required=True, type=custom_types.CliCaseInsensitiveChoice(["ENABLE_VANITY_DOMAIN", "DELETE_VANITY_DOMAIN"]), help=u"""The type of operation""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def create_vanity_domain_activity(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, vanity_domain_id, time_scheduled, operation_type, fusion_environment_id):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['vanityDomainId'] = vanity_domain_id
+    _details['timeScheduled'] = time_scheduled
+    _details['operationType'] = operation_type
+
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.create_vanity_domain_activity(
+        fusion_environment_id=fusion_environment_id,
+        create_vanity_domain_activity_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@email_subdomain_group.command(name=cli_util.override('fusion_apps.delete_email_subdomain.command_name', 'delete'), help=u"""Delete an email subdomain for a brand \n[Command Reference](deleteEmailSubdomain)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--marketing-brand-id', required=True, help=u"""unique brand identifier""")
+@cli_util.option('--email-subdomain-id', required=True, help=u"""unique emailSubdomain identifier""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.confirm_delete_option
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def delete_email_subdomain(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, fusion_environment_id, marketing_brand_id, email_subdomain_id, if_match):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(marketing_brand_id, six.string_types) and len(marketing_brand_id.strip()) == 0:
+        raise click.UsageError('Parameter --marketing-brand-id cannot be whitespace or empty string')
+
+    if isinstance(email_subdomain_id, six.string_types) and len(email_subdomain_id.strip()) == 0:
+        raise click.UsageError('Parameter --email-subdomain-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.delete_email_subdomain(
+        fusion_environment_id=fusion_environment_id,
+        marketing_brand_id=marketing_brand_id,
+        email_subdomain_id=email_subdomain_id,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Please retrieve the work request to find its current state', file=sys.stderr)
                 cli_util.render_response(result, ctx)
                 sys.exit(2)
             except Exception:
@@ -837,6 +1288,133 @@ def delete_fusion_environment_family(ctx, from_json, wait_for_state, max_wait_se
     cli_util.render_response(result, ctx)
 
 
+@marketing_brand_group.command(name=cli_util.override('fusion_apps.delete_marketing_brand.command_name', 'delete'), help=u"""Deletes a Marketing brand for fusion Environment \n[Command Reference](deleteMarketingBrand)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--marketing-brand-id', required=True, help=u"""unique brand identifier""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.confirm_delete_option
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def delete_marketing_brand(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, fusion_environment_id, marketing_brand_id, if_match):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(marketing_brand_id, six.string_types) and len(marketing_brand_id.strip()) == 0:
+        raise click.UsageError('Parameter --marketing-brand-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.delete_marketing_brand(
+        fusion_environment_id=fusion_environment_id,
+        marketing_brand_id=marketing_brand_id,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Please retrieve the work request to find its current state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@microsite_group.command(name=cli_util.override('fusion_apps.delete_microsite.command_name', 'delete'), help=u"""Delete microsite for a brand \n[Command Reference](deleteMicrosite)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--marketing-brand-id', required=True, help=u"""unique brand identifier""")
+@cli_util.option('--microsite-id', required=True, help=u"""unique microsite identifier""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.confirm_delete_option
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def delete_microsite(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, fusion_environment_id, marketing_brand_id, microsite_id, if_match):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(marketing_brand_id, six.string_types) and len(marketing_brand_id.strip()) == 0:
+        raise click.UsageError('Parameter --marketing-brand-id cannot be whitespace or empty string')
+
+    if isinstance(microsite_id, six.string_types) and len(microsite_id.strip()) == 0:
+        raise click.UsageError('Parameter --microsite-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.delete_microsite(
+        fusion_environment_id=fusion_environment_id,
+        marketing_brand_id=marketing_brand_id,
+        microsite_id=microsite_id,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Please retrieve the work request to find its current state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
 @refresh_activity_group.command(name=cli_util.override('fusion_apps.delete_refresh_activity.command_name', 'delete'), help=u"""Deletes a scheduled RefreshActivity resource by identifier \n[Command Reference](deleteRefreshActivity)""")
 @cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
 @cli_util.option('--refresh-activity-id', required=True, help=u"""The unique identifier (OCID) of the Refresh activity.""")
@@ -959,6 +1537,67 @@ def delete_service_attachment(ctx, from_json, wait_for_state, max_wait_seconds, 
     cli_util.render_response(result, ctx)
 
 
+@vanity_domain_activity_group.command(name=cli_util.override('fusion_apps.delete_vanity_domain_activity.command_name', 'delete'), help=u"""Deletes a VanityDomainActivity \n[Command Reference](deleteVanityDomainActivity)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--vanity-domain-activity-id', required=True, help=u"""The unique identifier (OCID) of the VanityDomainActivity""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.confirm_delete_option
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def delete_vanity_domain_activity(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, fusion_environment_id, vanity_domain_activity_id, if_match):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(vanity_domain_activity_id, six.string_types) and len(vanity_domain_activity_id.strip()) == 0:
+        raise click.UsageError('Parameter --vanity-domain-activity-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.delete_vanity_domain_activity(
+        fusion_environment_id=fusion_environment_id,
+        vanity_domain_activity_id=vanity_domain_activity_id,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Please retrieve the work request to find its current state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
 @fusion_environment_group.command(name=cli_util.override('fusion_apps.generate_extract_details.command_name', 'generate-extract-details'), help=u"""Begin the process of showing the details about where to retrieve data extract for a Fusion environment. \n[Command Reference](generateExtractDetails)""")
 @cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
 @json_skeleton_utils.get_cli_json_input_option({})
@@ -1003,6 +1642,102 @@ def get_data_masking_activity(ctx, from_json, fusion_environment_id, data_maskin
     result = client.get_data_masking_activity(
         fusion_environment_id=fusion_environment_id,
         data_masking_activity_id=data_masking_activity_id,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
+@email_subdomain_group.command(name=cli_util.override('fusion_apps.get_email_subdomain.command_name', 'get'), help=u"""Gets an email subdomain for the brand \n[Command Reference](getEmailSubdomain)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--marketing-brand-id', required=True, help=u"""unique brand identifier""")
+@cli_util.option('--email-subdomain-id', required=True, help=u"""unique emailSubdomain identifier""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'fusion_apps', 'class': 'EmailSubdomain'})
+@cli_util.wrap_exceptions
+def get_email_subdomain(ctx, from_json, fusion_environment_id, marketing_brand_id, email_subdomain_id):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(marketing_brand_id, six.string_types) and len(marketing_brand_id.strip()) == 0:
+        raise click.UsageError('Parameter --marketing-brand-id cannot be whitespace or empty string')
+
+    if isinstance(email_subdomain_id, six.string_types) and len(email_subdomain_id.strip()) == 0:
+        raise click.UsageError('Parameter --email-subdomain-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.get_email_subdomain(
+        fusion_environment_id=fusion_environment_id,
+        marketing_brand_id=marketing_brand_id,
+        email_subdomain_id=email_subdomain_id,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
+@email_subdomain_group.command(name=cli_util.override('fusion_apps.get_email_subdomain_csr.command_name', 'get-email-subdomain-csr'), help=u"""Gets a CSR for email subdomain for a brand \n[Command Reference](getEmailSubdomainCsr)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--marketing-brand-id', required=True, help=u"""unique brand identifier""")
+@cli_util.option('--email-subdomain-id', required=True, help=u"""unique emailSubdomain identifier""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'fusion_apps', 'class': 'MarketingBrandEmailSubdomainCsr'})
+@cli_util.wrap_exceptions
+def get_email_subdomain_csr(ctx, from_json, fusion_environment_id, marketing_brand_id, email_subdomain_id):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(marketing_brand_id, six.string_types) and len(marketing_brand_id.strip()) == 0:
+        raise click.UsageError('Parameter --marketing-brand-id cannot be whitespace or empty string')
+
+    if isinstance(email_subdomain_id, six.string_types) and len(email_subdomain_id.strip()) == 0:
+        raise click.UsageError('Parameter --email-subdomain-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.get_email_subdomain_csr(
+        fusion_environment_id=fusion_environment_id,
+        marketing_brand_id=marketing_brand_id,
+        email_subdomain_id=email_subdomain_id,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
+@email_subdomain_group.command(name=cli_util.override('fusion_apps.get_email_subdomain_dns_config.command_name', 'get-email-subdomain-dns-config'), help=u"""Get all DNS records for emailSubdomain \n[Command Reference](getEmailSubdomainDnsConfig)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--marketing-brand-id', required=True, help=u"""unique brand identifier""")
+@cli_util.option('--email-subdomain-id', required=True, help=u"""unique emailSubdomain identifier""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'fusion_apps', 'class': 'MarketingBrandEmailSubdomainDnsConfig'})
+@cli_util.wrap_exceptions
+def get_email_subdomain_dns_config(ctx, from_json, fusion_environment_id, marketing_brand_id, email_subdomain_id):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(marketing_brand_id, six.string_types) and len(marketing_brand_id.strip()) == 0:
+        raise click.UsageError('Parameter --marketing-brand-id cannot be whitespace or empty string')
+
+    if isinstance(email_subdomain_id, six.string_types) and len(email_subdomain_id.strip()) == 0:
+        raise click.UsageError('Parameter --email-subdomain-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.get_email_subdomain_dns_config(
+        fusion_environment_id=fusion_environment_id,
+        marketing_brand_id=marketing_brand_id,
+        email_subdomain_id=email_subdomain_id,
         **kwargs
     )
     cli_util.render_response(result, ctx)
@@ -1118,6 +1853,97 @@ def get_fusion_environment_status(ctx, from_json, fusion_environment_id):
     cli_util.render_response(result, ctx)
 
 
+@marketing_brand_group.command(name=cli_util.override('fusion_apps.get_marketing_brand.command_name', 'get'), help=u"""Gets a Marketing Brand by identifier \n[Command Reference](getMarketingBrand)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--marketing-brand-id', required=True, help=u"""unique brand identifier""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'fusion_apps', 'class': 'MarketingBrand'})
+@cli_util.wrap_exceptions
+def get_marketing_brand(ctx, from_json, fusion_environment_id, marketing_brand_id):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(marketing_brand_id, six.string_types) and len(marketing_brand_id.strip()) == 0:
+        raise click.UsageError('Parameter --marketing-brand-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.get_marketing_brand(
+        fusion_environment_id=fusion_environment_id,
+        marketing_brand_id=marketing_brand_id,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
+@microsite_group.command(name=cli_util.override('fusion_apps.get_microsite.command_name', 'get'), help=u"""Get the microsite for the brand \n[Command Reference](getMicrosite)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--marketing-brand-id', required=True, help=u"""unique brand identifier""")
+@cli_util.option('--microsite-id', required=True, help=u"""unique microsite identifier""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'fusion_apps', 'class': 'Microsite'})
+@cli_util.wrap_exceptions
+def get_microsite(ctx, from_json, fusion_environment_id, marketing_brand_id, microsite_id):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(marketing_brand_id, six.string_types) and len(marketing_brand_id.strip()) == 0:
+        raise click.UsageError('Parameter --marketing-brand-id cannot be whitespace or empty string')
+
+    if isinstance(microsite_id, six.string_types) and len(microsite_id.strip()) == 0:
+        raise click.UsageError('Parameter --microsite-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.get_microsite(
+        fusion_environment_id=fusion_environment_id,
+        marketing_brand_id=marketing_brand_id,
+        microsite_id=microsite_id,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
+@microsite_group.command(name=cli_util.override('fusion_apps.get_microsite_dns_config.command_name', 'get-microsite-dns-config'), help=u"""Get DNS records for microsite \n[Command Reference](getMicrositeDnsConfig)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--marketing-brand-id', required=True, help=u"""unique brand identifier""")
+@cli_util.option('--microsite-id', required=True, help=u"""unique microsite identifier""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'fusion_apps', 'class': 'MarketingBrandMicrositeDnsConfig'})
+@cli_util.wrap_exceptions
+def get_microsite_dns_config(ctx, from_json, fusion_environment_id, marketing_brand_id, microsite_id):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(marketing_brand_id, six.string_types) and len(marketing_brand_id.strip()) == 0:
+        raise click.UsageError('Parameter --marketing-brand-id cannot be whitespace or empty string')
+
+    if isinstance(microsite_id, six.string_types) and len(microsite_id.strip()) == 0:
+        raise click.UsageError('Parameter --microsite-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.get_microsite_dns_config(
+        fusion_environment_id=fusion_environment_id,
+        marketing_brand_id=marketing_brand_id,
+        microsite_id=microsite_id,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
 @refresh_activity_group.command(name=cli_util.override('fusion_apps.get_refresh_activity.command_name', 'get'), help=u"""Gets a RefreshActivity by identifier \n[Command Reference](getRefreshActivity)""")
 @cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
 @cli_util.option('--refresh-activity-id', required=True, help=u"""The unique identifier (OCID) of the Refresh activity.""")
@@ -1194,6 +2020,66 @@ def get_service_attachment(ctx, from_json, fusion_environment_id, service_attach
     result = client.get_service_attachment(
         fusion_environment_id=fusion_environment_id,
         service_attachment_id=service_attachment_id,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
+@vanity_domain_group.command(name=cli_util.override('fusion_apps.get_vanity_domain.command_name', 'get'), help=u"""Gets a VanityDomain \n[Command Reference](getVanityDomain)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--vanity-domain-id', required=True, help=u"""The unique identifier (OCID) of the VanityDomain""")
+@cli_util.option('--does-download-origin-csr', type=click.BOOL, help=u"""A parameter indicating whether to download the Origin Csr or not""")
+@cli_util.option('--does-download-akamai-csr', type=click.BOOL, help=u"""A parameter indicating whether to download the Akamai Csr or not""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'fusion_apps', 'class': 'VanityDomain'})
+@cli_util.wrap_exceptions
+def get_vanity_domain(ctx, from_json, fusion_environment_id, vanity_domain_id, does_download_origin_csr, does_download_akamai_csr):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(vanity_domain_id, six.string_types) and len(vanity_domain_id.strip()) == 0:
+        raise click.UsageError('Parameter --vanity-domain-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if does_download_origin_csr is not None:
+        kwargs['does_download_origin_csr'] = does_download_origin_csr
+    if does_download_akamai_csr is not None:
+        kwargs['does_download_akamai_csr'] = does_download_akamai_csr
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.get_vanity_domain(
+        fusion_environment_id=fusion_environment_id,
+        vanity_domain_id=vanity_domain_id,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
+@vanity_domain_activity_group.command(name=cli_util.override('fusion_apps.get_vanity_domain_activity.command_name', 'get'), help=u"""Gets a VanityDomainActivity \n[Command Reference](getVanityDomainActivity)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--vanity-domain-activity-id', required=True, help=u"""The unique identifier (OCID) of the VanityDomainActivity""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'fusion_apps', 'class': 'VanityDomainActivity'})
+@cli_util.wrap_exceptions
+def get_vanity_domain_activity(ctx, from_json, fusion_environment_id, vanity_domain_activity_id):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(vanity_domain_activity_id, six.string_types) and len(vanity_domain_activity_id.strip()) == 0:
+        raise click.UsageError('Parameter --vanity-domain-activity-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.get_vanity_domain_activity(
+        fusion_environment_id=fusion_environment_id,
+        vanity_domain_activity_id=vanity_domain_activity_id,
         **kwargs
     )
     cli_util.render_response(result, ctx)
@@ -1356,6 +2242,79 @@ def list_data_masking_activities(ctx, from_json, all_pages, page_size, fusion_en
     cli_util.render_response(result, ctx)
 
 
+@email_subdomain_group.command(name=cli_util.override('fusion_apps.list_email_subdomains.command_name', 'list'), help=u"""Returns a list of email subdomains for a brand \n[Command Reference](listEmailSubdomains)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--marketing-brand-id', required=True, help=u"""unique brand identifier""")
+@cli_util.option('--email-subdomain-id', help=u"""unique emailSubdomain identifier""")
+@cli_util.option('--name', help=u"""A filter to return only resources that match the entire name given.""")
+@cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["ACTIVE", "INACTIVE"]), help=u"""A filter that returns all resources that match the specified status""")
+@cli_util.option('--sort-order', type=custom_types.CliCaseInsensitiveChoice(["ASC", "DESC"]), help=u"""The sort order to use, either 'asc' or 'desc'.""")
+@cli_util.option('--sort-by', type=custom_types.CliCaseInsensitiveChoice(["TIME_CREATED", "NAME", "ID"]), help=u"""The field to sort by. Only one sort order may be provided. Default order for timeCreated is descending. Default order for name is ascending. If no value is specified timeCreated is default.""")
+@cli_util.option('--limit', type=click.INT, help=u"""The maximum number of items to return.""")
+@cli_util.option('--page', help=u"""The page token representing the page at which to start retrieving results. This is usually retrieved from a previous list call.""")
+@cli_util.option('--all', 'all_pages', is_flag=True, help="""Fetches all pages of results. If you provide this option, then you cannot provide the --limit option.""")
+@cli_util.option('--page-size', type=click.INT, help="""When fetching results, the number of results to fetch per call. Only valid when used with --all or --limit, and ignored otherwise.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'fusion_apps', 'class': 'EmailSubdomainCollection'})
+@cli_util.wrap_exceptions
+def list_email_subdomains(ctx, from_json, all_pages, page_size, fusion_environment_id, marketing_brand_id, email_subdomain_id, name, lifecycle_state, sort_order, sort_by, limit, page):
+
+    if all_pages and limit:
+        raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(marketing_brand_id, six.string_types) and len(marketing_brand_id.strip()) == 0:
+        raise click.UsageError('Parameter --marketing-brand-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if email_subdomain_id is not None:
+        kwargs['email_subdomain_id'] = email_subdomain_id
+    if name is not None:
+        kwargs['name'] = name
+    if lifecycle_state is not None:
+        kwargs['lifecycle_state'] = lifecycle_state
+    if sort_order is not None:
+        kwargs['sort_order'] = sort_order
+    if sort_by is not None:
+        kwargs['sort_by'] = sort_by
+    if limit is not None:
+        kwargs['limit'] = limit
+    if page is not None:
+        kwargs['page'] = page
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    if all_pages:
+        if page_size:
+            kwargs['limit'] = page_size
+
+        result = cli_util.list_call_get_all_results(
+            client.list_email_subdomains,
+            fusion_environment_id=fusion_environment_id,
+            marketing_brand_id=marketing_brand_id,
+            **kwargs
+        )
+    elif limit is not None:
+        result = cli_util.list_call_get_up_to_limit(
+            client.list_email_subdomains,
+            limit,
+            page_size,
+            fusion_environment_id=fusion_environment_id,
+            marketing_brand_id=marketing_brand_id,
+            **kwargs
+        )
+    else:
+        result = client.list_email_subdomains(
+            fusion_environment_id=fusion_environment_id,
+            marketing_brand_id=marketing_brand_id,
+            **kwargs
+        )
+    cli_util.render_response(result, ctx)
+
+
 @fusion_environment_family_group.command(name=cli_util.override('fusion_apps.list_fusion_environment_families.command_name', 'list'), help=u"""Returns a list of FusionEnvironmentFamilies. \n[Command Reference](listFusionEnvironmentFamilies)""")
 @cli_util.option('--compartment-id', required=True, help=u"""The ID of the compartment in which to list resources.""")
 @cli_util.option('--fusion-environment-family-id', help=u"""The ID of the fusion environment family in which to list resources.""")
@@ -1477,6 +2436,145 @@ def list_fusion_environments(ctx, from_json, all_pages, page_size, compartment_i
     else:
         result = client.list_fusion_environments(
             compartment_id=compartment_id,
+            **kwargs
+        )
+    cli_util.render_response(result, ctx)
+
+
+@marketing_brand_group.command(name=cli_util.override('fusion_apps.list_marketing_brands.command_name', 'list'), help=u"""Returns a list of marketing brands \n[Command Reference](listMarketingBrands)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--marketing-brand-id', help=u"""unique brand identifier""")
+@cli_util.option('--name', help=u"""A filter to return only resources that match the entire name given.""")
+@cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["ACTIVE", "INACTIVE"]), help=u"""A filter that returns all resources that match the specified status""")
+@cli_util.option('--limit', type=click.INT, help=u"""The maximum number of items to return.""")
+@cli_util.option('--page', help=u"""The page token representing the page at which to start retrieving results. This is usually retrieved from a previous list call.""")
+@cli_util.option('--sort-order', type=custom_types.CliCaseInsensitiveChoice(["ASC", "DESC"]), help=u"""The sort order to use, either 'asc' or 'desc'.""")
+@cli_util.option('--sort-by', type=custom_types.CliCaseInsensitiveChoice(["TIME_CREATED", "NAME", "ID"]), help=u"""The field to sort by. Only one sort order may be provided. Default order for timeCreated is descending. Default order for name is ascending. If no value is specified timeCreated is default.""")
+@cli_util.option('--all', 'all_pages', is_flag=True, help="""Fetches all pages of results. If you provide this option, then you cannot provide the --limit option.""")
+@cli_util.option('--page-size', type=click.INT, help="""When fetching results, the number of results to fetch per call. Only valid when used with --all or --limit, and ignored otherwise.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'fusion_apps', 'class': 'MarketingBrandCollection'})
+@cli_util.wrap_exceptions
+def list_marketing_brands(ctx, from_json, all_pages, page_size, fusion_environment_id, marketing_brand_id, name, lifecycle_state, limit, page, sort_order, sort_by):
+
+    if all_pages and limit:
+        raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if marketing_brand_id is not None:
+        kwargs['marketing_brand_id'] = marketing_brand_id
+    if name is not None:
+        kwargs['name'] = name
+    if lifecycle_state is not None:
+        kwargs['lifecycle_state'] = lifecycle_state
+    if limit is not None:
+        kwargs['limit'] = limit
+    if page is not None:
+        kwargs['page'] = page
+    if sort_order is not None:
+        kwargs['sort_order'] = sort_order
+    if sort_by is not None:
+        kwargs['sort_by'] = sort_by
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    if all_pages:
+        if page_size:
+            kwargs['limit'] = page_size
+
+        result = cli_util.list_call_get_all_results(
+            client.list_marketing_brands,
+            fusion_environment_id=fusion_environment_id,
+            **kwargs
+        )
+    elif limit is not None:
+        result = cli_util.list_call_get_up_to_limit(
+            client.list_marketing_brands,
+            limit,
+            page_size,
+            fusion_environment_id=fusion_environment_id,
+            **kwargs
+        )
+    else:
+        result = client.list_marketing_brands(
+            fusion_environment_id=fusion_environment_id,
+            **kwargs
+        )
+    cli_util.render_response(result, ctx)
+
+
+@microsite_group.command(name=cli_util.override('fusion_apps.list_microsites.command_name', 'list'), help=u"""Returns a list of microsites \n[Command Reference](listMicrosites)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--marketing-brand-id', required=True, help=u"""unique brand identifier""")
+@cli_util.option('--microsite-id', help=u"""unique microsite identifier""")
+@cli_util.option('--name', help=u"""A filter to return only resources that match the entire name given.""")
+@cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["ACTIVE", "INACTIVE"]), help=u"""A filter that returns all resources that match the specified status""")
+@cli_util.option('--sort-order', type=custom_types.CliCaseInsensitiveChoice(["ASC", "DESC"]), help=u"""The sort order to use, either 'asc' or 'desc'.""")
+@cli_util.option('--sort-by', type=custom_types.CliCaseInsensitiveChoice(["TIME_CREATED", "NAME", "ID"]), help=u"""The field to sort by. Only one sort order may be provided. Default order for timeCreated is descending. Default order for name is ascending. If no value is specified timeCreated is default.""")
+@cli_util.option('--limit', type=click.INT, help=u"""The maximum number of items to return.""")
+@cli_util.option('--page', help=u"""The page token representing the page at which to start retrieving results. This is usually retrieved from a previous list call.""")
+@cli_util.option('--all', 'all_pages', is_flag=True, help="""Fetches all pages of results. If you provide this option, then you cannot provide the --limit option.""")
+@cli_util.option('--page-size', type=click.INT, help="""When fetching results, the number of results to fetch per call. Only valid when used with --all or --limit, and ignored otherwise.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'fusion_apps', 'class': 'MicrositeCollection'})
+@cli_util.wrap_exceptions
+def list_microsites(ctx, from_json, all_pages, page_size, fusion_environment_id, marketing_brand_id, microsite_id, name, lifecycle_state, sort_order, sort_by, limit, page):
+
+    if all_pages and limit:
+        raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(marketing_brand_id, six.string_types) and len(marketing_brand_id.strip()) == 0:
+        raise click.UsageError('Parameter --marketing-brand-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if microsite_id is not None:
+        kwargs['microsite_id'] = microsite_id
+    if name is not None:
+        kwargs['name'] = name
+    if lifecycle_state is not None:
+        kwargs['lifecycle_state'] = lifecycle_state
+    if sort_order is not None:
+        kwargs['sort_order'] = sort_order
+    if sort_by is not None:
+        kwargs['sort_by'] = sort_by
+    if limit is not None:
+        kwargs['limit'] = limit
+    if page is not None:
+        kwargs['page'] = page
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    if all_pages:
+        if page_size:
+            kwargs['limit'] = page_size
+
+        result = cli_util.list_call_get_all_results(
+            client.list_microsites,
+            fusion_environment_id=fusion_environment_id,
+            marketing_brand_id=marketing_brand_id,
+            **kwargs
+        )
+    elif limit is not None:
+        result = cli_util.list_call_get_up_to_limit(
+            client.list_microsites,
+            limit,
+            page_size,
+            fusion_environment_id=fusion_environment_id,
+            marketing_brand_id=marketing_brand_id,
+            **kwargs
+        )
+    else:
+        result = client.list_microsites(
+            fusion_environment_id=fusion_environment_id,
+            marketing_brand_id=marketing_brand_id,
             **kwargs
         )
     cli_util.render_response(result, ctx)
@@ -1752,6 +2850,71 @@ def list_time_available_for_refreshes(ctx, from_json, all_pages, page_size, fusi
     cli_util.render_response(result, ctx)
 
 
+@vanity_domain_group.command(name=cli_util.override('fusion_apps.list_vanity_domains.command_name', 'list'), help=u"""Lists all VanityDomains. \n[Command Reference](listVanityDomains)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--compartment-id', required=True, help=u"""The ID of the compartment in which to list resources.""")
+@cli_util.option('--is-full-vanity-domain', required=True, type=click.BOOL, help=u"""The boolean filter to distinguish prefix or full vanity""")
+@cli_util.option('--limit', type=click.INT, help=u"""The maximum number of items to return.""")
+@cli_util.option('--page', help=u"""The page token representing the page at which to start retrieving results. This is usually retrieved from a previous list call.""")
+@cli_util.option('--sort-order', type=custom_types.CliCaseInsensitiveChoice(["ASC", "DESC"]), help=u"""The sort order to use, either 'asc' or 'desc'.""")
+@cli_util.option('--sort-by', type=custom_types.CliCaseInsensitiveChoice(["TIME_CREATED", "DISPLAY_NAME"]), help=u"""The field to sort by. Only one sort order may be provided. Default order for timeCreated is descending. Default order for displayName is ascending. If no value is specified timeCreated is default.""")
+@cli_util.option('--all', 'all_pages', is_flag=True, help="""Fetches all pages of results. If you provide this option, then you cannot provide the --limit option.""")
+@cli_util.option('--page-size', type=click.INT, help="""When fetching results, the number of results to fetch per call. Only valid when used with --all or --limit, and ignored otherwise.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'fusion_apps', 'class': 'VanityDomainCollection'})
+@cli_util.wrap_exceptions
+def list_vanity_domains(ctx, from_json, all_pages, page_size, fusion_environment_id, compartment_id, is_full_vanity_domain, limit, page, sort_order, sort_by):
+
+    if all_pages and limit:
+        raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if limit is not None:
+        kwargs['limit'] = limit
+    if page is not None:
+        kwargs['page'] = page
+    if sort_order is not None:
+        kwargs['sort_order'] = sort_order
+    if sort_by is not None:
+        kwargs['sort_by'] = sort_by
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    if all_pages:
+        if page_size:
+            kwargs['limit'] = page_size
+
+        result = cli_util.list_call_get_all_results(
+            client.list_vanity_domains,
+            fusion_environment_id=fusion_environment_id,
+            compartment_id=compartment_id,
+            is_full_vanity_domain=is_full_vanity_domain,
+            **kwargs
+        )
+    elif limit is not None:
+        result = cli_util.list_call_get_up_to_limit(
+            client.list_vanity_domains,
+            limit,
+            page_size,
+            fusion_environment_id=fusion_environment_id,
+            compartment_id=compartment_id,
+            is_full_vanity_domain=is_full_vanity_domain,
+            **kwargs
+        )
+    else:
+        result = client.list_vanity_domains(
+            fusion_environment_id=fusion_environment_id,
+            compartment_id=compartment_id,
+            is_full_vanity_domain=is_full_vanity_domain,
+            **kwargs
+        )
+    cli_util.render_response(result, ctx)
+
+
 @work_request_error_group.command(name=cli_util.override('fusion_apps.list_work_request_errors.command_name', 'list'), help=u"""Return a (paginated) list of errors for a given work request. \n[Command Reference](listWorkRequestErrors)""")
 @cli_util.option('--work-request-id', required=True, help=u"""The ID of the asynchronous request.""")
 @cli_util.option('--sort-by', type=custom_types.CliCaseInsensitiveChoice(["timeAccepted"]), help=u"""The field to sort by. Only one sort order may be provided. Default order for timeAccepted is descending.""")
@@ -1926,6 +3089,63 @@ def list_work_requests(ctx, from_json, all_pages, page_size, compartment_id, sta
     cli_util.render_response(result, ctx)
 
 
+@email_subdomain_group.command(name=cli_util.override('fusion_apps.request_email_subdomain_csr.command_name', 'request-email-subdomain-csr'), help=u"""Request Email Subdomain CSR \n[Command Reference](requestEmailSubdomainCsr)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--marketing-brand-id', required=True, help=u"""unique brand identifier""")
+@cli_util.option('--email-subdomain-id', required=True, help=u"""unique emailSubdomain identifier""")
+@cli_util.option('--common-name', required=True, help=u"""fully qualified host name""")
+@cli_util.option('--organization-name', required=True, help=u"""company name""")
+@cli_util.option('--organization-unit', required=True, help=u"""company section""")
+@cli_util.option('--locality', required=True, help=u"""city""")
+@cli_util.option('--state', required=True, help=u"""state or province""")
+@cli_util.option('--country', required=True, help=u"""country name""")
+@cli_util.option('--email-address', required=True, help=u"""email address""")
+@cli_util.option('--sans', help=u"""subject alternative names, comma separated""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'fusion_apps', 'class': 'MarketingBrandEmailSubdomainCsr'})
+@cli_util.wrap_exceptions
+def request_email_subdomain_csr(ctx, from_json, fusion_environment_id, marketing_brand_id, email_subdomain_id, common_name, organization_name, organization_unit, locality, state, country, email_address, sans, if_match):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(marketing_brand_id, six.string_types) and len(marketing_brand_id.strip()) == 0:
+        raise click.UsageError('Parameter --marketing-brand-id cannot be whitespace or empty string')
+
+    if isinstance(email_subdomain_id, six.string_types) and len(email_subdomain_id.strip()) == 0:
+        raise click.UsageError('Parameter --email-subdomain-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['commonName'] = common_name
+    _details['organizationName'] = organization_name
+    _details['organizationUnit'] = organization_unit
+    _details['locality'] = locality
+    _details['state'] = state
+    _details['country'] = country
+    _details['emailAddress'] = email_address
+
+    if sans is not None:
+        _details['sans'] = sans
+
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.request_email_subdomain_csr(
+        fusion_environment_id=fusion_environment_id,
+        marketing_brand_id=marketing_brand_id,
+        email_subdomain_id=email_subdomain_id,
+        request_email_subdomain_csr_details=_details,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
 @fusion_environment_group.command(name=cli_util.override('fusion_apps.reset_fusion_environment_password.command_name', 'reset-fusion-environment-password'), help=u"""Reset FusionEnvironment admin password. This API will be deprecated on Mon, 15 Jan 2024 01:00:00 GMT. Users can reset password themselves, FAaaS will no longer provide an API for this. \n[Command Reference](resetFusionEnvironmentPassword)""")
 @cli_util.option('--password', required=True, help=u"""Admin password""")
 @cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
@@ -1992,6 +3212,144 @@ def reset_fusion_environment_password(ctx, from_json, wait_for_state, max_wait_s
     cli_util.render_response(result, ctx)
 
 
+@vanity_domain_group.command(name=cli_util.override('fusion_apps.submit_vanity_domain_validation.command_name', 'submit-vanity-domain-validation'), help=u"""Submit Vanity Domain Validation \n[Command Reference](submitVanityDomainValidation)""")
+@cli_util.option('--vanity-domain-id', required=True, help=u"""The unique identifier (OCID) of the VanityDomain""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def submit_vanity_domain_validation(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, vanity_domain_id, fusion_environment_id, if_match):
+
+    if isinstance(vanity_domain_id, six.string_types) and len(vanity_domain_id.strip()) == 0:
+        raise click.UsageError('Parameter --vanity-domain-id cannot be whitespace or empty string')
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.submit_vanity_domain_validation(
+        vanity_domain_id=vanity_domain_id,
+        fusion_environment_id=fusion_environment_id,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@email_subdomain_group.command(name=cli_util.override('fusion_apps.update_email_subdomain.command_name', 'update'), help=u"""Updates an email subdomain \n[Command Reference](updateEmailSubdomain)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--marketing-brand-id', required=True, help=u"""unique brand identifier""")
+@cli_util.option('--email-subdomain-id', required=True, help=u"""unique emailSubdomain identifier""")
+@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Simple key-value pair that is applied without any predefined name, type or scope. Exists for cross-compatibility only. Example: `{\"bar-key\": \"value\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. Example: `{\"foo-namespace\": {\"bar-key\": \"value\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACTIVE", "INACTIVE"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACTIVE --wait-for-state INACTIVE would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'freeform-tags': {'module': 'fusion_apps', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'fusion_apps', 'class': 'dict(str, dict(str, object))'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'freeform-tags': {'module': 'fusion_apps', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'fusion_apps', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'fusion_apps', 'class': 'EmailSubdomain'})
+@cli_util.wrap_exceptions
+def update_email_subdomain(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, fusion_environment_id, marketing_brand_id, email_subdomain_id, freeform_tags, defined_tags, if_match):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(marketing_brand_id, six.string_types) and len(marketing_brand_id.strip()) == 0:
+        raise click.UsageError('Parameter --marketing-brand-id cannot be whitespace or empty string')
+
+    if isinstance(email_subdomain_id, six.string_types) and len(email_subdomain_id.strip()) == 0:
+        raise click.UsageError('Parameter --email-subdomain-id cannot be whitespace or empty string')
+    if not force:
+        if freeform_tags or defined_tags:
+            if not click.confirm("WARNING: Updates to freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
+                ctx.abort()
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+
+    if freeform_tags is not None:
+        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
+
+    if defined_tags is not None:
+        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.update_email_subdomain(
+        fusion_environment_id=fusion_environment_id,
+        marketing_brand_id=marketing_brand_id,
+        email_subdomain_id=email_subdomain_id,
+        update_email_subdomain_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_email_subdomain') and callable(getattr(client, 'get_email_subdomain')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+
+                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_email_subdomain(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
 @fusion_environment_group.command(name=cli_util.override('fusion_apps.update_fusion_environment.command_name', 'update'), help=u"""Updates the FusionEnvironment \n[Command Reference](updateFusionEnvironment)""")
 @cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
 @cli_util.option('--display-name', help=u"""FusionEnvironment Identifier, can be renamed""")
@@ -2002,7 +3360,7 @@ def reset_fusion_environment_password(ctx, from_json, wait_for_state, max_wait_s
 @cli_util.option('--rules', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Network access control rules to limit internet traffic that can access the environment. For more information, see [AllowRule Reference].
 
 This option is a JSON list with items of type Rule.  For documentation on Rule please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/fusionapplications/20211201/datatypes/Rule.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--additional-egress-rules', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Additional egress rules that should be applied to the environment. Some standard ports are open for general use; see [Securing Network Access to a Fusion Applications Environment][iaas/Content/fusion-applications/plan-environment.htm#internet-cache]. If access to a non-standard port is required, however, they can be listed here.
+@cli_util.option('--additional-egress-rules', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Additional egress rules that should be applied to the environment. Some standard ports are open for general use; see [Securing Network Access to a Fusion Applications Environment]. If access to a non-standard port is required, however, they can be listed here.
 
 This option is a JSON list with items of type AdditionalEgressRule.  For documentation on AdditionalEgressRule please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/fusionapplications/20211201/datatypes/AdditionalEgressRule.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Simple key-value pair that is applied without any predefined name, type or scope. Exists for cross-compatibility only. Example: `{\"bar-key\": \"value\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
@@ -2180,6 +3538,157 @@ def update_fusion_environment_family(ctx, from_json, force, wait_for_state, max_
     cli_util.render_response(result, ctx)
 
 
+@marketing_brand_group.command(name=cli_util.override('fusion_apps.update_marketing_brand.command_name', 'update'), help=u"""Updates a Marketing Brand \n[Command Reference](updateMarketingBrand)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--marketing-brand-id', required=True, help=u"""unique brand identifier""")
+@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Simple key-value pair that is applied without any predefined name, type or scope. Exists for cross-compatibility only. Example: `{\"bar-key\": \"value\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. Example: `{\"foo-namespace\": {\"bar-key\": \"value\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACTIVE", "INACTIVE"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACTIVE --wait-for-state INACTIVE would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'freeform-tags': {'module': 'fusion_apps', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'fusion_apps', 'class': 'dict(str, dict(str, object))'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'freeform-tags': {'module': 'fusion_apps', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'fusion_apps', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'fusion_apps', 'class': 'MarketingBrand'})
+@cli_util.wrap_exceptions
+def update_marketing_brand(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, fusion_environment_id, marketing_brand_id, freeform_tags, defined_tags, if_match):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(marketing_brand_id, six.string_types) and len(marketing_brand_id.strip()) == 0:
+        raise click.UsageError('Parameter --marketing-brand-id cannot be whitespace or empty string')
+    if not force:
+        if freeform_tags or defined_tags:
+            if not click.confirm("WARNING: Updates to freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
+                ctx.abort()
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+
+    if freeform_tags is not None:
+        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
+
+    if defined_tags is not None:
+        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.update_marketing_brand(
+        fusion_environment_id=fusion_environment_id,
+        marketing_brand_id=marketing_brand_id,
+        update_marketing_brand_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_marketing_brand') and callable(getattr(client, 'get_marketing_brand')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+
+                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_marketing_brand(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@microsite_group.command(name=cli_util.override('fusion_apps.update_microsite.command_name', 'update'), help=u"""Updates an microsite \n[Command Reference](updateMicrosite)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--marketing-brand-id', required=True, help=u"""unique brand identifier""")
+@cli_util.option('--microsite-id', required=True, help=u"""unique microsite identifier""")
+@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Simple key-value pair that is applied without any predefined name, type or scope. Exists for cross-compatibility only. Example: `{\"bar-key\": \"value\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. Example: `{\"foo-namespace\": {\"bar-key\": \"value\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACTIVE", "INACTIVE"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACTIVE --wait-for-state INACTIVE would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'freeform-tags': {'module': 'fusion_apps', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'fusion_apps', 'class': 'dict(str, dict(str, object))'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'freeform-tags': {'module': 'fusion_apps', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'fusion_apps', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'fusion_apps', 'class': 'Microsite'})
+@cli_util.wrap_exceptions
+def update_microsite(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, fusion_environment_id, marketing_brand_id, microsite_id, freeform_tags, defined_tags, if_match):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(marketing_brand_id, six.string_types) and len(marketing_brand_id.strip()) == 0:
+        raise click.UsageError('Parameter --marketing-brand-id cannot be whitespace or empty string')
+
+    if isinstance(microsite_id, six.string_types) and len(microsite_id.strip()) == 0:
+        raise click.UsageError('Parameter --microsite-id cannot be whitespace or empty string')
+    if not force:
+        if freeform_tags or defined_tags:
+            if not click.confirm("WARNING: Updates to freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
+                ctx.abort()
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+
+    if freeform_tags is not None:
+        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
+
+    if defined_tags is not None:
+        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.update_microsite(
+        fusion_environment_id=fusion_environment_id,
+        marketing_brand_id=marketing_brand_id,
+        microsite_id=microsite_id,
+        update_microsite_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_microsite') and callable(getattr(client, 'get_microsite')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+
+                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_microsite(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
 @update_refresh_activity_details_group.command(name=cli_util.override('fusion_apps.update_refresh_activity.command_name', 'update-refresh-activity'), help=u"""Updates a scheduled RefreshActivity. \n[Command Reference](updateRefreshActivity)""")
 @cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
 @cli_util.option('--refresh-activity-id', required=True, help=u"""The unique identifier (OCID) of the Refresh activity.""")
@@ -2241,6 +3750,463 @@ def update_refresh_activity(ctx, from_json, wait_for_state, max_wait_seconds, wa
                 raise
         else:
             click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@vanity_domain_group.command(name=cli_util.override('fusion_apps.update_vanity_domain.command_name', 'update'), help=u"""Updates a VanityDomain \n[Command Reference](updateVanityDomain)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--vanity-domain-id', required=True, help=u"""The unique identifier (OCID) of the VanityDomain""")
+@cli_util.option('--certificate-info', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'certificate-info': {'module': 'fusion_apps', 'class': 'CertificateInfo'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'certificate-info': {'module': 'fusion_apps', 'class': 'CertificateInfo'}})
+@cli_util.wrap_exceptions
+def update_vanity_domain(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, fusion_environment_id, vanity_domain_id, certificate_info, if_match):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(vanity_domain_id, six.string_types) and len(vanity_domain_id.strip()) == 0:
+        raise click.UsageError('Parameter --vanity-domain-id cannot be whitespace or empty string')
+    if not force:
+        if certificate_info:
+            if not click.confirm("WARNING: Updates to certificate-info will replace any existing values. Are you sure you want to continue?"):
+                ctx.abort()
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+
+    if certificate_info is not None:
+        _details['certificateInfo'] = cli_util.parse_json_parameter("certificate_info", certificate_info)
+
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.update_vanity_domain(
+        fusion_environment_id=fusion_environment_id,
+        vanity_domain_id=vanity_domain_id,
+        update_vanity_domain_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@vanity_domain_activity_group.command(name=cli_util.override('fusion_apps.update_vanity_domain_activity.command_name', 'update'), help=u"""Updates a VanityDomainActivity \n[Command Reference](updateVanityDomainActivity)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--vanity-domain-activity-id', required=True, help=u"""The unique identifier (OCID) of the VanityDomainActivity""")
+@cli_util.option('--time-scheduled', type=custom_types.CLI_DATETIME, help=u"""Expected activity start time""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def update_vanity_domain_activity(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, fusion_environment_id, vanity_domain_activity_id, time_scheduled, if_match):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(vanity_domain_activity_id, six.string_types) and len(vanity_domain_activity_id.strip()) == 0:
+        raise click.UsageError('Parameter --vanity-domain-activity-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+
+    if time_scheduled is not None:
+        _details['timeScheduled'] = time_scheduled
+
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.update_vanity_domain_activity(
+        fusion_environment_id=fusion_environment_id,
+        vanity_domain_activity_id=vanity_domain_activity_id,
+        update_vanity_domain_activity_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@email_subdomain_group.command(name=cli_util.override('fusion_apps.upload_email_subdomain_certificate.command_name', 'upload-email-subdomain-certificate'), help=u"""upload certificate for emailSubdomain \n[Command Reference](uploadEmailSubdomainCertificate)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--marketing-brand-id', required=True, help=u"""unique brand identifier""")
+@cli_util.option('--email-subdomain-id', required=True, help=u"""unique emailSubdomain identifier""")
+@cli_util.option('--common-name', required=True, help=u"""fully qualified host name""")
+@cli_util.option('--certificate-pem', required=True, help=u"""Certificate PEM""")
+@cli_util.option('--certificate-chain-pem', help=u"""Certificate chain PEM, including intermediate and root""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def upload_email_subdomain_certificate(ctx, from_json, fusion_environment_id, marketing_brand_id, email_subdomain_id, common_name, certificate_pem, certificate_chain_pem, if_match):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(marketing_brand_id, six.string_types) and len(marketing_brand_id.strip()) == 0:
+        raise click.UsageError('Parameter --marketing-brand-id cannot be whitespace or empty string')
+
+    if isinstance(email_subdomain_id, six.string_types) and len(email_subdomain_id.strip()) == 0:
+        raise click.UsageError('Parameter --email-subdomain-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['commonName'] = common_name
+    _details['certificatePem'] = certificate_pem
+
+    if certificate_chain_pem is not None:
+        _details['certificateChainPem'] = certificate_chain_pem
+
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.upload_email_subdomain_certificate(
+        fusion_environment_id=fusion_environment_id,
+        marketing_brand_id=marketing_brand_id,
+        email_subdomain_id=email_subdomain_id,
+        upload_email_subdomain_certificate_details=_details,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
+@vanity_domain_group.command(name=cli_util.override('fusion_apps.upload_vanity_domain_certificate.command_name', 'upload-vanity-domain-certificate'), help=u"""Upload Vanity Domain certificate \n[Command Reference](uploadVanityDomainCertificate)""")
+@cli_util.option('--is-akamai', required=True, type=click.BOOL, help=u"""Identify if this is certificate for pod LB or Akamai""")
+@cli_util.option('--common-name', required=True, help=u"""Fully qualified host name""")
+@cli_util.option('--certificate-pem', required=True, help=u"""Public certificate PEM""")
+@cli_util.option('--vanity-domain-id', required=True, help=u"""The unique identifier (OCID) of the VanityDomain""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--certificate-chain-pem', help=u"""Certificate chain PEM, including intermediate and root""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def upload_vanity_domain_certificate(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, is_akamai, common_name, certificate_pem, vanity_domain_id, fusion_environment_id, certificate_chain_pem, if_match):
+
+    if isinstance(vanity_domain_id, six.string_types) and len(vanity_domain_id.strip()) == 0:
+        raise click.UsageError('Parameter --vanity-domain-id cannot be whitespace or empty string')
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['isAkamai'] = is_akamai
+    _details['commonName'] = common_name
+    _details['certificatePem'] = certificate_pem
+
+    if certificate_chain_pem is not None:
+        _details['certificateChainPem'] = certificate_chain_pem
+
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.upload_vanity_domain_certificate(
+        vanity_domain_id=vanity_domain_id,
+        fusion_environment_id=fusion_environment_id,
+        upload_vanity_domain_certificate_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@email_subdomain_group.command(name=cli_util.override('fusion_apps.validate_and_configure_email_subdomain_certificate.command_name', 'validate-and-configure-email-subdomain-certificate'), help=u"""Validate and configure certificate for emailSubdomain \n[Command Reference](validateAndConfigureEmailSubdomainCertificate)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--marketing-brand-id', required=True, help=u"""unique brand identifier""")
+@cli_util.option('--email-subdomain-id', required=True, help=u"""unique emailSubdomain identifier""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def validate_and_configure_email_subdomain_certificate(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, fusion_environment_id, marketing_brand_id, email_subdomain_id, if_match):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(marketing_brand_id, six.string_types) and len(marketing_brand_id.strip()) == 0:
+        raise click.UsageError('Parameter --marketing-brand-id cannot be whitespace or empty string')
+
+    if isinstance(email_subdomain_id, six.string_types) and len(email_subdomain_id.strip()) == 0:
+        raise click.UsageError('Parameter --email-subdomain-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.validate_and_configure_email_subdomain_certificate(
+        fusion_environment_id=fusion_environment_id,
+        marketing_brand_id=marketing_brand_id,
+        email_subdomain_id=email_subdomain_id,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@email_subdomain_group.command(name=cli_util.override('fusion_apps.validate_and_configure_email_subdomain_dns.command_name', 'validate-and-configure-email-subdomain-dns'), help=u"""Validate and configure DNS records for emailSubdomain \n[Command Reference](validateAndConfigureEmailSubdomainDns)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--marketing-brand-id', required=True, help=u"""unique brand identifier""")
+@cli_util.option('--email-subdomain-id', required=True, help=u"""unique emailSubdomain identifier""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def validate_and_configure_email_subdomain_dns(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, fusion_environment_id, marketing_brand_id, email_subdomain_id, if_match):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(marketing_brand_id, six.string_types) and len(marketing_brand_id.strip()) == 0:
+        raise click.UsageError('Parameter --marketing-brand-id cannot be whitespace or empty string')
+
+    if isinstance(email_subdomain_id, six.string_types) and len(email_subdomain_id.strip()) == 0:
+        raise click.UsageError('Parameter --email-subdomain-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.validate_and_configure_email_subdomain_dns(
+        fusion_environment_id=fusion_environment_id,
+        marketing_brand_id=marketing_brand_id,
+        email_subdomain_id=email_subdomain_id,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@microsite_group.command(name=cli_util.override('fusion_apps.validate_and_configure_microsite_dns.command_name', 'validate-and-configure-microsite-dns'), help=u"""Validate and configure DNS records for microsite \n[Command Reference](validateAndConfigureMicrositeDns)""")
+@cli_util.option('--fusion-environment-id', required=True, help=u"""unique FusionEnvironment identifier""")
+@cli_util.option('--marketing-brand-id', required=True, help=u"""unique brand identifier""")
+@cli_util.option('--microsite-id', required=True, help=u"""unique microsite identifier""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def validate_and_configure_microsite_dns(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, fusion_environment_id, marketing_brand_id, microsite_id, if_match):
+
+    if isinstance(fusion_environment_id, six.string_types) and len(fusion_environment_id.strip()) == 0:
+        raise click.UsageError('Parameter --fusion-environment-id cannot be whitespace or empty string')
+
+    if isinstance(marketing_brand_id, six.string_types) and len(marketing_brand_id.strip()) == 0:
+        raise click.UsageError('Parameter --marketing-brand-id cannot be whitespace or empty string')
+
+    if isinstance(microsite_id, six.string_types) and len(microsite_id.strip()) == 0:
+        raise click.UsageError('Parameter --microsite-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('fusion_apps', 'fusion_applications', ctx)
+    result = client.validate_and_configure_microsite_dns(
+        fusion_environment_id=fusion_environment_id,
+        marketing_brand_id=marketing_brand_id,
+        microsite_id=microsite_id,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
     cli_util.render_response(result, ctx)
 
 
