@@ -206,6 +206,12 @@ def drg_route_table_group():
     pass
 
 
+@click.command(cli_util.override('virtual_network.provider_remote_region_name_group.command_name', 'provider-remote-region-name'), cls=CommandGroupWithAlias, help="""A pair of OCI region and Provider remote region names for FastConnect MultiCloud interconnect.""")
+@cli_util.help_option_group
+def provider_remote_region_name_group():
+    pass
+
+
 @click.command(cli_util.override('virtual_network.tunnel_security_association_group.command_name', 'tunnel-security-association'), cls=CommandGroupWithAlias, help="""A summary of the IPSec tunnel security association details.""")
 @cli_util.help_option_group
 def tunnel_security_association_group():
@@ -591,6 +597,7 @@ virtual_network_root_group.add_command(fast_connect_provider_service_key_group)
 virtual_network_root_group.add_command(drg_route_distribution_statement_group)
 virtual_network_root_group.add_command(ip_inventory_subnet_resource_collection_group)
 virtual_network_root_group.add_command(drg_route_table_group)
+virtual_network_root_group.add_command(provider_remote_region_name_group)
 virtual_network_root_group.add_command(tunnel_security_association_group)
 virtual_network_root_group.add_command(internet_gateway_group)
 virtual_network_root_group.add_command(ip_sec_connection_group)
@@ -5078,6 +5085,8 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 This option is a JSON list with items of type CreateVirtualCircuitPublicPrefixDetails.  For documentation on CreateVirtualCircuitPublicPrefixDetails please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/iaas/20160918/datatypes/CreateVirtualCircuitPublicPrefixDetails.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--region-parameterconflict', help=u"""The Oracle Cloud Infrastructure region where this virtual circuit is located. Example: `phx`""")
 @cli_util.option('--ip-mtu', type=custom_types.CliCaseInsensitiveChoice(["MTU_1500", "MTU_9000"]), help=u"""The layer 3 IP MTU to use with this virtual circuit.""")
+@cli_util.option('--provider-remote-region', help=u"""The OCI's FastConnect MultiCloud Provider/Partner remote region name associated with the OCI region. To get the list of associated provider remote region use the ListProviderRemoteRegions operation""")
+@cli_util.option('--remote-account-id', help=u"""Customer's account on Provider/Partner cloud (AWS, GCP or any other)""")
 @cli_util.option('--traffic-mode', type=custom_types.CliCaseInsensitiveChoice(["NORMAL", "DRAIN"]), help=u"""The traffic mode to be set with this Virtual Circuit. This controls whether the traffic is to be drained for the associated Virtual Circuit or not.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["PENDING_PROVIDER", "VERIFYING", "PROVISIONING", "PROVISIONED", "FAILED", "INACTIVE", "TERMINATING", "TERMINATED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state PENDING_PROVIDER --wait-for-state TERMINATED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
@@ -5087,7 +5096,7 @@ This option is a JSON list with items of type CreateVirtualCircuitPublicPrefixDe
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'cross-connect-mappings': {'module': 'core', 'class': 'list[CrossConnectMapping]'}, 'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}, 'public-prefixes': {'module': 'core', 'class': 'list[CreateVirtualCircuitPublicPrefixDetails]'}}, output_type={'module': 'core', 'class': 'VirtualCircuit'})
 @cli_util.wrap_exceptions
-def create_virtual_circuit(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, type, bandwidth_shape_name, cross_connect_mappings, routing_policy, bgp_admin_state, is_bfd_enabled, is_transport_mode, customer_bgp_asn, customer_asn, defined_tags, display_name, freeform_tags, gateway_id, provider_name, provider_service_id, provider_service_key_name, provider_service_name, public_prefixes, region_parameterconflict, ip_mtu, traffic_mode):
+def create_virtual_circuit(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, type, bandwidth_shape_name, cross_connect_mappings, routing_policy, bgp_admin_state, is_bfd_enabled, is_transport_mode, customer_bgp_asn, customer_asn, defined_tags, display_name, freeform_tags, gateway_id, provider_name, provider_service_id, provider_service_key_name, provider_service_name, public_prefixes, region_parameterconflict, ip_mtu, provider_remote_region, remote_account_id, traffic_mode):
 
     kwargs = {}
 
@@ -5151,6 +5160,12 @@ def create_virtual_circuit(ctx, from_json, wait_for_state, max_wait_seconds, wai
 
     if ip_mtu is not None:
         _details['ipMtu'] = ip_mtu
+
+    if provider_remote_region is not None:
+        _details['providerRemoteRegion'] = provider_remote_region
+
+    if remote_account_id is not None:
+        _details['remoteAccountId'] = remote_account_id
 
     if traffic_mode is not None:
         _details['trafficMode'] = traffic_mode
@@ -10702,6 +10717,59 @@ def list_private_ips(ctx, from_json, all_pages, page_size, limit, page, ip_addre
         )
     else:
         result = client.list_private_ips(
+            **kwargs
+        )
+    cli_util.render_response(result, ctx)
+
+
+@provider_remote_region_name_group.command(name=cli_util.override('virtual_network.list_provider_remote_regions.command_name', 'list-provider-remote-regions'), help=u"""The operation lists available OCI's FastConnect MultiCloud Provider/Partner remote region names associated with an OCI region. \n[Command Reference](listProviderRemoteRegions)""")
+@cli_util.option('--provider-service-id', required=True, help=u"""The [OCID] of the provider service.""")
+@cli_util.option('--limit', type=click.INT, help=u"""For list pagination. The maximum number of results per page, or items to return in a paginated \"List\" call. For important details about how pagination works, see [List Pagination].
+
+Example: `50`""")
+@cli_util.option('--page', help=u"""For list pagination. The value of the `opc-next-page` response header from the previous \"List\" call. For important details about how pagination works, see [List Pagination].""")
+@cli_util.option('--all', 'all_pages', is_flag=True, help="""Fetches all pages of results. If you provide this option, then you cannot provide the --limit option.""")
+@cli_util.option('--page-size', type=click.INT, help="""When fetching results, the number of results to fetch per call. Only valid when used with --all or --limit, and ignored otherwise.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'core', 'class': 'list[ProviderRemoteRegionName]'})
+@cli_util.wrap_exceptions
+def list_provider_remote_regions(ctx, from_json, all_pages, page_size, provider_service_id, limit, page):
+
+    if all_pages and limit:
+        raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
+
+    if isinstance(provider_service_id, six.string_types) and len(provider_service_id.strip()) == 0:
+        raise click.UsageError('Parameter --provider-service-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if limit is not None:
+        kwargs['limit'] = limit
+    if page is not None:
+        kwargs['page'] = page
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('core', 'virtual_network', ctx)
+    if all_pages:
+        if page_size:
+            kwargs['limit'] = page_size
+
+        result = cli_util.list_call_get_all_results(
+            client.list_provider_remote_regions,
+            provider_service_id=provider_service_id,
+            **kwargs
+        )
+    elif limit is not None:
+        result = cli_util.list_call_get_up_to_limit(
+            client.list_provider_remote_regions,
+            limit,
+            page_size,
+            provider_service_id=provider_service_id,
+            **kwargs
+        )
+    else:
+        result = client.list_provider_remote_regions(
+            provider_service_id=provider_service_id,
             **kwargs
         )
     cli_util.render_response(result, ctx)

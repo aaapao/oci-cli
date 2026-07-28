@@ -201,6 +201,7 @@ SDK_client_map = {
     "virtual_network.list_network_security_group_vnics": "oci.core.VirtualNetworkClient.list_network_security_group_vnics",
     "virtual_network.list_network_security_groups": "oci.core.VirtualNetworkClient.list_network_security_groups",
     "virtual_network.list_private_ips": "oci.core.VirtualNetworkClient.list_private_ips",
+    "virtual_network.list_provider_remote_regions": "oci.core.VirtualNetworkClient.list_provider_remote_regions",
     "virtual_network.list_public_ip_pools": "oci.core.VirtualNetworkClient.list_public_ip_pools",
     "virtual_network.list_public_ips": "oci.core.VirtualNetworkClient.list_public_ips",
     "virtual_network.list_remote_peering_connections": "oci.core.VirtualNetworkClient.list_remote_peering_connections",

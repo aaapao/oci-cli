@@ -1161,15 +1161,19 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--type', type=custom_types.CliCaseInsensitiveChoice(["FULL", "INCREMENTAL"]), help=u"""The type of backup to create. If omitted, defaults to incremental.""")
 @cli_util.option('--kms-key-id', help=u"""The OCID of the Vault service key which is the master encryption key for the volume backup. For more information about the Vault service and encryption keys, see [Overview of Vault service] and [Using Keys].""")
+@cli_util.option('--retention-period', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--is-prevent-deletion-enabled', type=click.BOOL, help=u"""Prevent backups from being deleted during the configured retention period. This is an optional field. If it is not specified, it is set to null, prevent deletion will not be applied to the backups.""")
+@cli_util.option('--is-retention-lock-enabled', type=click.BOOL, help=u"""feature that prevents deletion or alteration of backup data for a specified period to ensure data protection and regulatory compliance. This is an optional field. If it is not specified, it is set to null, no retention lock will be applied to the backups. This feature should be used in conjunction with the retention-period field.""")
+@cli_util.option('--is-indefinite-retention-enabled', type=click.BOOL, help=u"""feature that preserves backup data from modification or deletion to ensure it remains available for legal or regulatory investigations or litigation, regardless of standard retention policies. This is an optional field. If it is not specified, it is set to null, no legal hold will be applied to the backups.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "AVAILABLE", "TERMINATING", "TERMINATED", "FAULTY", "REQUEST_RECEIVED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state CREATING --wait-for-state REQUEST_RECEIVED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}})
+@json_skeleton_utils.get_cli_json_input_option({'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}, 'retention-period': {'module': 'core', 'class': 'RetentionDuration'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}}, output_type={'module': 'core', 'class': 'BootVolumeBackup'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}, 'retention-period': {'module': 'core', 'class': 'RetentionDuration'}}, output_type={'module': 'core', 'class': 'BootVolumeBackup'})
 @cli_util.wrap_exceptions
-def create_boot_volume_backup(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, boot_volume_id, defined_tags, display_name, freeform_tags, type, kms_key_id):
+def create_boot_volume_backup(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, boot_volume_id, defined_tags, display_name, freeform_tags, type, kms_key_id, retention_period, is_prevent_deletion_enabled, is_retention_lock_enabled, is_indefinite_retention_enabled):
 
     kwargs = {}
 
@@ -1190,6 +1194,18 @@ def create_boot_volume_backup(ctx, from_json, wait_for_state, max_wait_seconds, 
 
     if kms_key_id is not None:
         _details['kmsKeyId'] = kms_key_id
+
+    if retention_period is not None:
+        _details['retentionPeriod'] = cli_util.parse_json_parameter("retention_period", retention_period)
+
+    if is_prevent_deletion_enabled is not None:
+        _details['isPreventDeletionEnabled'] = is_prevent_deletion_enabled
+
+    if is_retention_lock_enabled is not None:
+        _details['isRetentionLockEnabled'] = is_retention_lock_enabled
+
+    if is_indefinite_retention_enabled is not None:
+        _details['isIndefiniteRetentionEnabled'] = is_indefinite_retention_enabled
 
     client = cli_util.build_client('core', 'blockstorage', ctx)
     result = client.create_boot_volume_backup(
@@ -1955,15 +1971,19 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--type', type=custom_types.CliCaseInsensitiveChoice(["FULL", "INCREMENTAL"]), help=u"""The type of backup to create. If omitted, defaults to INCREMENTAL.""")
+@cli_util.option('--retention-period', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--is-prevent-deletion-enabled', type=click.BOOL, help=u"""Prevent backups from being deleted during the configured retention period. This is an optional field. If it is not specified, it is set to null, prevent deletion will not be applied to the backups.""")
+@cli_util.option('--is-retention-lock-enabled', type=click.BOOL, help=u"""feature that prevents deletion or alteration of backup data for a specified period to ensure data protection and regulatory compliance. This is an optional field. If it is not specified, it is set to null, no retention lock will be applied to the backups. This feature should be used in conjunction with the retention-period field.""")
+@cli_util.option('--is-indefinite-retention-enabled', type=click.BOOL, help=u"""feature that preserves backup data from modification or deletion to ensure it remains available for legal or regulatory investigations or litigation, regardless of standard retention policies. This is an optional field. If it is not specified, it is set to null, no legal hold will be applied to the backups.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "AVAILABLE", "TERMINATING", "TERMINATED", "FAULTY", "REQUEST_RECEIVED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state CREATING --wait-for-state REQUEST_RECEIVED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}})
+@json_skeleton_utils.get_cli_json_input_option({'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}, 'retention-period': {'module': 'core', 'class': 'RetentionDuration'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}}, output_type={'module': 'core', 'class': 'VolumeBackup'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}, 'retention-period': {'module': 'core', 'class': 'RetentionDuration'}}, output_type={'module': 'core', 'class': 'VolumeBackup'})
 @cli_util.wrap_exceptions
-def create_volume_backup(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, volume_id, kms_key_id, defined_tags, display_name, freeform_tags, type):
+def create_volume_backup(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, volume_id, kms_key_id, defined_tags, display_name, freeform_tags, type, retention_period, is_prevent_deletion_enabled, is_retention_lock_enabled, is_indefinite_retention_enabled):
 
     kwargs = {}
 
@@ -1984,6 +2004,18 @@ def create_volume_backup(ctx, from_json, wait_for_state, max_wait_seconds, wait_
 
     if type is not None:
         _details['type'] = type
+
+    if retention_period is not None:
+        _details['retentionPeriod'] = cli_util.parse_json_parameter("retention_period", retention_period)
+
+    if is_prevent_deletion_enabled is not None:
+        _details['isPreventDeletionEnabled'] = is_prevent_deletion_enabled
+
+    if is_retention_lock_enabled is not None:
+        _details['isRetentionLockEnabled'] = is_retention_lock_enabled
+
+    if is_indefinite_retention_enabled is not None:
+        _details['isIndefiniteRetentionEnabled'] = is_indefinite_retention_enabled
 
     client = cli_util.build_client('core', 'blockstorage', ctx)
     result = client.create_volume_backup(
@@ -2558,15 +2590,19 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--type', type=custom_types.CliCaseInsensitiveChoice(["FULL", "INCREMENTAL"]), help=u"""The type of backup to create. If omitted, defaults to incremental.""")
+@cli_util.option('--retention-period', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--is-prevent-deletion-enabled', type=click.BOOL, help=u"""Prevent backups from being deleted during the configured retention period. This is an optional field. If it is not specified, it is set to null, prevent deletion will not be applied to the backups.""")
+@cli_util.option('--is-retention-lock-enabled', type=click.BOOL, help=u"""feature that prevents deletion or alteration of backup data for a specified period to ensure data protection and regulatory compliance. This is an optional field. If it is not specified, it is set to null, no retention lock will be applied to the backups. This feature should be used in conjunction with the retention-period field.""")
+@cli_util.option('--is-indefinite-retention-enabled', type=click.BOOL, help=u"""feature that preserves backup data from modification or deletion to ensure it remains available for legal or regulatory investigations or litigation, regardless of standard retention policies. This is an optional field. If it is not specified, it is set to null, no legal hold will be applied to the backups.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "COMMITTED", "AVAILABLE", "TERMINATING", "TERMINATED", "FAULTY", "REQUEST_RECEIVED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state CREATING --wait-for-state REQUEST_RECEIVED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}})
+@json_skeleton_utils.get_cli_json_input_option({'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}, 'retention-period': {'module': 'core', 'class': 'RetentionDuration'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}}, output_type={'module': 'core', 'class': 'VolumeGroupBackup'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}, 'retention-period': {'module': 'core', 'class': 'RetentionDuration'}}, output_type={'module': 'core', 'class': 'VolumeGroupBackup'})
 @cli_util.wrap_exceptions
-def create_volume_group_backup(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, volume_group_id, compartment_id, defined_tags, display_name, freeform_tags, type):
+def create_volume_group_backup(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, volume_group_id, compartment_id, defined_tags, display_name, freeform_tags, type, retention_period, is_prevent_deletion_enabled, is_retention_lock_enabled, is_indefinite_retention_enabled):
 
     kwargs = {}
 
@@ -2587,6 +2623,18 @@ def create_volume_group_backup(ctx, from_json, wait_for_state, max_wait_seconds,
 
     if type is not None:
         _details['type'] = type
+
+    if retention_period is not None:
+        _details['retentionPeriod'] = cli_util.parse_json_parameter("retention_period", retention_period)
+
+    if is_prevent_deletion_enabled is not None:
+        _details['isPreventDeletionEnabled'] = is_prevent_deletion_enabled
+
+    if is_retention_lock_enabled is not None:
+        _details['isRetentionLockEnabled'] = is_retention_lock_enabled
+
+    if is_indefinite_retention_enabled is not None:
+        _details['isIndefiniteRetentionEnabled'] = is_indefinite_retention_enabled
 
     client = cli_util.build_client('core', 'blockstorage', ctx)
     result = client.create_volume_group_backup(
@@ -4191,23 +4239,27 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--kms-key-id', help=u"""The OCID of the Vault service key which is the master encryption key for the volume backup. For more information about the Vault service and encryption keys, see [Overview of Vault service] and [Using Keys].""")
+@cli_util.option('--retention-period', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--is-prevent-deletion-enabled', type=click.BOOL, help=u"""Prevent backups from being deleted during the configured retention period. This is an optional field. If it is not specified, it is set to null, prevent deletion will not be applied to the backups.""")
+@cli_util.option('--is-retention-lock-enabled', type=click.BOOL, help=u"""feature that prevents deletion or alteration of backup data for a specified period to ensure data protection and regulatory compliance. This is an optional field. If it is not specified, it is set to null, no retention lock will be applied to the backups. This feature should be used in conjunction with the retention-period field.""")
+@cli_util.option('--is-indefinite-retention-enabled', type=click.BOOL, help=u"""feature that preserves backup data from modification or deletion to ensure it remains available for legal or regulatory investigations or litigation, regardless of standard retention policies. This is an optional field. If it is not specified, it is set to null, no legal hold will be applied to the backups.""")
 @cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
 @cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "AVAILABLE", "TERMINATING", "TERMINATED", "FAULTY", "REQUEST_RECEIVED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state CREATING --wait-for-state REQUEST_RECEIVED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}})
+@json_skeleton_utils.get_cli_json_input_option({'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}, 'retention-period': {'module': 'core', 'class': 'RetentionDuration'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}}, output_type={'module': 'core', 'class': 'BootVolumeBackup'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}, 'retention-period': {'module': 'core', 'class': 'RetentionDuration'}}, output_type={'module': 'core', 'class': 'BootVolumeBackup'})
 @cli_util.wrap_exceptions
-def update_boot_volume_backup(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, boot_volume_backup_id, defined_tags, display_name, freeform_tags, kms_key_id, if_match):
+def update_boot_volume_backup(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, boot_volume_backup_id, defined_tags, display_name, freeform_tags, kms_key_id, retention_period, is_prevent_deletion_enabled, is_retention_lock_enabled, is_indefinite_retention_enabled, if_match):
 
     if isinstance(boot_volume_backup_id, six.string_types) and len(boot_volume_backup_id.strip()) == 0:
         raise click.UsageError('Parameter --boot-volume-backup-id cannot be whitespace or empty string')
     if not force:
-        if defined_tags or freeform_tags:
-            if not click.confirm("WARNING: Updates to defined-tags and freeform-tags will replace any existing values. Are you sure you want to continue?"):
+        if defined_tags or freeform_tags or retention_period:
+            if not click.confirm("WARNING: Updates to defined-tags and freeform-tags and retention-period will replace any existing values. Are you sure you want to continue?"):
                 ctx.abort()
 
     kwargs = {}
@@ -4227,6 +4279,18 @@ def update_boot_volume_backup(ctx, from_json, force, wait_for_state, max_wait_se
 
     if kms_key_id is not None:
         _details['kmsKeyId'] = kms_key_id
+
+    if retention_period is not None:
+        _details['retentionPeriod'] = cli_util.parse_json_parameter("retention_period", retention_period)
+
+    if is_prevent_deletion_enabled is not None:
+        _details['isPreventDeletionEnabled'] = is_prevent_deletion_enabled
+
+    if is_retention_lock_enabled is not None:
+        _details['isRetentionLockEnabled'] = is_retention_lock_enabled
+
+    if is_indefinite_retention_enabled is not None:
+        _details['isIndefiniteRetentionEnabled'] = is_indefinite_retention_enabled
 
     client = cli_util.build_client('core', 'blockstorage', ctx)
     result = client.update_boot_volume_backup(
@@ -4417,23 +4481,27 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--kms-key-id', help=u"""The OCID of the Vault service key which is the master encryption key for the volume backup. For more information about the Vault service and encryption keys, see [Overview of Vault service] and [Using Keys].""")
+@cli_util.option('--retention-period', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--is-prevent-deletion-enabled', type=click.BOOL, help=u"""Prevent backups from being deleted during the configured retention period. This is an optional field. If it is not specified, it is set to null, prevent deletion will not be applied to the backups.""")
+@cli_util.option('--is-retention-lock-enabled', type=click.BOOL, help=u"""feature that prevents deletion or alteration of backup data for a specified period to ensure data protection and regulatory compliance. This is an optional field. If it is not specified, it is set to null, no retention lock will be applied to the backups. This feature should be used in conjunction with the retention-period field.""")
+@cli_util.option('--is-indefinite-retention-enabled', type=click.BOOL, help=u"""feature that preserves backup data from modification or deletion to ensure it remains available for legal or regulatory investigations or litigation, regardless of standard retention policies. This is an optional field. If it is not specified, it is set to null, no legal hold will be applied to the backups.""")
 @cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
 @cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "AVAILABLE", "TERMINATING", "TERMINATED", "FAULTY", "REQUEST_RECEIVED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state CREATING --wait-for-state REQUEST_RECEIVED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}})
+@json_skeleton_utils.get_cli_json_input_option({'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}, 'retention-period': {'module': 'core', 'class': 'RetentionDuration'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}}, output_type={'module': 'core', 'class': 'VolumeBackup'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}, 'retention-period': {'module': 'core', 'class': 'RetentionDuration'}}, output_type={'module': 'core', 'class': 'VolumeBackup'})
 @cli_util.wrap_exceptions
-def update_volume_backup(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, volume_backup_id, defined_tags, display_name, freeform_tags, kms_key_id, if_match):
+def update_volume_backup(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, volume_backup_id, defined_tags, display_name, freeform_tags, kms_key_id, retention_period, is_prevent_deletion_enabled, is_retention_lock_enabled, is_indefinite_retention_enabled, if_match):
 
     if isinstance(volume_backup_id, six.string_types) and len(volume_backup_id.strip()) == 0:
         raise click.UsageError('Parameter --volume-backup-id cannot be whitespace or empty string')
     if not force:
-        if defined_tags or freeform_tags:
-            if not click.confirm("WARNING: Updates to defined-tags and freeform-tags will replace any existing values. Are you sure you want to continue?"):
+        if defined_tags or freeform_tags or retention_period:
+            if not click.confirm("WARNING: Updates to defined-tags and freeform-tags and retention-period will replace any existing values. Are you sure you want to continue?"):
                 ctx.abort()
 
     kwargs = {}
@@ -4453,6 +4521,18 @@ def update_volume_backup(ctx, from_json, force, wait_for_state, max_wait_seconds
 
     if kms_key_id is not None:
         _details['kmsKeyId'] = kms_key_id
+
+    if retention_period is not None:
+        _details['retentionPeriod'] = cli_util.parse_json_parameter("retention_period", retention_period)
+
+    if is_prevent_deletion_enabled is not None:
+        _details['isPreventDeletionEnabled'] = is_prevent_deletion_enabled
+
+    if is_retention_lock_enabled is not None:
+        _details['isRetentionLockEnabled'] = is_retention_lock_enabled
+
+    if is_indefinite_retention_enabled is not None:
+        _details['isIndefiniteRetentionEnabled'] = is_indefinite_retention_enabled
 
     client = cli_util.build_client('core', 'blockstorage', ctx)
     result = client.update_volume_backup(
@@ -4647,23 +4727,27 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--retention-period', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--is-prevent-deletion-enabled', type=click.BOOL, help=u"""Prevent backups from being deleted during the configured retention period. This is an optional field. If it is not specified, it is set to null, prevent deletion will not be applied to the backups.""")
+@cli_util.option('--is-retention-lock-enabled', type=click.BOOL, help=u"""feature that prevents deletion or alteration of backup data for a specified period to ensure data protection and regulatory compliance. This is an optional field. If it is not specified, it is set to null, no retention lock will be applied to the backups. This feature should be used in conjunction with the retention-period field.""")
+@cli_util.option('--is-indefinite-retention-enabled', type=click.BOOL, help=u"""feature that preserves backup data from modification or deletion to ensure it remains available for legal or regulatory investigations or litigation, regardless of standard retention policies. This is an optional field. If it is not specified, it is set to null, no legal hold will be applied to the backups.""")
 @cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
 @cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "COMMITTED", "AVAILABLE", "TERMINATING", "TERMINATED", "FAULTY", "REQUEST_RECEIVED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state CREATING --wait-for-state REQUEST_RECEIVED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}})
+@json_skeleton_utils.get_cli_json_input_option({'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}, 'retention-period': {'module': 'core', 'class': 'RetentionDuration'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}}, output_type={'module': 'core', 'class': 'VolumeGroupBackup'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}, 'retention-period': {'module': 'core', 'class': 'RetentionDuration'}}, output_type={'module': 'core', 'class': 'VolumeGroupBackup'})
 @cli_util.wrap_exceptions
-def update_volume_group_backup(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, volume_group_backup_id, defined_tags, display_name, freeform_tags, if_match):
+def update_volume_group_backup(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, volume_group_backup_id, defined_tags, display_name, freeform_tags, retention_period, is_prevent_deletion_enabled, is_retention_lock_enabled, is_indefinite_retention_enabled, if_match):
 
     if isinstance(volume_group_backup_id, six.string_types) and len(volume_group_backup_id.strip()) == 0:
         raise click.UsageError('Parameter --volume-group-backup-id cannot be whitespace or empty string')
     if not force:
-        if defined_tags or freeform_tags:
-            if not click.confirm("WARNING: Updates to defined-tags and freeform-tags will replace any existing values. Are you sure you want to continue?"):
+        if defined_tags or freeform_tags or retention_period:
+            if not click.confirm("WARNING: Updates to defined-tags and freeform-tags and retention-period will replace any existing values. Are you sure you want to continue?"):
                 ctx.abort()
 
     kwargs = {}
@@ -4680,6 +4764,18 @@ def update_volume_group_backup(ctx, from_json, force, wait_for_state, max_wait_s
 
     if freeform_tags is not None:
         _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
+
+    if retention_period is not None:
+        _details['retentionPeriod'] = cli_util.parse_json_parameter("retention_period", retention_period)
+
+    if is_prevent_deletion_enabled is not None:
+        _details['isPreventDeletionEnabled'] = is_prevent_deletion_enabled
+
+    if is_retention_lock_enabled is not None:
+        _details['isRetentionLockEnabled'] = is_retention_lock_enabled
+
+    if is_indefinite_retention_enabled is not None:
+        _details['isIndefiniteRetentionEnabled'] = is_indefinite_retention_enabled
 
     client = cli_util.build_client('core', 'blockstorage', ctx)
     result = client.update_volume_group_backup(

@@ -1469,6 +1469,7 @@ database_cli.db_root_group.commands.pop(database_cli.vm_cluster_update_history_e
 @cli_util.option('--patch-action', help="""The action to perform on the patch.""")
 @cli_util.option('--patch-id', help="""The OCID of the patch.""")
 @cli_util.option('--update-action', help="""The action to perform on the update.""")
+@cli_util.option('--update-mode', help="""The update mode applicable to OS Update.""")
 @cli_util.option('--update-id', help="""The [OCID](/Content/General/Concepts/identifiers.htm) of the maintenance update.""")
 @cli_util.option('--gi-image-id', help="""The [OCID](/Content/General/Concepts/identifiers.htm) of the grid infrastructure software image. This is a database software image of type `GRID_IMAGE`.""")
 @cli_util.option('--data-collection-options', type=custom_types.CLI_COMPLEX_TYPE, help=DATA_COLLECTION_OPTIONS_HELP)
@@ -1489,6 +1490,7 @@ def update_vm_cluster_extended(ctx, **kwargs):
         }
 
     update_action = kwargs.get('update_action')
+    update_mode = kwargs.get('update_mode')
     update_id = kwargs.get('update_id')
     gi_image_id = kwargs.get('gi_image_id')
     if update_id and gi_image_id:
@@ -1497,11 +1499,15 @@ def update_vm_cluster_extended(ctx, **kwargs):
         raise click.UsageError('--update-id or --gi-image-id is required if --update-action is specified')
     elif (update_id or gi_image_id) and not update_action:
         raise click.UsageError('--update-action is required if --update-id or --gi-image-id is specified')
+    elif update_mode is not None and not update_id:
+        raise click.UsageError('--update-mode is only required if --update-id is specified to perform DomU OS Update')
     elif update_id and update_action:
         kwargs['update_details'] = {
             "updateAction": update_action,
             "updateId": update_id
         }
+        if update_mode is not None:
+            kwargs['update_details']['updateMode'] = update_mode
     elif gi_image_id and update_action:
         kwargs['update_details'] = {
             "updateAction": update_action,
@@ -1514,6 +1520,7 @@ def update_vm_cluster_extended(ctx, **kwargs):
     del kwargs['update_action']
     del kwargs['update_id']
     del kwargs['gi_image_id']
+    del kwargs['update_mode']
 
     ctx.invoke(database_cli.update_vm_cluster, **kwargs)
 
@@ -2125,6 +2132,7 @@ def list_cloud_vm_clusters(ctx, **kwargs):
 @cli_util.copy_params_from_generated_command(database_cli.update_cloud_vm_cluster, params_to_exclude=['ssh_public_keys', 'update_details', 'data_collection_options'])
 @database_cli.cloud_vm_cluster_group.command(name='update', help=database_cli.update_cloud_vm_cluster.help)
 @cli_util.option('--update-action', help="""The action to perform on the update.""")
+@cli_util.option('--update-mode', help="""The update mode applicable to OS Update.""")
 @cli_util.option('--update-id', help="""The [OCID](/Content/General/Concepts/identifiers.htm) of the maintenance update.""")
 @cli_util.option('--gi-image-id', help="""The [OCID](/Content/General/Concepts/identifiers.htm) of the grid infrastructure software image. This is a database software image of type `GRID_IMAGE`.""")
 @cli_util.option('--ssh-authorized-keys-file', type=click.File('r'), help="""A file containing one or more public SSH keys to use for SSH access to the cloud VM cluster. Use a newline character to separate multiple keys. The length of the combined keys cannot exceed 10,000 characters.""")
@@ -2138,6 +2146,7 @@ def update_cloud_vm_cluster(ctx, **kwargs):
         kwargs['ssh_public_keys'] = json.dumps(content)
 
     update_action = kwargs.get('update_action')
+    update_mode = kwargs.get('update_mode')
     update_id = kwargs.get('update_id')
     gi_image_id = kwargs.get('gi_image_id')
     if update_id and gi_image_id:
@@ -2146,11 +2155,15 @@ def update_cloud_vm_cluster(ctx, **kwargs):
         raise click.UsageError('--update-id or --gi-image-id is required if --update-action is specified')
     elif (update_id or gi_image_id) and not update_action:
         raise click.UsageError('--update-action is required if --update-id or --gi-image-id is specified')
+    elif update_mode is not None and not update_id:
+        raise click.UsageError('--update-mode is only required if --update-id is specified to perform DomU OS Update')
     elif update_id and update_action:
         kwargs['update_details'] = {
             "updateAction": update_action,
             "updateId": update_id
         }
+        if update_mode is not None:
+            kwargs['update_details']['updateMode'] = update_mode
     elif gi_image_id and update_action:
         kwargs['update_details'] = {
             "updateAction": update_action,
@@ -2162,6 +2175,7 @@ def update_cloud_vm_cluster(ctx, **kwargs):
     del kwargs['update_action']
     del kwargs['update_id']
     del kwargs['gi_image_id']
+    del kwargs['update_mode']
 
     ctx.invoke(database_cli.update_cloud_vm_cluster, **kwargs)
 

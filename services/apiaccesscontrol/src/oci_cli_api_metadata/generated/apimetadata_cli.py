@@ -62,7 +62,7 @@ def get_api_metadata(ctx, from_json, api_metadata_id):
 
 
 @api_metadata_group.command(name=cli_util.override('api_metadata.list_api_metadata.command_name', 'list'), help=u"""Gets a list of ApiMetadata. \n[Command Reference](listApiMetadata)""")
-@cli_util.option('--compartment-id', help=u"""The [OCID] of the compartment in which to list resources.""")
+@cli_util.option('--compartment-id', required=True, help=u"""The [OCID] of the compartment in which to list resources.""")
 @cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "UPDATING", "ACTIVE", "DELETING", "DELETED", "FAILED"]), help=u"""A filter to return only resources that match the given lifecycle state. The state value is case-insensitive.""")
 @cli_util.option('--resource-type', help=u"""A filter to return only lists of resources that match the entire given service type.""")
 @cli_util.option('--display-name', help=u"""A filter to return only resources that match the given display name exactly.""")
@@ -83,8 +83,6 @@ def list_api_metadata(ctx, from_json, all_pages, page_size, compartment_id, life
         raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
 
     kwargs = {}
-    if compartment_id is not None:
-        kwargs['compartment_id'] = compartment_id
     if lifecycle_state is not None:
         kwargs['lifecycle_state'] = lifecycle_state
     if resource_type is not None:
@@ -107,6 +105,7 @@ def list_api_metadata(ctx, from_json, all_pages, page_size, compartment_id, life
 
         result = cli_util.list_call_get_all_results(
             client.list_api_metadata,
+            compartment_id=compartment_id,
             **kwargs
         )
     elif limit is not None:
@@ -114,17 +113,19 @@ def list_api_metadata(ctx, from_json, all_pages, page_size, compartment_id, life
             client.list_api_metadata,
             limit,
             page_size,
+            compartment_id=compartment_id,
             **kwargs
         )
     else:
         result = client.list_api_metadata(
+            compartment_id=compartment_id,
             **kwargs
         )
     cli_util.render_response(result, ctx)
 
 
 @api_metadata_group.command(name=cli_util.override('api_metadata.list_api_metadata_by_entity_types.command_name', 'list-api-metadata-by-entity-types'), help=u"""Gets a list of ApiMetadata Grouped By Entity Types. \n[Command Reference](listApiMetadataByEntityTypes)""")
-@cli_util.option('--compartment-id', help=u"""The [OCID] of the compartment in which to list resources.""")
+@cli_util.option('--compartment-id', required=True, help=u"""The [OCID] of the compartment in which to list resources.""")
 @cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "UPDATING", "ACTIVE", "DELETING", "DELETED", "FAILED"]), help=u"""A filter to return only resources that match the given lifecycle state. The state value is case-insensitive.""")
 @cli_util.option('--resource-type', help=u"""A filter to return only lists of resources that match the entire given service type.""")
 @cli_util.option('--display-name', help=u"""A filter to return only resources that match the given display name exactly.""")
@@ -145,8 +146,6 @@ def list_api_metadata_by_entity_types(ctx, from_json, all_pages, page_size, comp
         raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
 
     kwargs = {}
-    if compartment_id is not None:
-        kwargs['compartment_id'] = compartment_id
     if lifecycle_state is not None:
         kwargs['lifecycle_state'] = lifecycle_state
     if resource_type is not None:
@@ -169,6 +168,7 @@ def list_api_metadata_by_entity_types(ctx, from_json, all_pages, page_size, comp
 
         result = cli_util.list_call_get_all_results(
             client.list_api_metadata_by_entity_types,
+            compartment_id=compartment_id,
             **kwargs
         )
     elif limit is not None:
@@ -176,10 +176,12 @@ def list_api_metadata_by_entity_types(ctx, from_json, all_pages, page_size, comp
             client.list_api_metadata_by_entity_types,
             limit,
             page_size,
+            compartment_id=compartment_id,
             **kwargs
         )
     else:
         result = client.list_api_metadata_by_entity_types(
+            compartment_id=compartment_id,
             **kwargs
         )
     cli_util.render_response(result, ctx)
