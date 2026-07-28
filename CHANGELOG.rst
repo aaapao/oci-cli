@@ -6,6 +6,114 @@ All notable changes to this project will be documented in this file.
 
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`__.
 
+3.90.0 - 2026-07-28
+-------------------
+Added
+~~~~~
+* Block Volume Service
+
+  * Support for new optional parameter ``retention-period``, ``is-retention-lock-enabled``, ``is-prevent-deletion-enabled`` and ``is-indefinite-retention-enabled``
+
+    * ``oci bv backup create``
+    * ``oci bv backup update``
+    * ``oci bv boot-volume-backup create``
+    * ``oci bv volume-group-backup update``
+    * ``oci bv volume-group-backup create``
+
+* Compute Service
+
+  * Support for new optional parameter ``--is-burstable``
+
+    * ``oci compute dedicated-vm-host create``
+    * ``oci compute dedicated-vm-host create-dedicated-vm-host-compute-bare-metal-host-placement-constraint-details``
+    * ``oci compute dedicated-vm-host create-dedicated-vm-host-host-group-placement-constraint-details``
+
+* Database Service
+
+  * Support for Oracle Base Database Cloud@Customer (BaseDB-C@C) VM cluster lifecycle, update, and maintenance operations
+
+    * ``oci db basecc-vm-cluster-update-history-entry list``
+    * ``oci db basecc-vm-cluster change-compartment``
+    * ``oci db basecc-vm-cluster delete``
+    * ``oci db basecc-vm-cluster-update-history-entry get``
+    * ``oci db basecc-vm-cluster-update list``
+    * ``oci db basecc-vm-cluster-update get``
+    * ``oci db basecc-vm-cluster list``
+    * ``oci db basecc-vm-cluster get``
+    * ``oci db basecc-vm-cluster create``
+    * ``oci db basecc-vm-cluster update``
+
+
+  * Support for new commands to install or uninstall the PKCS11 driver for a given TDE keystore type on an Exadata VM cluster on Exascale Infrastructure
+
+    * ``oci db exadb-vm-cluster register-exadb-vm-cluster-pkcs``
+    * ``oci db exadb-vm-cluster unregister-exadb-vm-cluster-pkcs``
+
+* Generative AI Service Management
+
+  * Support for additional H100_X16 and H100_X32 dedicated AI cluster shapes
+
+    * ``oci generative-ai dedicated-ai-cluster create --unit-shape``
+
+* GoldenGate
+
+  * Support for AI model connections and AI model/provider collections
+
+    * ``oci goldengate ai-model list``
+    * ``oci goldengate ai-provider list``
+    * ``oci goldengate connection create-ai-model-connection``
+    * ``oci goldengate connection update-ai-model-connection``
+
+  * Support for new optional parameter ``--connection-type-not-equal-to``
+
+    * ``oci goldengate connection-assignment list --connection-type-not-equal-to``
+    * ``oci goldengate connection list --connection-type-not-equal-to``
+
+  * Support for new optional parameter ``connection-type``
+
+    * ``oci goldengate connection-assignment list``
+
+* Networking Service
+
+  * Support for new command for listing available provider regions in the Networking service
+
+    * ``oci network provider-remote-region-name list-provider-remote-regions``
+
+  * Support for new optional parameters ``--provider-remote-region`` and ``--remote-account-id``
+
+    * ``oci network virtual-circuit create``
+
+* Oracle Access Control
+
+  * Support for new optional parameter ``--approver-group-level-list``
+
+    * ``oci apiaccesscontrol privileged-api-control create --approver-group-level-list``
+    * ``oci apiaccesscontrol privileged-api-control update --approver-group-level-list``
+
+Changed
+~~~~~~~
+* Generative AI Service Management
+
+  * [BREAKING] ``--inbound-auth-config`` is now a required parameter
+
+    * ``oci generative-ai hosted-application create --inbound-auth-config``
+
+* Oracle Access Control
+
+  * [BREAKING] ``--compartment-id | -c`` is now a required parameter
+
+    * ``oci apiaccesscontrol api-metadata list``
+    * ``oci apiaccesscontrol api-metadata list-api-metadata-by-entity-types``
+    * ``oci apiaccesscontrol privileged-api-control list-privileged-api-controls``
+    * ``oci apiaccesscontrol privileged-api-work-request list``
+    * ``oci apiaccesscontrol privileged-api-requests list-privileged-api-requests``
+    * ``oci apiaccesscontrol privileged-api-requests create``
+
+  * ``--resources`` is now an optional parameter
+
+    * ``oci apiaccesscontrol privileged-api-control create``
+
+
 3.89.3 - 2026-07-21
 -------------------
 Added

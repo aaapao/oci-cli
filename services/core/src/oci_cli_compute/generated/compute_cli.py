@@ -2598,6 +2598,7 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @cli_util.option('--placement-constraint-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--capacity-config', help=u"""The capacity configuration selected to be configured for the Dedicated Virtual Machine host. Run [ListDedicatedVmHostShapes] API first to see the capacity configuration options.""")
 @cli_util.option('--is-memory-encryption-enabled', type=click.BOOL, help=u"""Specifies if the Dedicated Virtual Machine Host (DVMH) is restricted to running only Confidential VMs. If `true`, only Confidential VMs can be launched. If `false`, Confidential VMs cannot be launched.""")
+@cli_util.option('--is-burstable', type=click.BOOL, help=u"""Specifies if the Dedicated Virtual Machine Host (DVMH) is restricted to running only Burstable VMs. If `true`, only Burstable VMs can be launched. If `false`, Burstable VMs cannot be launched.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "ACTIVE", "UPDATING", "DELETING", "DELETED", "FAILED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state CREATING --wait-for-state FAILED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
@@ -2606,7 +2607,7 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}, 'placement-constraint-details': {'module': 'core', 'class': 'PlacementConstraintDetails'}}, output_type={'module': 'core', 'class': 'DedicatedVmHost'})
 @cli_util.wrap_exceptions
-def create_dedicated_vm_host(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, availability_domain, compartment_id, dedicated_vm_host_shape, defined_tags, display_name, fault_domain, freeform_tags, placement_constraint_details, capacity_config, is_memory_encryption_enabled):
+def create_dedicated_vm_host(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, availability_domain, compartment_id, dedicated_vm_host_shape, defined_tags, display_name, fault_domain, freeform_tags, placement_constraint_details, capacity_config, is_memory_encryption_enabled, is_burstable):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
@@ -2636,6 +2637,9 @@ def create_dedicated_vm_host(ctx, from_json, wait_for_state, max_wait_seconds, w
 
     if is_memory_encryption_enabled is not None:
         _details['isMemoryEncryptionEnabled'] = is_memory_encryption_enabled
+
+    if is_burstable is not None:
+        _details['isBurstable'] = is_burstable
 
     client = cli_util.build_client('core', 'compute', ctx)
     result = client.create_dedicated_vm_host(
@@ -2689,6 +2693,7 @@ Example: `FAULT-DOMAIN-1`""")
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--capacity-config', help=u"""The capacity configuration selected to be configured for the Dedicated Virtual Machine host. Run [ListDedicatedVmHostShapes] API first to see the capacity configuration options.""")
 @cli_util.option('--is-memory-encryption-enabled', type=click.BOOL, help=u"""Specifies if the Dedicated Virtual Machine Host (DVMH) is restricted to running only Confidential VMs. If `true`, only Confidential VMs can be launched. If `false`, Confidential VMs cannot be launched.""")
+@cli_util.option('--is-burstable', type=click.BOOL, help=u"""Specifies if the Dedicated Virtual Machine Host (DVMH) is restricted to running only Burstable VMs. If `true`, only Burstable VMs can be launched. If `false`, Burstable VMs cannot be launched.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "ACTIVE", "UPDATING", "DELETING", "DELETED", "FAILED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state CREATING --wait-for-state FAILED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
@@ -2697,7 +2702,7 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}}, output_type={'module': 'core', 'class': 'DedicatedVmHost'})
 @cli_util.wrap_exceptions
-def create_dedicated_vm_host_host_group_placement_constraint_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, availability_domain, compartment_id, dedicated_vm_host_shape, placement_constraint_details_compute_host_group_id, defined_tags, display_name, fault_domain, freeform_tags, capacity_config, is_memory_encryption_enabled):
+def create_dedicated_vm_host_host_group_placement_constraint_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, availability_domain, compartment_id, dedicated_vm_host_shape, placement_constraint_details_compute_host_group_id, defined_tags, display_name, fault_domain, freeform_tags, capacity_config, is_memory_encryption_enabled, is_burstable):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
@@ -2726,6 +2731,9 @@ def create_dedicated_vm_host_host_group_placement_constraint_details(ctx, from_j
 
     if is_memory_encryption_enabled is not None:
         _details['isMemoryEncryptionEnabled'] = is_memory_encryption_enabled
+
+    if is_burstable is not None:
+        _details['isBurstable'] = is_burstable
 
     _details['placementConstraintDetails']['type'] = 'HOST_GROUP'
 
@@ -2780,6 +2788,7 @@ Example: `FAULT-DOMAIN-1`""")
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--capacity-config', help=u"""The capacity configuration selected to be configured for the Dedicated Virtual Machine host. Run [ListDedicatedVmHostShapes] API first to see the capacity configuration options.""")
 @cli_util.option('--is-memory-encryption-enabled', type=click.BOOL, help=u"""Specifies if the Dedicated Virtual Machine Host (DVMH) is restricted to running only Confidential VMs. If `true`, only Confidential VMs can be launched. If `false`, Confidential VMs cannot be launched.""")
+@cli_util.option('--is-burstable', type=click.BOOL, help=u"""Specifies if the Dedicated Virtual Machine Host (DVMH) is restricted to running only Burstable VMs. If `true`, only Burstable VMs can be launched. If `false`, Burstable VMs cannot be launched.""")
 @cli_util.option('--placement-constraint-details-hpc-island-id', help=u"""The [OCID] of the HPC island for the compute cluster.
 
 This field cannot be updated after creation of the compute cluster.""")
@@ -2802,7 +2811,7 @@ The ordering of the array will be preserved. Ensure that all items in the array 
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}, 'placement-constraint-details-target-network-block-ids': {'module': 'core', 'class': 'list[string]'}, 'placement-constraint-details-target-memory-fabric-ids': {'module': 'core', 'class': 'list[string]'}}, output_type={'module': 'core', 'class': 'DedicatedVmHost'})
 @cli_util.wrap_exceptions
-def create_dedicated_vm_host_compute_cluster_placement_constraint_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, availability_domain, compartment_id, dedicated_vm_host_shape, defined_tags, display_name, fault_domain, freeform_tags, capacity_config, is_memory_encryption_enabled, placement_constraint_details_hpc_island_id, placement_constraint_details_target_network_block_ids, placement_constraint_details_target_memory_fabric_ids, placement_constraint_details_logical_placement_constraint):
+def create_dedicated_vm_host_compute_cluster_placement_constraint_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, availability_domain, compartment_id, dedicated_vm_host_shape, defined_tags, display_name, fault_domain, freeform_tags, capacity_config, is_memory_encryption_enabled, is_burstable, placement_constraint_details_hpc_island_id, placement_constraint_details_target_network_block_ids, placement_constraint_details_target_memory_fabric_ids, placement_constraint_details_logical_placement_constraint):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
@@ -2830,6 +2839,9 @@ def create_dedicated_vm_host_compute_cluster_placement_constraint_details(ctx, f
 
     if is_memory_encryption_enabled is not None:
         _details['isMemoryEncryptionEnabled'] = is_memory_encryption_enabled
+
+    if is_burstable is not None:
+        _details['isBurstable'] = is_burstable
 
     if placement_constraint_details_hpc_island_id is not None:
         _details['placementConstraintDetails']['hpcIslandId'] = placement_constraint_details_hpc_island_id
@@ -2897,6 +2909,7 @@ Example: `FAULT-DOMAIN-1`""")
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--capacity-config', help=u"""The capacity configuration selected to be configured for the Dedicated Virtual Machine host. Run [ListDedicatedVmHostShapes] API first to see the capacity configuration options.""")
 @cli_util.option('--is-memory-encryption-enabled', type=click.BOOL, help=u"""Specifies if the Dedicated Virtual Machine Host (DVMH) is restricted to running only Confidential VMs. If `true`, only Confidential VMs can be launched. If `false`, Confidential VMs cannot be launched.""")
+@cli_util.option('--is-burstable', type=click.BOOL, help=u"""Specifies if the Dedicated Virtual Machine Host (DVMH) is restricted to running only Burstable VMs. If `true`, only Burstable VMs can be launched. If `false`, Burstable VMs cannot be launched.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "ACTIVE", "UPDATING", "DELETING", "DELETED", "FAILED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state CREATING --wait-for-state FAILED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
@@ -2905,7 +2918,7 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}}, output_type={'module': 'core', 'class': 'DedicatedVmHost'})
 @cli_util.wrap_exceptions
-def create_dedicated_vm_host_compute_bare_metal_host_placement_constraint_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, availability_domain, compartment_id, dedicated_vm_host_shape, placement_constraint_details_compute_bare_metal_host_id, defined_tags, display_name, fault_domain, freeform_tags, capacity_config, is_memory_encryption_enabled):
+def create_dedicated_vm_host_compute_bare_metal_host_placement_constraint_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, availability_domain, compartment_id, dedicated_vm_host_shape, placement_constraint_details_compute_bare_metal_host_id, defined_tags, display_name, fault_domain, freeform_tags, capacity_config, is_memory_encryption_enabled, is_burstable):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
@@ -2934,6 +2947,9 @@ def create_dedicated_vm_host_compute_bare_metal_host_placement_constraint_detail
 
     if is_memory_encryption_enabled is not None:
         _details['isMemoryEncryptionEnabled'] = is_memory_encryption_enabled
+
+    if is_burstable is not None:
+        _details['isBurstable'] = is_burstable
 
     _details['placementConstraintDetails']['type'] = 'COMPUTE_BARE_METAL_HOST'
 

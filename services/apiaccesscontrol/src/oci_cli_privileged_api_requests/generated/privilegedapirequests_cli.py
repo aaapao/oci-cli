@@ -178,9 +178,9 @@ def close_privileged_api_request(ctx, from_json, wait_for_state, max_wait_second
 
 @privileged_api_request_group.command(name=cli_util.override('privileged_api_requests.create_privileged_api_request.command_name', 'create'), help=u"""Creates a PrivilegedApiRequest. \n[Command Reference](createPrivilegedApiRequest)""")
 @cli_util.option('--reason-summary', required=True, help=u"""Summary comment by the operator creating the access request.""")
+@cli_util.option('--compartment-id', required=True, help=u"""The [OCID] of the compartment.""")
 @cli_util.option('--resource-id', required=True, help=u"""The OCID of the target resource associated with the access request. The operator raises an access request to get approval to access the target resource.""")
 @cli_util.option('--privileged-operation-list', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""List of api names, attributes for which approval is sought by the user.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--compartment-id', help=u"""The [OCID] of the compartment.""")
 @cli_util.option('--sub-resource-name-list', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The subresource names requested for approval.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--notification-topic-id', help=u"""The OCID of the OCI Notification topic to publish messages related to this Privileged Api Request.""")
 @cli_util.option('--reason-detail', help=u"""Reason in detail for which the operator is requesting access on the target resource.""")
@@ -202,18 +202,16 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'sub-resource-name-list': {'module': 'apiaccesscontrol', 'class': 'list[string]'}, 'privileged-operation-list': {'module': 'apiaccesscontrol', 'class': 'list[PrivilegedApiRequestOperationDetails]'}, 'ticket-numbers': {'module': 'apiaccesscontrol', 'class': 'list[string]'}, 'freeform-tags': {'module': 'apiaccesscontrol', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'apiaccesscontrol', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'apiaccesscontrol', 'class': 'PrivilegedApiRequest'})
 @cli_util.wrap_exceptions
-def create_privileged_api_request(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, reason_summary, resource_id, privileged_operation_list, compartment_id, sub_resource_name_list, notification_topic_id, reason_detail, severity, duration_in_hrs, ticket_numbers, time_requested_for_future_access, freeform_tags, defined_tags):
+def create_privileged_api_request(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, reason_summary, compartment_id, resource_id, privileged_operation_list, sub_resource_name_list, notification_topic_id, reason_detail, severity, duration_in_hrs, ticket_numbers, time_requested_for_future_access, freeform_tags, defined_tags):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
     _details = {}
     _details['reasonSummary'] = reason_summary
+    _details['compartmentId'] = compartment_id
     _details['resourceId'] = resource_id
     _details['privilegedOperationList'] = cli_util.parse_json_parameter("privileged_operation_list", privileged_operation_list)
-
-    if compartment_id is not None:
-        _details['compartmentId'] = compartment_id
 
     if sub_resource_name_list is not None:
         _details['subResourceNameList'] = cli_util.parse_json_parameter("sub_resource_name_list", sub_resource_name_list)
@@ -300,7 +298,7 @@ def get_privileged_api_request(ctx, from_json, privileged_api_request_id):
 
 
 @privileged_api_request_collection_group.command(name=cli_util.override('privileged_api_requests.list_privileged_api_requests.command_name', 'list-privileged-api-requests'), help=u"""Lists all privilegedApi requests in the compartment. \n[Command Reference](listPrivilegedApiRequests)""")
-@cli_util.option('--compartment-id', help=u"""The [OCID] of the compartment in which to list resources.""")
+@cli_util.option('--compartment-id', required=True, help=u"""The [OCID] of the compartment in which to list resources.""")
 @cli_util.option('--id', help=u"""The [OCID] of the PrivilegedApiRequest.""")
 @cli_util.option('--display-name', help=u"""A filter to return only resources that match the given display name exactly.""")
 @cli_util.option('--resource-id', help=u"""The [OCID] of the resource .""")
@@ -324,8 +322,6 @@ def list_privileged_api_requests(ctx, from_json, all_pages, page_size, compartme
         raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
 
     kwargs = {}
-    if compartment_id is not None:
-        kwargs['compartment_id'] = compartment_id
     if id is not None:
         kwargs['id'] = id
     if display_name is not None:
@@ -354,6 +350,7 @@ def list_privileged_api_requests(ctx, from_json, all_pages, page_size, compartme
 
         result = cli_util.list_call_get_all_results(
             client.list_privileged_api_requests,
+            compartment_id=compartment_id,
             **kwargs
         )
     elif limit is not None:
@@ -361,10 +358,12 @@ def list_privileged_api_requests(ctx, from_json, all_pages, page_size, compartme
             client.list_privileged_api_requests,
             limit,
             page_size,
+            compartment_id=compartment_id,
             **kwargs
         )
     else:
         result = client.list_privileged_api_requests(
+            compartment_id=compartment_id,
             **kwargs
         )
     cli_util.render_response(result, ctx)

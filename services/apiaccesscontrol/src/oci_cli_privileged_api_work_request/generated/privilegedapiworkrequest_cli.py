@@ -214,7 +214,7 @@ def list_work_request_logs(ctx, from_json, all_pages, page_size, work_request_id
 
 
 @work_request_group.command(name=cli_util.override('privileged_api_work_request.list_work_requests.command_name', 'list'), help=u"""Lists the work requests in a compartment. \n[Command Reference](listWorkRequests)""")
-@cli_util.option('--compartment-id', help=u"""The [OCID] of the compartment in which to list resources.""")
+@cli_util.option('--compartment-id', required=True, help=u"""The [OCID] of the compartment in which to list resources.""")
 @cli_util.option('--work-request-id', help=u"""The [OCID] of the asynchronous work request.""")
 @cli_util.option('--status', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "NEEDS_ATTENTION", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), help=u"""A filter to return only the resources that match the given lifecycle state.""")
 @cli_util.option('--resource-id', help=u"""The [OCID] of the resource affected by the work request.""")
@@ -235,8 +235,6 @@ def list_work_requests(ctx, from_json, all_pages, page_size, compartment_id, wor
         raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
 
     kwargs = {}
-    if compartment_id is not None:
-        kwargs['compartment_id'] = compartment_id
     if work_request_id is not None:
         kwargs['work_request_id'] = work_request_id
     if status is not None:
@@ -259,6 +257,7 @@ def list_work_requests(ctx, from_json, all_pages, page_size, compartment_id, wor
 
         result = cli_util.list_call_get_all_results(
             client.list_work_requests,
+            compartment_id=compartment_id,
             **kwargs
         )
     elif limit is not None:
@@ -266,10 +265,12 @@ def list_work_requests(ctx, from_json, all_pages, page_size, compartment_id, wor
             client.list_work_requests,
             limit,
             page_size,
+            compartment_id=compartment_id,
             **kwargs
         )
     else:
         result = client.list_work_requests(
+            compartment_id=compartment_id,
             **kwargs
         )
     cli_util.render_response(result, ctx)

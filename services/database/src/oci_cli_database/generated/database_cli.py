@@ -174,6 +174,12 @@ def execution_window_group():
     pass
 
 
+@click.command(cli_util.override('db.basecc_vm_cluster_update_history_entry_group.command_name', 'basecc-vm-cluster-update-history-entry'), cls=CommandGroupWithAlias, help="""The record of a maintenance update action on a specified BaseDB-C@C VM cluster.""")
+@cli_util.help_option_group
+def basecc_vm_cluster_update_history_entry_group():
+    pass
+
+
 @click.command(cli_util.override('db.gi_minor_version_summary_group.command_name', 'gi-minor-version-summary'), cls=CommandGroupWithAlias, help="""The Oracle Grid Infrastructure (GI) minor version.
 
 To use any of the API operations, you must be authorized in an IAM policy. If you're not authorized, talk to an administrator. If you're an administrator who needs to write policies to give users access, see [Getting Started with Policies].""")
@@ -191,6 +197,12 @@ def autonomous_exadata_infrastructure_group():
 @click.command(cli_util.override('db.pdb_conversion_history_entry_group.command_name', 'pdb-conversion-history-entry'), cls=CommandGroupWithAlias, help="""Details of operations performed to convert a non-container database to pluggable database.""")
 @cli_util.help_option_group
 def pdb_conversion_history_entry_group():
+    pass
+
+
+@click.command(cli_util.override('db.basecc_vm_cluster_group.command_name', 'basecc-vm-cluster'), cls=CommandGroupWithAlias, help="""Details of the BaseDB-C@C VM cluster resource. Applies to Base Database Service on Cloud@Customer instances only.""")
+@cli_util.help_option_group
+def basecc_vm_cluster_group():
     pass
 
 
@@ -434,6 +446,12 @@ def autonomous_container_database_dataguard_association_group():
     pass
 
 
+@click.command(cli_util.override('db.basecc_vm_cluster_update_group.command_name', 'basecc-vm-cluster-update'), cls=CommandGroupWithAlias, help="""Maintenance update details for a BaseDB-C@C VM cluster.""")
+@cli_util.help_option_group
+def basecc_vm_cluster_update_group():
+    pass
+
+
 @click.command(cli_util.override('db.db_system_os_patch_history_entry_group.command_name', 'db-system-os-patch-history-entry'), cls=CommandGroupWithAlias, help="""The record of an OS patch action on a DB system.""")
 @cli_util.help_option_group
 def db_system_os_patch_history_entry_group():
@@ -582,9 +600,11 @@ db_root_group.add_command(db_home_group)
 db_root_group.add_command(autonomous_exadata_infrastructure_shape_group)
 db_root_group.add_command(db_system_os_patch_history_entry_collection_group)
 db_root_group.add_command(execution_window_group)
+db_root_group.add_command(basecc_vm_cluster_update_history_entry_group)
 db_root_group.add_command(gi_minor_version_summary_group)
 db_root_group.add_command(autonomous_exadata_infrastructure_group)
 db_root_group.add_command(pdb_conversion_history_entry_group)
+db_root_group.add_command(basecc_vm_cluster_group)
 db_root_group.add_command(cloud_exadata_infrastructure_group)
 db_root_group.add_command(backup_destination_group)
 db_root_group.add_command(maintenance_run_group)
@@ -623,6 +643,7 @@ db_root_group.add_command(database_upgrade_history_entry_group)
 db_root_group.add_command(external_backup_job_group)
 db_root_group.add_command(autonomous_database_character_sets_group)
 db_root_group.add_command(autonomous_container_database_dataguard_association_group)
+db_root_group.add_command(basecc_vm_cluster_update_group)
 db_root_group.add_command(db_system_os_patch_history_entry_group)
 db_root_group.add_command(exadata_infrastructure_un_allocated_resources_group)
 db_root_group.add_command(db_system_group)
@@ -1759,6 +1780,75 @@ def change_backup_destination_compartment(ctx, from_json, wait_for_state, max_wa
     result = client.change_backup_destination_compartment(
         backup_destination_id=backup_destination_id,
         change_compartment_details=_details,
+        **kwargs
+    )
+    work_request_client = cli_util.build_client('work_requests', 'work_request', ctx)
+    if wait_for_state:
+
+        if hasattr(work_request_client, 'get_work_request') and callable(getattr(work_request_client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(work_request_client, work_request_client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+                if hasattr(result, "data") and hasattr(result.data, "resources") and len(result.data.resources) == 1:
+                    entity_type = result.data.resources[0].entity_type
+                    identifier = result.data.resources[0].identifier
+                    get_operation = 'get_' + entity_type
+                    if hasattr(client, get_operation) and callable(getattr(client, get_operation)):
+                        result = getattr(client, get_operation)(identifier)
+
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@basecc_vm_cluster_group.command(name=cli_util.override('db.change_basecc_vm_cluster_compartment.command_name', 'change-compartment'), help=u"""Moves a BaseDB-C@C VM cluster and its dependent resources to another compartment. Applies to Base Database Service on Cloud@Customer instances only. \n[Command Reference](changeBaseccVmClusterCompartment)""")
+@cli_util.option('--compartment-id', required=True, help=u"""The [OCID] of the compartment.""")
+@cli_util.option('--basecc-vm-cluster-id', required=True, help=u"""The BaseDB-C@C VM cluster [OCID].""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource.  The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state SUCCEEDED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def change_basecc_vm_cluster_compartment(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, basecc_vm_cluster_id, if_match):
+
+    if isinstance(basecc_vm_cluster_id, six.string_types) and len(basecc_vm_cluster_id.strip()) == 0:
+        raise click.UsageError('Parameter --basecc-vm-cluster-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['compartmentId'] = compartment_id
+
+    client = cli_util.build_client('database', 'database', ctx)
+    result = client.change_basecc_vm_cluster_compartment(
+        basecc_vm_cluster_id=basecc_vm_cluster_id,
+        change_basecc_vm_cluster_compartment_details=_details,
         **kwargs
     )
     work_request_client = cli_util.build_client('work_requests', 'work_request', ctx)
@@ -12429,6 +12519,129 @@ def create_backup_destination_create_recovery_appliance_backup_destination_detai
     cli_util.render_response(result, ctx)
 
 
+@basecc_vm_cluster_group.command(name=cli_util.override('db.create_basecc_vm_cluster.command_name', 'create'), help=u"""Creates a BaseDB-C@C VM cluster. \n[Command Reference](createBaseccVmCluster)""")
+@cli_util.option('--compartment-id', required=True, help=u"""The [OCID] of the compartment.""")
+@cli_util.option('--cpu-core-count', required=True, type=click.INT, help=u"""Total CPU cores for the BaseDB C@C VM cluster.""")
+@cli_util.option('--base-infrastructure-id', required=True, help=u"""The [OCID] of Oracle Data Cloud@Customer Infrastructure.""")
+@cli_util.option('--base-vm-cluster-network-id', required=True, help=u"""The [OCID] of BaseDB-C@C VM Cluster Network.""")
+@cli_util.option('--gi-version', required=True, help=u"""A valid Oracle Grid Infrastructure (GI) software version.""")
+@cli_util.option('--display-name', required=True, help=u"""The user-friendly name for the Base Database Service on Cloud@Customer (BaseDB-C@C) VM cluster. The name does not need to be unique.""")
+@cli_util.option('--ssh-public-keys', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""The public key portion of one or more key pairs used for SSH access to the VMs of Base Database Service on Cloud@Customer (BaseDB-C@C) VM cluster.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--database-edition', type=custom_types.CliCaseInsensitiveChoice(["STANDARD_EDITION", "ENTERPRISE_EDITION", "ENTERPRISE_EDITION_HIGH_PERFORMANCE", "ENTERPRISE_EDITION_EXTREME_PERFORMANCE", "ENTERPRISE_EDITION_DEVELOPER"]), help=u"""The Oracle Database Edition that applies to all the databases on the DB system. Exadata DB systems and 2-node RAC DB systems require ENTERPRISE_EDITION_EXTREME_PERFORMANCE.""")
+@cli_util.option('--node-count', type=click.INT, help=u"""The number of nodes in the Base Database Service on Cloud@Customer (BaseDB-C@C) VM cluster.""")
+@cli_util.option('--db-server-id', help=u"""The [OCID] of the compute node of the Oracle Data Cloud@Customer Infrastructure, on which the VM should be launched. Note: Applies to single node Base Database Service on Cloud@Customer (BaseDB-C@C) VM clusters only""")
+@cli_util.option('--data-collection-options', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--description', help=u"""The description for Base Database Service on Cloud@Customer (BaseDB-C@C) VM cluster.""")
+@cli_util.option('--time-zone', help=u"""The time zone to use for the Base Database Service on Cloud@Customer (BaseDB-C@C) VM cluster. For details, see [Time Zones].""")
+@cli_util.option('--additional-vm-storage-size-in-gbs', type=click.INT, help=u"""Total /u01 partition size (GB) for the Base Database Service on Cloud@Customer (BaseDB-C@C) VM cluster.""")
+@cli_util.option('--data-storage-size-in-gbs', type=click.INT, help=u"""The DATA Disk Group size in GB for the Base Database Service on Cloud@Customer (BaseDB-C@C) VM cluster.""")
+@cli_util.option('--reco-storage-size-in-gbs', type=click.INT, help=u"""The RECO Disk Group size in GB for the Base Database Service on Cloud@Customer (BaseDB-C@C) VM cluster.""")
+@cli_util.option('--memory-size-in-gbs', type=click.INT, help=u"""The total memory to be allocated, in GBs, for the Base Database Service on Cloud@Customer (BaseDB-C@C) VM cluster. The minimum is 11GB for every 4 ECPU.""")
+@cli_util.option('--license-model', type=custom_types.CliCaseInsensitiveChoice(["LICENSE_INCLUDED", "BRING_YOUR_OWN_LICENSE"]), help=u"""The Oracle license model that applies to the Base Database Service on Cloud@Customer (BaseDB-C@C) VM cluster. The default is LICENSE_INCLUDED.""")
+@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
+
+Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--vm-cluster-type', type=custom_types.CliCaseInsensitiveChoice(["REGULAR", "DEVELOPER"]), help=u"""The cluster type for the Base Database Service on Cloud@Customer (BaseDB-C@C) VM cluster.""")
+@cli_util.option('--cloud-automation-update-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["PROVISIONING", "AVAILABLE", "UPDATING", "TERMINATING", "TERMINATED", "FAILED", "MAINTENANCE_IN_PROGRESS"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state PROVISIONING --wait-for-state MAINTENANCE_IN_PROGRESS would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'data-collection-options': {'module': 'database', 'class': 'DataCollectionOptions'}, 'ssh-public-keys': {'module': 'database', 'class': 'list[string]'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'cloud-automation-update-details': {'module': 'database', 'class': 'CloudAutomationUpdateDetails'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'data-collection-options': {'module': 'database', 'class': 'DataCollectionOptions'}, 'ssh-public-keys': {'module': 'database', 'class': 'list[string]'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'cloud-automation-update-details': {'module': 'database', 'class': 'CloudAutomationUpdateDetails'}}, output_type={'module': 'database', 'class': 'BaseccVmCluster'})
+@cli_util.wrap_exceptions
+def create_basecc_vm_cluster(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, cpu_core_count, base_infrastructure_id, base_vm_cluster_network_id, gi_version, display_name, ssh_public_keys, database_edition, node_count, db_server_id, data_collection_options, description, time_zone, additional_vm_storage_size_in_gbs, data_storage_size_in_gbs, reco_storage_size_in_gbs, memory_size_in_gbs, license_model, freeform_tags, defined_tags, vm_cluster_type, cloud_automation_update_details):
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['compartmentId'] = compartment_id
+    _details['cpuCoreCount'] = cpu_core_count
+    _details['baseInfrastructureId'] = base_infrastructure_id
+    _details['baseVmClusterNetworkId'] = base_vm_cluster_network_id
+    _details['giVersion'] = gi_version
+    _details['displayName'] = display_name
+    _details['sshPublicKeys'] = cli_util.parse_json_parameter("ssh_public_keys", ssh_public_keys)
+
+    if database_edition is not None:
+        _details['databaseEdition'] = database_edition
+
+    if node_count is not None:
+        _details['nodeCount'] = node_count
+
+    if db_server_id is not None:
+        _details['dbServerId'] = db_server_id
+
+    if data_collection_options is not None:
+        _details['dataCollectionOptions'] = cli_util.parse_json_parameter("data_collection_options", data_collection_options)
+
+    if description is not None:
+        _details['description'] = description
+
+    if time_zone is not None:
+        _details['timeZone'] = time_zone
+
+    if additional_vm_storage_size_in_gbs is not None:
+        _details['additionalVmStorageSizeInGBs'] = additional_vm_storage_size_in_gbs
+
+    if data_storage_size_in_gbs is not None:
+        _details['dataStorageSizeInGBs'] = data_storage_size_in_gbs
+
+    if reco_storage_size_in_gbs is not None:
+        _details['recoStorageSizeInGBs'] = reco_storage_size_in_gbs
+
+    if memory_size_in_gbs is not None:
+        _details['memorySizeInGBs'] = memory_size_in_gbs
+
+    if license_model is not None:
+        _details['licenseModel'] = license_model
+
+    if freeform_tags is not None:
+        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
+
+    if defined_tags is not None:
+        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    if vm_cluster_type is not None:
+        _details['vmClusterType'] = vm_cluster_type
+
+    if cloud_automation_update_details is not None:
+        _details['cloudAutomationUpdateDetails'] = cli_util.parse_json_parameter("cloud_automation_update_details", cloud_automation_update_details)
+
+    client = cli_util.build_client('database', 'database', ctx)
+    result = client.create_basecc_vm_cluster(
+        create_basecc_vm_cluster_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_basecc_vm_cluster') and callable(getattr(client, 'get_basecc_vm_cluster')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+
+                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_basecc_vm_cluster(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
 @cloud_autonomous_vm_cluster_group.command(name=cli_util.override('db.create_cloud_autonomous_vm_cluster.command_name', 'create'), help=u"""Creates an Autonomous Exadata VM cluster in the Oracle cloud. For Exadata Cloud@Customer systems, see [CreateAutonomousVmCluster]. \n[Command Reference](createCloudAutonomousVmCluster)""")
 @cli_util.option('--compartment-id', required=True, help=u"""The [OCID] of the compartment.""")
 @cli_util.option('--subnet-id', required=True, help=u"""The [OCID] of the subnet the cloud Autonomous VM Cluster is associated with.""")
@@ -14320,7 +14533,7 @@ def create_database_create_database_from_backup(ctx, from_json, wait_for_state, 
 @cli_util.option('--compartment-id', required=True, help=u"""The [OCID] of the compartment the database software image  belongs in.""")
 @cli_util.option('--display-name', required=True, help=u"""The user-friendly name for the database software image. The name does not have to be unique.""")
 @cli_util.option('--database-version', help=u"""The database version with which the database software image is to be built.""")
-@cli_util.option('--image-shape-family', type=custom_types.CliCaseInsensitiveChoice(["VM_BM_SHAPE", "EXADATA_SHAPE", "EXACC_SHAPE", "EXADBXS_SHAPE"]), help=u"""To what shape the image is meant for.""")
+@cli_util.option('--image-shape-family', type=custom_types.CliCaseInsensitiveChoice(["VM_BM_SHAPE", "EXADATA_SHAPE", "EXACC_SHAPE", "EXADBXS_SHAPE", "BDBCC_SHAPE"]), help=u"""To what shape the image is meant for.""")
 @cli_util.option('--image-type', type=custom_types.CliCaseInsensitiveChoice(["GRID_IMAGE", "DATABASE_IMAGE"]), help=u"""The type of software image. Can be grid or database.""")
 @cli_util.option('--patch-set', help=u"""The PSU or PBP or Release Updates. To get a list of supported versions, use the [ListDbVersions] operation.""")
 @cli_util.option('--database-software-image-one-off-patches', type=custom_types.CLI_COMPLEX_TYPE, help=u"""List of one-off patches for Database Homes.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
@@ -17679,6 +17892,63 @@ def delete_backup_destination(ctx, from_json, wait_for_state, max_wait_seconds, 
                 raise
         else:
             click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@basecc_vm_cluster_group.command(name=cli_util.override('db.delete_basecc_vm_cluster.command_name', 'delete'), help=u"""Deletes the specified BaseDB-C@C VM cluster. Applies to Base Database Service on Cloud@Customer instances only. \n[Command Reference](deleteBaseccVmCluster)""")
+@cli_util.option('--basecc-vm-cluster-id', required=True, help=u"""The BaseDB-C@C VM cluster [OCID].""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource.  The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.confirm_delete_option
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state SUCCEEDED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def delete_basecc_vm_cluster(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, basecc_vm_cluster_id, if_match):
+
+    if isinstance(basecc_vm_cluster_id, six.string_types) and len(basecc_vm_cluster_id.strip()) == 0:
+        raise click.UsageError('Parameter --basecc-vm-cluster-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('database', 'database', ctx)
+    result = client.delete_basecc_vm_cluster(
+        basecc_vm_cluster_id=basecc_vm_cluster_id,
+        **kwargs
+    )
+    work_request_client = cli_util.build_client('work_requests', 'work_request', ctx)
+    if wait_for_state:
+
+        if hasattr(work_request_client, 'get_work_request') and callable(getattr(work_request_client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(work_request_client, work_request_client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Please retrieve the work request to find its current state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
     cli_util.render_response(result, ctx)
 
 
@@ -22134,6 +22404,82 @@ def get_backup_destination(ctx, from_json, backup_destination_id):
     cli_util.render_response(result, ctx)
 
 
+@basecc_vm_cluster_group.command(name=cli_util.override('db.get_basecc_vm_cluster.command_name', 'get'), help=u"""Gets information about the BaseDB-C@C VM cluster. Applies to Base Database Service on Cloud@Customer instances only. \n[Command Reference](getBaseccVmCluster)""")
+@cli_util.option('--basecc-vm-cluster-id', required=True, help=u"""The BaseDB-C@C VM cluster [OCID].""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'database', 'class': 'BaseccVmCluster'})
+@cli_util.wrap_exceptions
+def get_basecc_vm_cluster(ctx, from_json, basecc_vm_cluster_id):
+
+    if isinstance(basecc_vm_cluster_id, six.string_types) and len(basecc_vm_cluster_id.strip()) == 0:
+        raise click.UsageError('Parameter --basecc-vm-cluster-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('database', 'database', ctx)
+    result = client.get_basecc_vm_cluster(
+        basecc_vm_cluster_id=basecc_vm_cluster_id,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
+@basecc_vm_cluster_update_group.command(name=cli_util.override('db.get_basecc_vm_cluster_update.command_name', 'get'), help=u"""Gets information about a specified maintenance update package for a BaseDB-C@C VM cluster. Applies to Base Database Service on Cloud@Customer instances only. \n[Command Reference](getBaseccVmClusterUpdate)""")
+@cli_util.option('--basecc-vm-cluster-id', required=True, help=u"""The BaseDB-C@C VM cluster [OCID].""")
+@cli_util.option('--update-id', required=True, help=u"""The [OCID] of the maintenance update.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'database', 'class': 'BaseccVmClusterUpdate'})
+@cli_util.wrap_exceptions
+def get_basecc_vm_cluster_update(ctx, from_json, basecc_vm_cluster_id, update_id):
+
+    if isinstance(basecc_vm_cluster_id, six.string_types) and len(basecc_vm_cluster_id.strip()) == 0:
+        raise click.UsageError('Parameter --basecc-vm-cluster-id cannot be whitespace or empty string')
+
+    if isinstance(update_id, six.string_types) and len(update_id.strip()) == 0:
+        raise click.UsageError('Parameter --update-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('database', 'database', ctx)
+    result = client.get_basecc_vm_cluster_update(
+        basecc_vm_cluster_id=basecc_vm_cluster_id,
+        update_id=update_id,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
+@basecc_vm_cluster_update_history_entry_group.command(name=cli_util.override('db.get_basecc_vm_cluster_update_history_entry.command_name', 'get'), help=u"""Gets the maintenance update history details for the specified update history entry. Applies to Base Database Service on Cloud@Customer instances only. \n[Command Reference](getBaseccVmClusterUpdateHistoryEntry)""")
+@cli_util.option('--basecc-vm-cluster-id', required=True, help=u"""The BaseDB-C@C VM cluster [OCID].""")
+@cli_util.option('--update-history-entry-id', required=True, help=u"""The [OCID] of the maintenance update history entry.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'database', 'class': 'BaseccVmClusterUpdateHistoryEntry'})
+@cli_util.wrap_exceptions
+def get_basecc_vm_cluster_update_history_entry(ctx, from_json, basecc_vm_cluster_id, update_history_entry_id):
+
+    if isinstance(basecc_vm_cluster_id, six.string_types) and len(basecc_vm_cluster_id.strip()) == 0:
+        raise click.UsageError('Parameter --basecc-vm-cluster-id cannot be whitespace or empty string')
+
+    if isinstance(update_history_entry_id, six.string_types) and len(update_history_entry_id.strip()) == 0:
+        raise click.UsageError('Parameter --update-history-entry-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('database', 'database', ctx)
+    result = client.get_basecc_vm_cluster_update_history_entry(
+        basecc_vm_cluster_id=basecc_vm_cluster_id,
+        update_history_entry_id=update_history_entry_id,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
 @cloud_autonomous_vm_cluster_group.command(name=cli_util.override('db.get_cloud_autonomous_vm_cluster.command_name', 'get'), help=u"""Gets information about the specified Autonomous Exadata VM cluster in the Oracle cloud. For Exadata Cloud@Custustomer systems, see [GetAutonomousVmCluster ]. \n[Command Reference](getCloudAutonomousVmCluster)""")
 @cli_util.option('--cloud-autonomous-vm-cluster-id', required=True, help=u"""The Cloud VM cluster [OCID].""")
 @json_skeleton_utils.get_cli_json_input_option({})
@@ -26419,6 +26765,191 @@ def list_backups(ctx, from_json, all_pages, page_size, database_id, compartment_
     cli_util.render_response(result, ctx)
 
 
+@basecc_vm_cluster_update_history_entry_group.command(name=cli_util.override('db.list_basecc_vm_cluster_update_history_entries.command_name', 'list'), help=u"""Gets the history of the maintenance update actions performed on the specified BaseDB-C@C VM cluster. Applies to Base Database Service on Cloud@Customer instances only. \n[Command Reference](listBaseccVmClusterUpdateHistoryEntries)""")
+@cli_util.option('--basecc-vm-cluster-id', required=True, help=u"""The BaseDB-C@C VM cluster [OCID].""")
+@cli_util.option('--update-type', type=custom_types.CliCaseInsensitiveChoice(["GI_UPGRADE", "GI_PATCH", "OS_UPDATE"]), help=u"""A filter to return only resources that match the given update type exactly.""")
+@cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["IN_PROGRESS", "SUCCEEDED", "FAILED"]), help=u"""A filter to return only resources that match the given lifecycle state exactly.""")
+@cli_util.option('--limit', type=click.INT, help=u"""The maximum number of items to return per page.""")
+@cli_util.option('--page', help=u"""The pagination token to continue listing from.""")
+@cli_util.option('--all', 'all_pages', is_flag=True, help="""Fetches all pages of results. If you provide this option, then you cannot provide the --limit option.""")
+@cli_util.option('--page-size', type=click.INT, help="""When fetching results, the number of results to fetch per call. Only valid when used with --all or --limit, and ignored otherwise.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'database', 'class': 'list[BaseccVmClusterUpdateHistoryEntrySummary]'})
+@cli_util.wrap_exceptions
+def list_basecc_vm_cluster_update_history_entries(ctx, from_json, all_pages, page_size, basecc_vm_cluster_id, update_type, lifecycle_state, limit, page):
+
+    if all_pages and limit:
+        raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
+
+    if isinstance(basecc_vm_cluster_id, six.string_types) and len(basecc_vm_cluster_id.strip()) == 0:
+        raise click.UsageError('Parameter --basecc-vm-cluster-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if update_type is not None:
+        kwargs['update_type'] = update_type
+    if lifecycle_state is not None:
+        kwargs['lifecycle_state'] = lifecycle_state
+    if limit is not None:
+        kwargs['limit'] = limit
+    if page is not None:
+        kwargs['page'] = page
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('database', 'database', ctx)
+    if all_pages:
+        if page_size:
+            kwargs['limit'] = page_size
+
+        result = cli_util.list_call_get_all_results(
+            client.list_basecc_vm_cluster_update_history_entries,
+            basecc_vm_cluster_id=basecc_vm_cluster_id,
+            **kwargs
+        )
+    elif limit is not None:
+        result = cli_util.list_call_get_up_to_limit(
+            client.list_basecc_vm_cluster_update_history_entries,
+            limit,
+            page_size,
+            basecc_vm_cluster_id=basecc_vm_cluster_id,
+            **kwargs
+        )
+    else:
+        result = client.list_basecc_vm_cluster_update_history_entries(
+            basecc_vm_cluster_id=basecc_vm_cluster_id,
+            **kwargs
+        )
+    cli_util.render_response(result, ctx)
+
+
+@basecc_vm_cluster_update_group.command(name=cli_util.override('db.list_basecc_vm_cluster_updates.command_name', 'list'), help=u"""Lists the maintenance updates that can be applied to the specified BaseDB-C@C VM cluster. Applies to Base Database Service on Cloud@Customer instances only. \n[Command Reference](listBaseccVmClusterUpdates)""")
+@cli_util.option('--basecc-vm-cluster-id', required=True, help=u"""The BaseDB-C@C VM cluster [OCID].""")
+@cli_util.option('--update-type', type=custom_types.CliCaseInsensitiveChoice(["GI_UPGRADE", "GI_PATCH", "OS_UPDATE"]), help=u"""A filter to return only resources that match the given update type exactly.""")
+@cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["AVAILABLE", "SUCCESS", "IN_PROGRESS", "FAILED"]), help=u"""A filter to return only resources that match the given lifecycle state exactly.""")
+@cli_util.option('--limit', type=click.INT, help=u"""The maximum number of items to return per page.""")
+@cli_util.option('--page', help=u"""The pagination token to continue listing from.""")
+@cli_util.option('--all', 'all_pages', is_flag=True, help="""Fetches all pages of results. If you provide this option, then you cannot provide the --limit option.""")
+@cli_util.option('--page-size', type=click.INT, help="""When fetching results, the number of results to fetch per call. Only valid when used with --all or --limit, and ignored otherwise.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'database', 'class': 'list[BaseccVmClusterUpdateSummary]'})
+@cli_util.wrap_exceptions
+def list_basecc_vm_cluster_updates(ctx, from_json, all_pages, page_size, basecc_vm_cluster_id, update_type, lifecycle_state, limit, page):
+
+    if all_pages and limit:
+        raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
+
+    if isinstance(basecc_vm_cluster_id, six.string_types) and len(basecc_vm_cluster_id.strip()) == 0:
+        raise click.UsageError('Parameter --basecc-vm-cluster-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if update_type is not None:
+        kwargs['update_type'] = update_type
+    if lifecycle_state is not None:
+        kwargs['lifecycle_state'] = lifecycle_state
+    if limit is not None:
+        kwargs['limit'] = limit
+    if page is not None:
+        kwargs['page'] = page
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('database', 'database', ctx)
+    if all_pages:
+        if page_size:
+            kwargs['limit'] = page_size
+
+        result = cli_util.list_call_get_all_results(
+            client.list_basecc_vm_cluster_updates,
+            basecc_vm_cluster_id=basecc_vm_cluster_id,
+            **kwargs
+        )
+    elif limit is not None:
+        result = cli_util.list_call_get_up_to_limit(
+            client.list_basecc_vm_cluster_updates,
+            limit,
+            page_size,
+            basecc_vm_cluster_id=basecc_vm_cluster_id,
+            **kwargs
+        )
+    else:
+        result = client.list_basecc_vm_cluster_updates(
+            basecc_vm_cluster_id=basecc_vm_cluster_id,
+            **kwargs
+        )
+    cli_util.render_response(result, ctx)
+
+
+@basecc_vm_cluster_group.command(name=cli_util.override('db.list_basecc_vm_clusters.command_name', 'list'), help=u"""Lists the BaseDB-C@C VM clusters in the specified compartment. Applies to Base Database Service on Cloud@Customer instances only. \n[Command Reference](listBaseccVmClusters)""")
+@cli_util.option('--compartment-id', required=True, help=u"""The compartment [OCID].""")
+@cli_util.option('--base-infrastructure-id', help=u"""If provided, filters the results for the given Oracle Data Cloud@Customer Infrastructure.""")
+@cli_util.option('--limit', type=click.INT, help=u"""The maximum number of items to return per page.""")
+@cli_util.option('--page', help=u"""The pagination token to continue listing from.""")
+@cli_util.option('--sort-by', type=custom_types.CliCaseInsensitiveChoice(["TIMECREATED", "DISPLAYNAME"]), help=u"""The field to sort by.  You can provide one sort order (`sortOrder`).  Default order for TIMECREATED is descending.  Default order for DISPLAYNAME is ascending. The DISPLAYNAME sort order is case sensitive.""")
+@cli_util.option('--sort-order', type=custom_types.CliCaseInsensitiveChoice(["ASC", "DESC"]), help=u"""The sort order to use, either ascending (`ASC`) or descending (`DESC`).""")
+@cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["PROVISIONING", "AVAILABLE", "UPDATING", "TERMINATING", "TERMINATED", "FAILED", "MAINTENANCE_IN_PROGRESS"]), help=u"""A filter to return only resources that match the given lifecycle state exactly.""")
+@cli_util.option('--availability-domain', help=u"""A filter to return only resources that match the given availability domain exactly.""")
+@cli_util.option('--display-name', help=u"""A filter to return only resources that match the entire display name given. The match is not case sensitive.""")
+@cli_util.option('--vm-cluster-type', type=custom_types.CliCaseInsensitiveChoice(["REGULAR", "DEVELOPER"]), help=u"""A filter to return only BaseDB-C@C VM clusters that match the given VM Cluster type exactly.""")
+@cli_util.option('--all', 'all_pages', is_flag=True, help="""Fetches all pages of results. If you provide this option, then you cannot provide the --limit option.""")
+@cli_util.option('--page-size', type=click.INT, help="""When fetching results, the number of results to fetch per call. Only valid when used with --all or --limit, and ignored otherwise.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'database', 'class': 'list[BaseccVmClusterSummary]'})
+@cli_util.wrap_exceptions
+def list_basecc_vm_clusters(ctx, from_json, all_pages, page_size, compartment_id, base_infrastructure_id, limit, page, sort_by, sort_order, lifecycle_state, availability_domain, display_name, vm_cluster_type):
+
+    if all_pages and limit:
+        raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
+    if sort_by and not availability_domain and not all_pages:
+        raise click.UsageError('You must provide an --availability-domain when doing a --sort-by, unless you specify the --all parameter')
+
+    kwargs = {}
+    if base_infrastructure_id is not None:
+        kwargs['base_infrastructure_id'] = base_infrastructure_id
+    if limit is not None:
+        kwargs['limit'] = limit
+    if page is not None:
+        kwargs['page'] = page
+    if sort_by is not None:
+        kwargs['sort_by'] = sort_by
+    if sort_order is not None:
+        kwargs['sort_order'] = sort_order
+    if lifecycle_state is not None:
+        kwargs['lifecycle_state'] = lifecycle_state
+    if availability_domain is not None:
+        kwargs['availability_domain'] = availability_domain
+    if display_name is not None:
+        kwargs['display_name'] = display_name
+    if vm_cluster_type is not None:
+        kwargs['vm_cluster_type'] = vm_cluster_type
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('database', 'database', ctx)
+    if all_pages:
+        if page_size:
+            kwargs['limit'] = page_size
+
+        result = cli_util.list_call_get_all_results(
+            client.list_basecc_vm_clusters,
+            compartment_id=compartment_id,
+            **kwargs
+        )
+    elif limit is not None:
+        result = cli_util.list_call_get_up_to_limit(
+            client.list_basecc_vm_clusters,
+            limit,
+            page_size,
+            compartment_id=compartment_id,
+            **kwargs
+        )
+    else:
+        result = client.list_basecc_vm_clusters(
+            compartment_id=compartment_id,
+            **kwargs
+        )
+    cli_util.render_response(result, ctx)
+
+
 @cloud_autonomous_vm_cluster_group.command(name=cli_util.override('db.list_cloud_autonomous_vm_cluster_acd_resource_usage.command_name', 'list-cloud-autonomous-vm-cluster-acd-resource-usage'), help=u"""Gets the list of resource usage details for all the Cloud Autonomous Container Database in the specified Cloud Autonomous Exadata VM cluster. \n[Command Reference](listCloudAutonomousVmClusterAcdResourceUsage)""")
 @cli_util.option('--cloud-autonomous-vm-cluster-id', required=True, help=u"""The Cloud VM cluster [OCID].""")
 @cli_util.option('--compartment-id', help=u"""The compartment [OCID].""")
@@ -26979,7 +27510,7 @@ def list_data_guard_associations(ctx, from_json, all_pages, page_size, database_
 @cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["PROVISIONING", "AVAILABLE", "DELETING", "DELETED", "FAILED", "TERMINATING", "TERMINATED", "UPDATING"]), help=u"""A filter to return only resources that match the given lifecycle state exactly.""")
 @cli_util.option('--display-name', help=u"""A filter to return only resources that match the entire display name given. The match is not case sensitive.""")
 @cli_util.option('--image-type', type=custom_types.CliCaseInsensitiveChoice(["GRID_IMAGE", "DATABASE_IMAGE"]), help=u"""A filter to return only resources that match the given image type exactly.""")
-@cli_util.option('--image-shape-family', type=custom_types.CliCaseInsensitiveChoice(["VM_BM_SHAPE", "EXADATA_SHAPE", "EXACC_SHAPE", "EXADBXS_SHAPE"]), help=u"""A filter to return only resources that match the given image shape family exactly.""")
+@cli_util.option('--image-shape-family', type=custom_types.CliCaseInsensitiveChoice(["VM_BM_SHAPE", "EXADATA_SHAPE", "EXACC_SHAPE", "EXADBXS_SHAPE", "BDBCC_SHAPE"]), help=u"""A filter to return only resources that match the given image shape family exactly.""")
 @cli_util.option('--patch-set-greater-than-or-equal-to', help=u"""A filter to return only resources with `patchSet` greater than or equal to given value.""")
 @cli_util.option('--db-system-id', help=u"""The DB system [OCID]. If provided, filters the results to the set of database versions which are supported for the DB system.""")
 @cli_util.option('--is-upgrade-supported', type=click.BOOL, help=u"""If provided, filters the results to the set of database versions which are supported for Upgrade.""")
@@ -28933,6 +29464,7 @@ def list_flex_components(ctx, from_json, all_pages, page_size, compartment_id, n
 @cli_util.option('--version-parameterconflict', required=True, help=u"""The Oracle Grid Infrastructure major version.""")
 @cli_util.option('--availability-domain', help=u"""The target availability domain. Only passed if the limit is AD-specific.""")
 @cli_util.option('--compartment-id', help=u"""The compartment [OCID].""")
+@cli_util.option('--exadata-infrastructure-id', help=u"""If provided, filters the results for the given Exadata Infrastructure.""")
 @cli_util.option('--shape-family', type=custom_types.CliCaseInsensitiveChoice(["SINGLENODE", "YODA", "VIRTUALMACHINE", "EXADATA", "EXACC", "EXADB_XS"]), help=u"""If provided, filters the results to the set of database versions which are supported for the given shape family.""")
 @cli_util.option('--is-gi-version-for-provisioning', type=click.BOOL, help=u"""If true, returns the Grid Infrastructure versions that can be used for provisioning a cluster""")
 @cli_util.option('--shape', help=u"""If provided, filters the results for the given shape.""")
@@ -28947,7 +29479,7 @@ def list_flex_components(ctx, from_json, all_pages, page_size, compartment_id, n
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'database', 'class': 'list[GiMinorVersionSummary]'})
 @cli_util.wrap_exceptions
-def list_gi_version_minor_versions(ctx, from_json, all_pages, page_size, version_parameterconflict, availability_domain, compartment_id, shape_family, is_gi_version_for_provisioning, shape, sort_by, sort_order, limit, page):
+def list_gi_version_minor_versions(ctx, from_json, all_pages, page_size, version_parameterconflict, availability_domain, compartment_id, exadata_infrastructure_id, shape_family, is_gi_version_for_provisioning, shape, sort_by, sort_order, limit, page):
 
     if all_pages and limit:
         raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
@@ -28962,6 +29494,8 @@ def list_gi_version_minor_versions(ctx, from_json, all_pages, page_size, version
         kwargs['availability_domain'] = availability_domain
     if compartment_id is not None:
         kwargs['compartment_id'] = compartment_id
+    if exadata_infrastructure_id is not None:
+        kwargs['exadata_infrastructure_id'] = exadata_infrastructure_id
     if shape_family is not None:
         kwargs['shape_family'] = shape_family
     if is_gi_version_for_provisioning is not None:
@@ -31333,6 +31867,75 @@ def register_cloud_vm_cluster_pkcs(ctx, from_json, wait_for_state, max_wait_seco
     result = client.register_cloud_vm_cluster_pkcs(
         cloud_vm_cluster_id=cloud_vm_cluster_id,
         register_cloud_vm_cluster_pkcs_details=_details,
+        **kwargs
+    )
+    work_request_client = cli_util.build_client('work_requests', 'work_request', ctx)
+    if wait_for_state:
+
+        if hasattr(work_request_client, 'get_work_request') and callable(getattr(work_request_client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(work_request_client, work_request_client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+                if hasattr(result, "data") and hasattr(result.data, "resources") and len(result.data.resources) == 1:
+                    entity_type = result.data.resources[0].entity_type
+                    identifier = result.data.resources[0].identifier
+                    get_operation = 'get_' + entity_type
+                    if hasattr(client, get_operation) and callable(getattr(client, get_operation)):
+                        result = getattr(client, get_operation)(identifier)
+
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@exadb_vm_cluster_group.command(name=cli_util.override('db.register_exadb_vm_cluster_pkcs.command_name', 'register-exadb-vm-cluster-pkcs'), help=u"""Install the PKCS11 driver for given keystore type \n[Command Reference](registerExadbVmClusterPkcs)""")
+@cli_util.option('--exadb-vm-cluster-id', required=True, help=u"""The Exadata VM cluster [OCID] on Exascale Infrastructure.""")
+@cli_util.option('--tde-key-store-type', required=True, type=custom_types.CliCaseInsensitiveChoice(["AZURE", "OCI", "GCP", "AWS"]), help=u"""TDE keystore type""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource.  The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state SUCCEEDED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def register_exadb_vm_cluster_pkcs(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, exadb_vm_cluster_id, tde_key_store_type, if_match):
+
+    if isinstance(exadb_vm_cluster_id, six.string_types) and len(exadb_vm_cluster_id.strip()) == 0:
+        raise click.UsageError('Parameter --exadb-vm-cluster-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['tdeKeyStoreType'] = tde_key_store_type
+
+    client = cli_util.build_client('database', 'database', ctx)
+    result = client.register_exadb_vm_cluster_pkcs(
+        exadb_vm_cluster_id=exadb_vm_cluster_id,
+        register_exadb_vm_cluster_pkcs_details=_details,
         **kwargs
     )
     work_request_client = cli_util.build_client('work_requests', 'work_request', ctx)
@@ -34510,6 +35113,75 @@ def unregister_cloud_vm_cluster_pkcs(ctx, from_json, wait_for_state, max_wait_se
     result = client.unregister_cloud_vm_cluster_pkcs(
         cloud_vm_cluster_id=cloud_vm_cluster_id,
         unregister_cloud_vm_cluster_pkcs_details=_details,
+        **kwargs
+    )
+    work_request_client = cli_util.build_client('work_requests', 'work_request', ctx)
+    if wait_for_state:
+
+        if hasattr(work_request_client, 'get_work_request') and callable(getattr(work_request_client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(work_request_client, work_request_client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+                if hasattr(result, "data") and hasattr(result.data, "resources") and len(result.data.resources) == 1:
+                    entity_type = result.data.resources[0].entity_type
+                    identifier = result.data.resources[0].identifier
+                    get_operation = 'get_' + entity_type
+                    if hasattr(client, get_operation) and callable(getattr(client, get_operation)):
+                        result = getattr(client, get_operation)(identifier)
+
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@exadb_vm_cluster_group.command(name=cli_util.override('db.unregister_exadb_vm_cluster_pkcs.command_name', 'unregister-exadb-vm-cluster-pkcs'), help=u"""Uninstall the PKCS11 driver for given keystore type \n[Command Reference](unregisterExadbVmClusterPkcs)""")
+@cli_util.option('--exadb-vm-cluster-id', required=True, help=u"""The Exadata VM cluster [OCID] on Exascale Infrastructure.""")
+@cli_util.option('--tde-key-store-type', required=True, type=custom_types.CliCaseInsensitiveChoice(["AZURE", "OCI", "GCP", "AWS"]), help=u"""TDE keystore type""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource.  The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state SUCCEEDED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def unregister_exadb_vm_cluster_pkcs(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, exadb_vm_cluster_id, tde_key_store_type, if_match):
+
+    if isinstance(exadb_vm_cluster_id, six.string_types) and len(exadb_vm_cluster_id.strip()) == 0:
+        raise click.UsageError('Parameter --exadb-vm-cluster-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['tdeKeyStoreType'] = tde_key_store_type
+
+    client = cli_util.build_client('database', 'database', ctx)
+    result = client.unregister_exadb_vm_cluster_pkcs(
+        exadb_vm_cluster_id=exadb_vm_cluster_id,
+        unregister_exadb_vm_cluster_pkcs_details=_details,
         **kwargs
     )
     work_request_client = cli_util.build_client('work_requests', 'work_request', ctx)
@@ -38363,6 +39035,120 @@ def update_backup_destination(ctx, from_json, force, wait_for_state, max_wait_se
 
                 click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
                 result = oci.wait_until(client, client.get_backup_destination(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@basecc_vm_cluster_group.command(name=cli_util.override('db.update_basecc_vm_cluster.command_name', 'update'), help=u"""Updates the specified BaseDB-C@C VM cluster. Applies to Base Database Service on Cloud@Customer instances only. \n[Command Reference](updateBaseccVmCluster)""")
+@cli_util.option('--basecc-vm-cluster-id', required=True, help=u"""The BaseDB-C@C VM cluster [OCID].""")
+@cli_util.option('--cpu-core-count', type=click.INT, help=u"""Total CPU cores for the BaseDB C@C VM cluster.""")
+@cli_util.option('--memory-size-in-gbs', type=click.INT, help=u"""The total memory to be allocated, in GBs, for the Base Database Service on Cloud@Customer (BaseDB-C@C) VM cluster. The minimum is 11GB for every 4 ECPU.""")
+@cli_util.option('--data-storage-size-in-gbs', type=click.INT, help=u"""The DATA Disk Group size in GB for the Base Database Service on Cloud@Customer (BaseDB-C@C) VM cluster.""")
+@cli_util.option('--reco-storage-size-in-gbs', type=click.INT, help=u"""The RECO Disk Group size in GB for the Base Database Service on Cloud@Customer (BaseDB-C@C) VM cluster.""")
+@cli_util.option('--license-model', type=custom_types.CliCaseInsensitiveChoice(["LICENSE_INCLUDED", "BRING_YOUR_OWN_LICENSE"]), help=u"""The Oracle license model that applies to the Base Database Service on Cloud@Customer (BaseDB-C@C) VM cluster. The default is LICENSE_INCLUDED.""")
+@cli_util.option('--ssh-public-keys', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The public key portion of one or more key pairs used for SSH access to the VMs of Base Database Service on Cloud@Customer (BaseDB-C@C) VM cluster.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--display-name', help=u"""The user-friendly name for the Base Database Service on Cloud@Customer (BaseDB-C@C) VM cluster. The name does not need to be unique.""")
+@cli_util.option('--additional-vm-storage-size-in-gbs', type=click.INT, help=u"""Total /u01 partition size (GB) for the Base Database Service on Cloud@Customer (BaseDB-C@C) VM cluster.""")
+@cli_util.option('--update-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
+
+Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--data-collection-options', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--cloud-automation-update-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource.  The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["PROVISIONING", "AVAILABLE", "UPDATING", "TERMINATING", "TERMINATED", "FAILED", "MAINTENANCE_IN_PROGRESS"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state PROVISIONING --wait-for-state MAINTENANCE_IN_PROGRESS would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'ssh-public-keys': {'module': 'database', 'class': 'list[string]'}, 'update-details': {'module': 'database', 'class': 'BaseccVmClusterUpdateDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'data-collection-options': {'module': 'database', 'class': 'DataCollectionOptions'}, 'cloud-automation-update-details': {'module': 'database', 'class': 'CloudAutomationUpdateDetails'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'ssh-public-keys': {'module': 'database', 'class': 'list[string]'}, 'update-details': {'module': 'database', 'class': 'BaseccVmClusterUpdateDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'data-collection-options': {'module': 'database', 'class': 'DataCollectionOptions'}, 'cloud-automation-update-details': {'module': 'database', 'class': 'CloudAutomationUpdateDetails'}}, output_type={'module': 'database', 'class': 'BaseccVmCluster'})
+@cli_util.wrap_exceptions
+def update_basecc_vm_cluster(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, basecc_vm_cluster_id, cpu_core_count, memory_size_in_gbs, data_storage_size_in_gbs, reco_storage_size_in_gbs, license_model, ssh_public_keys, display_name, additional_vm_storage_size_in_gbs, update_details, freeform_tags, defined_tags, data_collection_options, cloud_automation_update_details, if_match):
+
+    if isinstance(basecc_vm_cluster_id, six.string_types) and len(basecc_vm_cluster_id.strip()) == 0:
+        raise click.UsageError('Parameter --basecc-vm-cluster-id cannot be whitespace or empty string')
+    if not force:
+        if ssh_public_keys or update_details or freeform_tags or defined_tags or data_collection_options or cloud_automation_update_details:
+            if not click.confirm("WARNING: Updates to ssh-public-keys and update-details and freeform-tags and defined-tags and data-collection-options and cloud-automation-update-details will replace any existing values. Are you sure you want to continue?"):
+                ctx.abort()
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+
+    if cpu_core_count is not None:
+        _details['cpuCoreCount'] = cpu_core_count
+
+    if memory_size_in_gbs is not None:
+        _details['memorySizeInGBs'] = memory_size_in_gbs
+
+    if data_storage_size_in_gbs is not None:
+        _details['dataStorageSizeInGBs'] = data_storage_size_in_gbs
+
+    if reco_storage_size_in_gbs is not None:
+        _details['recoStorageSizeInGBs'] = reco_storage_size_in_gbs
+
+    if license_model is not None:
+        _details['licenseModel'] = license_model
+
+    if ssh_public_keys is not None:
+        _details['sshPublicKeys'] = cli_util.parse_json_parameter("ssh_public_keys", ssh_public_keys)
+
+    if display_name is not None:
+        _details['displayName'] = display_name
+
+    if additional_vm_storage_size_in_gbs is not None:
+        _details['additionalVmStorageSizeInGBs'] = additional_vm_storage_size_in_gbs
+
+    if update_details is not None:
+        _details['updateDetails'] = cli_util.parse_json_parameter("update_details", update_details)
+
+    if freeform_tags is not None:
+        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
+
+    if defined_tags is not None:
+        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    if data_collection_options is not None:
+        _details['dataCollectionOptions'] = cli_util.parse_json_parameter("data_collection_options", data_collection_options)
+
+    if cloud_automation_update_details is not None:
+        _details['cloudAutomationUpdateDetails'] = cli_util.parse_json_parameter("cloud_automation_update_details", cloud_automation_update_details)
+
+    client = cli_util.build_client('database', 'database', ctx)
+    result = client.update_basecc_vm_cluster(
+        basecc_vm_cluster_id=basecc_vm_cluster_id,
+        update_basecc_vm_cluster_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_basecc_vm_cluster') and callable(getattr(client, 'get_basecc_vm_cluster')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+
+                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_basecc_vm_cluster(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
             except oci.exceptions.MaximumWaitTimeExceeded as e:
                 # If we fail, we should show an error, but we should still provide the information to the customer
                 click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
