@@ -1151,6 +1151,7 @@ def resize_opensearch_cluster_vertical(ctx, from_json, wait_for_state, max_wait_
 @cli_util.option('--security-master-user-password-hash', help=u"""The password hash of the master user that are used to manage security config""")
 @cli_util.option('--security-saml-config', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--backup-policy', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--nsg-id', help=u"""The OCID of the NSG where the private endpoint vnic will be attached.""")
 @cli_util.option('--reverse-connection-endpoint-customer-ips', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The customer IP addresses of the endpoint in customer VCN""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--outbound-cluster-config', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--maintenance-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
@@ -1171,7 +1172,7 @@ Example: `{\"Oracle-ZPR\": {\"MaxEgressCount\": {\"value\": \"42\", \"mode\": \"
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'security-saml-config': {'module': 'opensearch', 'class': 'SecuritySamlConfig'}, 'backup-policy': {'module': 'opensearch', 'class': 'BackupPolicy'}, 'reverse-connection-endpoint-customer-ips': {'module': 'opensearch', 'class': 'list[string]'}, 'outbound-cluster-config': {'module': 'opensearch', 'class': 'OutboundClusterConfig'}, 'maintenance-details': {'module': 'opensearch', 'class': 'UpdateMaintenanceDetails'}, 'load-balancer-config': {'module': 'opensearch', 'class': 'LoadBalancerConfig'}, 'certificate-config': {'module': 'opensearch', 'class': 'CertificateConfig'}, 'freeform-tags': {'module': 'opensearch', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'opensearch', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'opensearch', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.wrap_exceptions
-def update_opensearch_cluster(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, opensearch_cluster_id, display_name, software_version, security_mode, security_master_user_name, security_master_user_password_hash, security_saml_config, backup_policy, reverse_connection_endpoint_customer_ips, outbound_cluster_config, maintenance_details, load_balancer_config, certificate_config, freeform_tags, defined_tags, security_attributes, if_match):
+def update_opensearch_cluster(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, opensearch_cluster_id, display_name, software_version, security_mode, security_master_user_name, security_master_user_password_hash, security_saml_config, backup_policy, nsg_id, reverse_connection_endpoint_customer_ips, outbound_cluster_config, maintenance_details, load_balancer_config, certificate_config, freeform_tags, defined_tags, security_attributes, if_match):
 
     if isinstance(opensearch_cluster_id, six.string_types) and len(opensearch_cluster_id.strip()) == 0:
         raise click.UsageError('Parameter --opensearch-cluster-id cannot be whitespace or empty string')
@@ -1205,6 +1206,9 @@ def update_opensearch_cluster(ctx, from_json, force, wait_for_state, max_wait_se
 
     if backup_policy is not None:
         _details['backupPolicy'] = cli_util.parse_json_parameter("backup_policy", backup_policy)
+
+    if nsg_id is not None:
+        _details['nsgId'] = nsg_id
 
     if reverse_connection_endpoint_customer_ips is not None:
         _details['reverseConnectionEndpointCustomerIps'] = cli_util.parse_json_parameter("reverse_connection_endpoint_customer_ips", reverse_connection_endpoint_customer_ips)

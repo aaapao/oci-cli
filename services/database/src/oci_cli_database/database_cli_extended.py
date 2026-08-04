@@ -1002,7 +1002,7 @@ def create_database_from_backup(ctx, wait_for_state, max_wait_seconds, wait_inte
     cli_util.render(database, None, ctx)
 
 
-@cli_util.copy_params_from_generated_command(database_cli.update_database, params_to_exclude=['db_backup_config', 'managed_software_update_details'])
+@cli_util.copy_params_from_generated_command(database_cli.update_database, params_to_exclude=['db_backup_config', 'auto_failover_configuration', 'managed_software_update_details'])
 @database_cli.database_group.command(name='update', help="""Update a Database based on the request parameters you provide.""")
 @cli_util.option('--msu-details', type=custom_types.CLI_COMPLEX_TYPE, help="""This is a complex type whose value must be valid JSON. The value can be provided as a string on the command line or passed in as a file using
 the file://path/to/file syntax.
@@ -1015,6 +1015,9 @@ in a file, modifying it as needed and then passing it back in via the file:// sy
 @cli_util.option('--auto-full-backup-window', required=False, help="""Specifying a two hour slot when the full backup should kick in eg:- SLOT_ONE,SLOT_TWO. Default is anytime""")
 @cli_util.option('--backup-destination', required=False, type=custom_types.CLI_COMPLEX_TYPE, help="""backup destination list""")
 @cli_util.option('--zero-data-loss-enabled', required=False, type=click.BOOL, help=u"""Enable Zero Data loss feature""")
+@cli_util.option('--manage-auto-failover', type=custom_types.CliCaseInsensitiveChoice(["ENABLE", "DISABLE"]), help=u"""The value to assign to the managed_auto_failover property of the standby to be created.
+            Allowed values for this property are: "ENABLE", "DISABLE".""")
+@cli_util.option('--auto-failover-targets', type=click.STRING, help=u"""Defines auto failover targets for the current database. The value should be comma separated unique names of other data guard members.""")
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'backup-destination': {'module': 'database', 'class': 'list[BackupDestinationDetails]'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}}, output_type={'module': 'database', 'class': 'Database'})
 @cli_util.wrap_exceptions
@@ -1022,6 +1025,19 @@ def update_database_extended(ctx, **kwargs):
     if 'msu_details' in kwargs:
         kwargs['managed_software_update_details'] = kwargs['msu_details']
         kwargs.pop('msu_details')
+
+    database_auto_failover_details = {}
+    if 'manage_auto_failover' in kwargs and kwargs['manage_auto_failover']:
+        database_auto_failover_details['managed_auto_failover'] = kwargs['manage_auto_failover']
+    if 'auto_failover_targets' in kwargs and kwargs['auto_failover_targets'] is not None:
+        if kwargs['auto_failover_targets']:
+            database_auto_failover_details['failover_targets'] = kwargs['auto_failover_targets'].split(',')
+        else:
+            database_auto_failover_details['failover_targets'] = []
+
+    if database_auto_failover_details:
+        kwargs['auto_failover_configuration'] = json.dumps(database_auto_failover_details)
+
     if kwargs['auto_backup_enabled'] is not None or kwargs['recovery_window_in_days'] is not None:
         db_backup_config = {}
         if 'auto_backup_window' in kwargs and kwargs['auto_backup_window'] and kwargs['auto_backup_enabled'] is not None:
@@ -1056,6 +1072,8 @@ def update_database_extended(ctx, **kwargs):
     del kwargs['auto_full_backup_window']
     del kwargs['backup_destination']
     kwargs.pop('zero_data_loss_enabled', None)
+    del kwargs['manage_auto_failover']
+    del kwargs['auto_failover_targets']
 
     ctx.invoke(database_cli.update_database, **kwargs)
 
@@ -4197,6 +4215,9 @@ For more information, see [Redo Transport Services] in the Oracle Data Guard doc
 @cli_util.option('--hsm-password', help=u"""Provide the HSM password as you would in RDBMS for External HSM.""")
 @cli_util.option('--data-storage-size-in-gbs', type=click.INT, help=u"""Provide the DATA storage size, in gigabytes, that is applicable for the database.""")
 @cli_util.option('--reco-storage-size-in-gbs', type=click.INT, help=u"""Provide the RECO storage size, in gigabytes, that is applicable for the database.""")
+@cli_util.option('--manage-auto-failover', type=custom_types.CliCaseInsensitiveChoice(["ENABLE", "DISABLE"]), help=u"""The value to assign to the managed_auto_failover property of the standby to be created.
+            Allowed values for this property are: "ENABLE", "DISABLE".""")
+@cli_util.option('--auto-failover-targets', type=click.STRING, help=u"""Defines auto failover targets for the current database. The value should be comma separated unique names of other data guard members.""")
 @cli_util.help_option
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'database', 'class': 'DatabaseSummary'})
@@ -4253,6 +4274,18 @@ def create_standby_database_for_multiple_standby(ctx, wait_for_state, max_wait_s
 
     if include_storage_details:
         create_standby_details.storage_size_details = database_storage_size_details
+
+    database_auto_failover_details = oci.database.models.AutoFailoverConfiguration()
+    auto_failover_config_present = False
+    if 'manage_auto_failover' in kwargs and kwargs['manage_auto_failover']:
+        database_auto_failover_details.managed_auto_failover = kwargs['manage_auto_failover']
+        auto_failover_config_present = True
+    if 'auto_failover_targets' in kwargs and kwargs['auto_failover_targets']:
+        database_auto_failover_details.failover_targets = kwargs['auto_failover_targets'].split(',')
+        auto_failover_config_present = True
+
+    if auto_failover_config_present:
+        create_standby_details.auto_failover_configuration = database_auto_failover_details
 
     _details['database'] = create_standby_details
 

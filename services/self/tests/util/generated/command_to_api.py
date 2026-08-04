@@ -2,6 +2,7 @@
 # Copyright (c) 2016, 2026, Oracle and/or its affiliates. All rights reserved.
 
 SDK_client_map = {
+    "subscription.cancel_subscription": "oci.self.SubscriptionClient.cancel_subscription",
     "subscription.cancel_work_request": "oci.self.SubscriptionClient.cancel_work_request",
     "subscription.change_subscription_compartment": "oci.self.SubscriptionClient.change_subscription_compartment",
     "subscription.create_subscription": "oci.self.SubscriptionClient.create_subscription",

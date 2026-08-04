@@ -630,6 +630,7 @@ class TestSetup(unittest.TestCase):
             'Test-Policy',  # enter valid policy name
             'Test policy',  # enter policy description
             '["invalid policy statement"]',  # enter invalid policy statement
+            'N',  # keep the policy in the instance compartment and proceed to policy creation. Older click interpreted missing input as Enter and chose the default choice N.
         ]
 
         result = self.invoke(['setup', 'instance-principal', '--config-file', PERMANENT_CONFIG_FILENAME, '--profile', 'ADMIN'], input='\n'.join(stdin))

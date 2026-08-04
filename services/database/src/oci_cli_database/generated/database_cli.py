@@ -154,6 +154,12 @@ def db_home_group():
     pass
 
 
+@click.command(cli_util.override('db.autonomous_database_in_backup_group.command_name', 'autonomous-database-in-backup'), cls=CommandGroupWithAlias, help="""Details of Autonomous AI Database in Autonomous Container Database""")
+@cli_util.help_option_group
+def autonomous_database_in_backup_group():
+    pass
+
+
 @click.command(cli_util.override('db.autonomous_exadata_infrastructure_shape_group.command_name', 'autonomous-exadata-infrastructure-shape'), cls=CommandGroupWithAlias, help="""The shape of the Autonomous Exadata Infrastructure. The shape determines resources to allocate to the Autonomous Exadata Infrastructure (CPU cores, memory and storage).
 
 To use any of the API operations, you must be authorized in an IAM policy. If you're not authorized, talk to an administrator. If you're an administrator who needs to write policies to give users access, see [Getting Started with Policies].""")
@@ -597,6 +603,7 @@ db_root_group.add_command(vm_cluster_update_history_entry_group)
 db_root_group.add_command(database_software_image_group)
 db_root_group.add_command(data_guard_association_group)
 db_root_group.add_command(db_home_group)
+db_root_group.add_command(autonomous_database_in_backup_group)
 db_root_group.add_command(autonomous_exadata_infrastructure_shape_group)
 db_root_group.add_command(db_system_os_patch_history_entry_collection_group)
 db_root_group.add_command(execution_window_group)
@@ -5012,7 +5019,7 @@ def create_application_vip(ctx, from_json, wait_for_state, max_wait_seconds, wai
 
 This option is a JSON list with items of type CustomerContact.  For documentation on CustomerContact please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/database/20160918/datatypes/CustomerContact.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--okv-end-point-group-name', help=u"""The OKV End Point Group name for the Autonomous Container Database.""")
-@cli_util.option('--source', type=custom_types.CliCaseInsensitiveChoice(["NONE", "BACKUP_FROM_ID"]), help=u"""The source of the database. Use `NONE` to create a new Autonomous Container Database (ACD). Use `BACKUP_FROM_ID` to create a new ACD from a specified backup.""")
+@cli_util.option('--source', type=custom_types.CliCaseInsensitiveChoice(["NONE", "BACKUP_FROM_ID", "BACKUP_FROM_TIMESTAMP"]), help=u"""The source of the database. Use `NONE` to create a new Autonomous Container Database (ACD). Use `BACKUP_FROM_ID` to create a new ACD from a specified backup.""")
 @cli_util.option('--db-unique-name', help=u"""**Deprecated.** The `DB_UNIQUE_NAME` value is set by Oracle Cloud Infrastructure.  Do not specify a value for this parameter. Specifying a value for this field will cause Terraform operations to fail.""")
 @cli_util.option('--db-name', help=u"""The Database name for the Autonomous Container Database. The name must be unique within the Cloud Autonomous VM Cluster, starting with an alphabetic character, followed by 1 to 7 alphanumeric characters.""")
 @cli_util.option('--service-level-agreement-type', type=custom_types.CliCaseInsensitiveChoice(["STANDARD", "AUTONOMOUS_DATAGUARD"]), help=u"""The service level agreement type of the Autonomous Container Database. The default is STANDARD. For an autonomous dataguard Autonomous Container Database, the specified Autonomous Exadata Infrastructure must be associated with a remote Autonomous Exadata Infrastructure.""")
@@ -5179,6 +5186,230 @@ def create_autonomous_container_database(ctx, from_json, wait_for_state, max_wai
 
     if net_services_architecture is not None:
         _details['netServicesArchitecture'] = net_services_architecture
+
+    client = cli_util.build_client('database', 'database', ctx)
+    result = client.create_autonomous_container_database(
+        create_autonomous_container_database_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_autonomous_container_database') and callable(getattr(client, 'get_autonomous_container_database')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+
+                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_autonomous_container_database(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@autonomous_container_database_group.command(name=cli_util.override('db.create_autonomous_container_database_create_autonomous_container_database_from_backup_timestamp_details.command_name', 'create-autonomous-container-database-create-autonomous-container-database-from-backup-timestamp-details'), help=u"""Creates an Autonomous Container Database in the specified Autonomous Exadata Infrastructure. \n[Command Reference](createAutonomousContainerDatabase)""")
+@cli_util.option('--display-name', required=True, help=u"""The display name for the Autonomous Container Database.""")
+@cli_util.option('--patch-model', required=True, type=custom_types.CliCaseInsensitiveChoice(["RELEASE_UPDATES", "RELEASE_UPDATE_REVISIONS"]), help=u"""Database Patch model preference.""")
+@cli_util.option('--source-autonomous-container-database-id', required=True, help=u"""The [OCID] of the source ACD that you will clone to create a new ACD.""")
+@cli_util.option('--clone-type', required=True, type=custom_types.CliCaseInsensitiveChoice(["FULL", "METADATA", "PARTIAL"]), help=u"""The Autonomous AI Database clone type.""")
+@cli_util.option('--customer-contacts', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Customer Contacts. Setting this to an empty list removes all customer contacts.
+
+This option is a JSON list with items of type CustomerContact.  For documentation on CustomerContact please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/database/20160918/datatypes/CustomerContact.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--okv-end-point-group-name', help=u"""The OKV End Point Group name for the Autonomous Container Database.""")
+@cli_util.option('--db-unique-name', help=u"""**Deprecated.** The `DB_UNIQUE_NAME` value is set by Oracle Cloud Infrastructure.  Do not specify a value for this parameter. Specifying a value for this field will cause Terraform operations to fail.""")
+@cli_util.option('--db-name', help=u"""The Database name for the Autonomous Container Database. The name must be unique within the Cloud Autonomous VM Cluster, starting with an alphabetic character, followed by 1 to 7 alphanumeric characters.""")
+@cli_util.option('--service-level-agreement-type', type=custom_types.CliCaseInsensitiveChoice(["STANDARD", "AUTONOMOUS_DATAGUARD"]), help=u"""The service level agreement type of the Autonomous Container Database. The default is STANDARD. For an autonomous dataguard Autonomous Container Database, the specified Autonomous Exadata Infrastructure must be associated with a remote Autonomous Exadata Infrastructure.""")
+@cli_util.option('--autonomous-exadata-infrastructure-id', help=u"""**No longer used.** This parameter is no longer used for Autonomous AI Database on dedicated Exadata infrasture. Specify a `cloudAutonomousVmClusterId` instead. Using this parameter will cause the operation to fail.""")
+@cli_util.option('--db-version', help=u"""The base version for the Autonomous Container Database.""")
+@cli_util.option('--database-software-image-id', help=u"""The Autonomous AI Database Software Image [OCID].""")
+@cli_util.option('--peer-autonomous-exadata-infrastructure-id', help=u"""*No longer used.* This parameter is no longer used for Autonomous AI Database on dedicated Exadata infrasture. Specify a `peerCloudAutonomousVmClusterId` instead. Using this parameter will cause the operation to fail.""")
+@cli_util.option('--peer-autonomous-container-database-display-name', help=u"""The display name for the peer Autonomous Container Database.""")
+@cli_util.option('--protection-mode', type=custom_types.CliCaseInsensitiveChoice(["MAXIMUM_AVAILABILITY", "MAXIMUM_PERFORMANCE"]), help=u"""The protection mode of this Autonomous Data Guard association. For more information, see [Oracle Data Guard Protection Modes] in the Oracle Data Guard documentation.""")
+@cli_util.option('--fast-start-fail-over-lag-limit-in-seconds', type=click.INT, help=u"""The lag time for my preference based on data loss tolerance in seconds.""")
+@cli_util.option('--is-automatic-failover-enabled', type=click.BOOL, help=u"""Indicates whether Automatic Failover is enabled for Autonomous Container Database Dataguard Association""")
+@cli_util.option('--peer-cloud-autonomous-vm-cluster-id', help=u"""The [OCID] of the peer cloud Autonomous Exadata VM Cluster.""")
+@cli_util.option('--peer-autonomous-vm-cluster-id', help=u"""The [OCID] of the peer Autonomous VM cluster for Autonomous Data Guard. Required to enable Data Guard.""")
+@cli_util.option('--peer-autonomous-container-database-compartment-id', help=u"""The [OCID] of the compartment where the standby Autonomous Container Database will be created.""")
+@cli_util.option('--peer-autonomous-container-database-backup-config', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--peer-db-unique-name', help=u"""**Deprecated.** The `DB_UNIQUE_NAME` of the peer Autonomous Container Database in a Data Guard association is set by Oracle Cloud Infrastructure.  Do not specify a value for this parameter. Specifying a value for this field will cause Terraform operations to fail.""")
+@cli_util.option('--autonomous-vm-cluster-id', help=u"""The OCID of the Autonomous VM Cluster.""")
+@cli_util.option('--cloud-autonomous-vm-cluster-id', help=u"""The [OCID] of the cloud Autonomous Exadata VM Cluster.""")
+@cli_util.option('--compartment-id', help=u"""The [OCID] of the compartment containing the Autonomous Container Database.""")
+@cli_util.option('--maintenance-window-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--standby-maintenance-buffer-in-days', type=click.INT, help=u"""The scheduling detail for the quarterly maintenance window of the standby Autonomous Container Database. This value represents the number of days before scheduled maintenance of the primary database.""")
+@cli_util.option('--version-preference', type=custom_types.CliCaseInsensitiveChoice(["NEXT_RELEASE_UPDATE", "LATEST_RELEASE_UPDATE"]), help=u"""The next maintenance version preference.""")
+@cli_util.option('--is-dst-file-update-enabled', type=click.BOOL, help=u"""Indicates if an automatic DST Time Zone file update is enabled for the Autonomous Container Database. If enabled along with Release Update, patching will be done in a Non-Rolling manner.""")
+@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
+
+Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--backup-config', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--kms-key-id', help=u"""The OCID of the key container that is used as the master encryption key in database transparent data encryption (TDE) operations.""")
+@cli_util.option('--kms-key-version-id', help=u"""The OCID of the key container version that is used in database transparent data encryption (TDE) operations KMS Key can have multiple key versions. If none is specified, the current key version (latest) of the Key Id is used for the operation. Autonomous AI Database Serverless does not use key versions, hence is not applicable for Autonomous AI Database Serverless instances.""")
+@cli_util.option('--vault-id', help=u"""The [OCID] of the Oracle Cloud Infrastructure [vault]. This parameter and `secretId` are required for Customer Managed Keys.""")
+@cli_util.option('--key-store-id', help=u"""The [OCID] of the key store of Oracle Vault.""")
+@cli_util.option('--encryption-key-location-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--db-split-threshold', type=click.INT, help=u"""The CPU value beyond which an Autonomous AI Database will be opened across multiple nodes. The default value of this attribute is 16 for OCPUs and 64 for ECPUs.""")
+@cli_util.option('--vm-failover-reservation', type=click.INT, help=u"""The percentage of CPUs reserved across nodes to support node failover. Allowed values are 0%, 25%, 50%, 75%, and 100%, with 50% being the default option.""")
+@cli_util.option('--distribution-affinity', type=custom_types.CliCaseInsensitiveChoice(["MINIMUM_DISTRIBUTION", "MAXIMUM_DISTRIBUTION"]), help=u"""Determines whether an Autonomous AI Database must be opened across a minimum or maximum of nodes. By default, Minimum nodes is selected.""")
+@cli_util.option('--net-services-architecture', type=custom_types.CliCaseInsensitiveChoice(["DEDICATED", "SHARED", "DRCP"]), help=u"""Enabling SHARED server architecture enables a database server to allow many client processes to share very few server processes, thereby increasing the number of supported users.""")
+@cli_util.option('--time-stamp-to-use-for-cloning', type=custom_types.CLI_DATETIME, help=u"""The time stamp representing the point in time to which the Autonomous Container Database should be cloned from backup. And the requested timeStamp should be in the past.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
+@cli_util.option('--should-use-latest-available-backup-time-stamp', type=click.BOOL, help=u"""If set to true, OCI shall attempt to create a point in time to the latest available backup of the source Autonomous Container Database.""")
+@cli_util.option('--autonomous-databases-to-clone', type=custom_types.CLI_COMPLEX_TYPE, help=u"""A list of Autonomous Databases ( display name of the ADB in specific ) to be cloned from backup of the source Autonomous Container Database.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--clone-band-width', type=custom_types.CliCaseInsensitiveChoice(["SLOW", "MEDIUM", "FAST"]), help=u"""The speed at which the Autonomous Container Database Clone from backup operation to be performed by OCI.""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["PROVISIONING", "AVAILABLE", "UPDATING", "TERMINATING", "TERMINATED", "FAILED", "BACKUP_IN_PROGRESS", "RESTORING", "RESTORE_FAILED", "RESTARTING", "MAINTENANCE_IN_PROGRESS", "ROLE_CHANGE_IN_PROGRESS", "ENABLING_AUTONOMOUS_DATA_GUARD", "UNAVAILABLE"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state PROVISIONING --wait-for-state UNAVAILABLE would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'customer-contacts': {'module': 'database', 'class': 'list[CustomerContact]'}, 'peer-autonomous-container-database-backup-config': {'module': 'database', 'class': 'PeerAutonomousContainerDatabaseBackupConfig'}, 'maintenance-window-details': {'module': 'database', 'class': 'MaintenanceWindow'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'backup-config': {'module': 'database', 'class': 'AutonomousContainerDatabaseBackupConfig'}, 'encryption-key-location-details': {'module': 'database', 'class': 'EncryptionKeyLocationDetails'}, 'autonomous-databases-to-clone': {'module': 'database', 'class': 'list[string]'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'customer-contacts': {'module': 'database', 'class': 'list[CustomerContact]'}, 'peer-autonomous-container-database-backup-config': {'module': 'database', 'class': 'PeerAutonomousContainerDatabaseBackupConfig'}, 'maintenance-window-details': {'module': 'database', 'class': 'MaintenanceWindow'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'backup-config': {'module': 'database', 'class': 'AutonomousContainerDatabaseBackupConfig'}, 'encryption-key-location-details': {'module': 'database', 'class': 'EncryptionKeyLocationDetails'}, 'autonomous-databases-to-clone': {'module': 'database', 'class': 'list[string]'}}, output_type={'module': 'database', 'class': 'AutonomousContainerDatabase'})
+@cli_util.wrap_exceptions
+def create_autonomous_container_database_create_autonomous_container_database_from_backup_timestamp_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, display_name, patch_model, source_autonomous_container_database_id, clone_type, customer_contacts, okv_end_point_group_name, db_unique_name, db_name, service_level_agreement_type, autonomous_exadata_infrastructure_id, db_version, database_software_image_id, peer_autonomous_exadata_infrastructure_id, peer_autonomous_container_database_display_name, protection_mode, fast_start_fail_over_lag_limit_in_seconds, is_automatic_failover_enabled, peer_cloud_autonomous_vm_cluster_id, peer_autonomous_vm_cluster_id, peer_autonomous_container_database_compartment_id, peer_autonomous_container_database_backup_config, peer_db_unique_name, autonomous_vm_cluster_id, cloud_autonomous_vm_cluster_id, compartment_id, maintenance_window_details, standby_maintenance_buffer_in_days, version_preference, is_dst_file_update_enabled, freeform_tags, defined_tags, backup_config, kms_key_id, kms_key_version_id, vault_id, key_store_id, encryption_key_location_details, db_split_threshold, vm_failover_reservation, distribution_affinity, net_services_architecture, time_stamp_to_use_for_cloning, should_use_latest_available_backup_time_stamp, autonomous_databases_to_clone, clone_band_width):
+
+    kwargs = {}
+
+    _details = {}
+    _details['displayName'] = display_name
+    _details['patchModel'] = patch_model
+    _details['sourceAutonomousContainerDatabaseId'] = source_autonomous_container_database_id
+    _details['cloneType'] = clone_type
+
+    if customer_contacts is not None:
+        _details['customerContacts'] = cli_util.parse_json_parameter("customer_contacts", customer_contacts)
+
+    if okv_end_point_group_name is not None:
+        _details['okvEndPointGroupName'] = okv_end_point_group_name
+
+    if db_unique_name is not None:
+        _details['dbUniqueName'] = db_unique_name
+
+    if db_name is not None:
+        _details['dbName'] = db_name
+
+    if service_level_agreement_type is not None:
+        _details['serviceLevelAgreementType'] = service_level_agreement_type
+
+    if autonomous_exadata_infrastructure_id is not None:
+        _details['autonomousExadataInfrastructureId'] = autonomous_exadata_infrastructure_id
+
+    if db_version is not None:
+        _details['dbVersion'] = db_version
+
+    if database_software_image_id is not None:
+        _details['databaseSoftwareImageId'] = database_software_image_id
+
+    if peer_autonomous_exadata_infrastructure_id is not None:
+        _details['peerAutonomousExadataInfrastructureId'] = peer_autonomous_exadata_infrastructure_id
+
+    if peer_autonomous_container_database_display_name is not None:
+        _details['peerAutonomousContainerDatabaseDisplayName'] = peer_autonomous_container_database_display_name
+
+    if protection_mode is not None:
+        _details['protectionMode'] = protection_mode
+
+    if fast_start_fail_over_lag_limit_in_seconds is not None:
+        _details['fastStartFailOverLagLimitInSeconds'] = fast_start_fail_over_lag_limit_in_seconds
+
+    if is_automatic_failover_enabled is not None:
+        _details['isAutomaticFailoverEnabled'] = is_automatic_failover_enabled
+
+    if peer_cloud_autonomous_vm_cluster_id is not None:
+        _details['peerCloudAutonomousVmClusterId'] = peer_cloud_autonomous_vm_cluster_id
+
+    if peer_autonomous_vm_cluster_id is not None:
+        _details['peerAutonomousVmClusterId'] = peer_autonomous_vm_cluster_id
+
+    if peer_autonomous_container_database_compartment_id is not None:
+        _details['peerAutonomousContainerDatabaseCompartmentId'] = peer_autonomous_container_database_compartment_id
+
+    if peer_autonomous_container_database_backup_config is not None:
+        _details['peerAutonomousContainerDatabaseBackupConfig'] = cli_util.parse_json_parameter("peer_autonomous_container_database_backup_config", peer_autonomous_container_database_backup_config)
+
+    if peer_db_unique_name is not None:
+        _details['peerDbUniqueName'] = peer_db_unique_name
+
+    if autonomous_vm_cluster_id is not None:
+        _details['autonomousVmClusterId'] = autonomous_vm_cluster_id
+
+    if cloud_autonomous_vm_cluster_id is not None:
+        _details['cloudAutonomousVmClusterId'] = cloud_autonomous_vm_cluster_id
+
+    if compartment_id is not None:
+        _details['compartmentId'] = compartment_id
+
+    if maintenance_window_details is not None:
+        _details['maintenanceWindowDetails'] = cli_util.parse_json_parameter("maintenance_window_details", maintenance_window_details)
+
+    if standby_maintenance_buffer_in_days is not None:
+        _details['standbyMaintenanceBufferInDays'] = standby_maintenance_buffer_in_days
+
+    if version_preference is not None:
+        _details['versionPreference'] = version_preference
+
+    if is_dst_file_update_enabled is not None:
+        _details['isDstFileUpdateEnabled'] = is_dst_file_update_enabled
+
+    if freeform_tags is not None:
+        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
+
+    if defined_tags is not None:
+        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    if backup_config is not None:
+        _details['backupConfig'] = cli_util.parse_json_parameter("backup_config", backup_config)
+
+    if kms_key_id is not None:
+        _details['kmsKeyId'] = kms_key_id
+
+    if kms_key_version_id is not None:
+        _details['kmsKeyVersionId'] = kms_key_version_id
+
+    if vault_id is not None:
+        _details['vaultId'] = vault_id
+
+    if key_store_id is not None:
+        _details['keyStoreId'] = key_store_id
+
+    if encryption_key_location_details is not None:
+        _details['encryptionKeyLocationDetails'] = cli_util.parse_json_parameter("encryption_key_location_details", encryption_key_location_details)
+
+    if db_split_threshold is not None:
+        _details['dbSplitThreshold'] = db_split_threshold
+
+    if vm_failover_reservation is not None:
+        _details['vmFailoverReservation'] = vm_failover_reservation
+
+    if distribution_affinity is not None:
+        _details['distributionAffinity'] = distribution_affinity
+
+    if net_services_architecture is not None:
+        _details['netServicesArchitecture'] = net_services_architecture
+
+    if time_stamp_to_use_for_cloning is not None:
+        _details['timeStampToUseForCloning'] = time_stamp_to_use_for_cloning
+
+    if should_use_latest_available_backup_time_stamp is not None:
+        _details['shouldUseLatestAvailableBackupTimeStamp'] = should_use_latest_available_backup_time_stamp
+
+    if autonomous_databases_to_clone is not None:
+        _details['autonomousDatabasesToClone'] = cli_util.parse_json_parameter("autonomous_databases_to_clone", autonomous_databases_to_clone)
+
+    if clone_band_width is not None:
+        _details['cloneBandWidth'] = clone_band_width
+
+    _details['source'] = 'BACKUP_FROM_TIMESTAMP'
 
     client = cli_util.build_client('database', 'database', ctx)
     result = client.create_autonomous_container_database(
@@ -5460,15 +5691,18 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @cli_util.option('--vm-failover-reservation', type=click.INT, help=u"""The percentage of CPUs reserved across nodes to support node failover. Allowed values are 0%, 25%, 50%, 75%, and 100%, with 50% being the default option.""")
 @cli_util.option('--distribution-affinity', type=custom_types.CliCaseInsensitiveChoice(["MINIMUM_DISTRIBUTION", "MAXIMUM_DISTRIBUTION"]), help=u"""Determines whether an Autonomous AI Database must be opened across a minimum or maximum of nodes. By default, Minimum nodes is selected.""")
 @cli_util.option('--net-services-architecture', type=custom_types.CliCaseInsensitiveChoice(["DEDICATED", "SHARED", "DRCP"]), help=u"""Enabling SHARED server architecture enables a database server to allow many client processes to share very few server processes, thereby increasing the number of supported users.""")
+@cli_util.option('--clone-type', type=custom_types.CliCaseInsensitiveChoice(["FULL", "METADATA", "PARTIAL"]), help=u"""The Autonomous AI Database clone type.""")
+@cli_util.option('--autonomous-databases-to-clone', type=custom_types.CLI_COMPLEX_TYPE, help=u"""A list of Autonomous Databases ( display name of the ADB in specific ) to be cloned from backup of the source Autonomous Container Database.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--clone-band-width', type=custom_types.CliCaseInsensitiveChoice(["SLOW", "MEDIUM", "FAST"]), help=u"""The speed at which the Autonomous Container Database Clone from backup operation to be performed by OCI.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["PROVISIONING", "AVAILABLE", "UPDATING", "TERMINATING", "TERMINATED", "FAILED", "BACKUP_IN_PROGRESS", "RESTORING", "RESTORE_FAILED", "RESTARTING", "MAINTENANCE_IN_PROGRESS", "ROLE_CHANGE_IN_PROGRESS", "ENABLING_AUTONOMOUS_DATA_GUARD", "UNAVAILABLE"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state PROVISIONING --wait-for-state UNAVAILABLE would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'customer-contacts': {'module': 'database', 'class': 'list[CustomerContact]'}, 'peer-autonomous-container-database-backup-config': {'module': 'database', 'class': 'PeerAutonomousContainerDatabaseBackupConfig'}, 'maintenance-window-details': {'module': 'database', 'class': 'MaintenanceWindow'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'backup-config': {'module': 'database', 'class': 'AutonomousContainerDatabaseBackupConfig'}, 'encryption-key-location-details': {'module': 'database', 'class': 'EncryptionKeyLocationDetails'}})
+@json_skeleton_utils.get_cli_json_input_option({'customer-contacts': {'module': 'database', 'class': 'list[CustomerContact]'}, 'peer-autonomous-container-database-backup-config': {'module': 'database', 'class': 'PeerAutonomousContainerDatabaseBackupConfig'}, 'maintenance-window-details': {'module': 'database', 'class': 'MaintenanceWindow'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'backup-config': {'module': 'database', 'class': 'AutonomousContainerDatabaseBackupConfig'}, 'encryption-key-location-details': {'module': 'database', 'class': 'EncryptionKeyLocationDetails'}, 'autonomous-databases-to-clone': {'module': 'database', 'class': 'list[string]'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'customer-contacts': {'module': 'database', 'class': 'list[CustomerContact]'}, 'peer-autonomous-container-database-backup-config': {'module': 'database', 'class': 'PeerAutonomousContainerDatabaseBackupConfig'}, 'maintenance-window-details': {'module': 'database', 'class': 'MaintenanceWindow'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'backup-config': {'module': 'database', 'class': 'AutonomousContainerDatabaseBackupConfig'}, 'encryption-key-location-details': {'module': 'database', 'class': 'EncryptionKeyLocationDetails'}}, output_type={'module': 'database', 'class': 'AutonomousContainerDatabase'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'customer-contacts': {'module': 'database', 'class': 'list[CustomerContact]'}, 'peer-autonomous-container-database-backup-config': {'module': 'database', 'class': 'PeerAutonomousContainerDatabaseBackupConfig'}, 'maintenance-window-details': {'module': 'database', 'class': 'MaintenanceWindow'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'backup-config': {'module': 'database', 'class': 'AutonomousContainerDatabaseBackupConfig'}, 'encryption-key-location-details': {'module': 'database', 'class': 'EncryptionKeyLocationDetails'}, 'autonomous-databases-to-clone': {'module': 'database', 'class': 'list[string]'}}, output_type={'module': 'database', 'class': 'AutonomousContainerDatabase'})
 @cli_util.wrap_exceptions
-def create_autonomous_container_database_create_autonomous_container_database_from_backup_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, display_name, patch_model, autonomous_container_database_backup_id, customer_contacts, okv_end_point_group_name, db_unique_name, db_name, service_level_agreement_type, autonomous_exadata_infrastructure_id, db_version, database_software_image_id, peer_autonomous_exadata_infrastructure_id, peer_autonomous_container_database_display_name, protection_mode, fast_start_fail_over_lag_limit_in_seconds, is_automatic_failover_enabled, peer_cloud_autonomous_vm_cluster_id, peer_autonomous_vm_cluster_id, peer_autonomous_container_database_compartment_id, peer_autonomous_container_database_backup_config, peer_db_unique_name, autonomous_vm_cluster_id, cloud_autonomous_vm_cluster_id, compartment_id, maintenance_window_details, standby_maintenance_buffer_in_days, version_preference, is_dst_file_update_enabled, freeform_tags, defined_tags, backup_config, kms_key_id, kms_key_version_id, vault_id, key_store_id, encryption_key_location_details, db_split_threshold, vm_failover_reservation, distribution_affinity, net_services_architecture):
+def create_autonomous_container_database_create_autonomous_container_database_from_backup_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, display_name, patch_model, autonomous_container_database_backup_id, customer_contacts, okv_end_point_group_name, db_unique_name, db_name, service_level_agreement_type, autonomous_exadata_infrastructure_id, db_version, database_software_image_id, peer_autonomous_exadata_infrastructure_id, peer_autonomous_container_database_display_name, protection_mode, fast_start_fail_over_lag_limit_in_seconds, is_automatic_failover_enabled, peer_cloud_autonomous_vm_cluster_id, peer_autonomous_vm_cluster_id, peer_autonomous_container_database_compartment_id, peer_autonomous_container_database_backup_config, peer_db_unique_name, autonomous_vm_cluster_id, cloud_autonomous_vm_cluster_id, compartment_id, maintenance_window_details, standby_maintenance_buffer_in_days, version_preference, is_dst_file_update_enabled, freeform_tags, defined_tags, backup_config, kms_key_id, kms_key_version_id, vault_id, key_store_id, encryption_key_location_details, db_split_threshold, vm_failover_reservation, distribution_affinity, net_services_architecture, clone_type, autonomous_databases_to_clone, clone_band_width):
 
     kwargs = {}
 
@@ -5587,6 +5821,15 @@ def create_autonomous_container_database_create_autonomous_container_database_fr
 
     if net_services_architecture is not None:
         _details['netServicesArchitecture'] = net_services_architecture
+
+    if clone_type is not None:
+        _details['cloneType'] = clone_type
+
+    if autonomous_databases_to_clone is not None:
+        _details['autonomousDatabasesToClone'] = cli_util.parse_json_parameter("autonomous_databases_to_clone", autonomous_databases_to_clone)
+
+    if clone_band_width is not None:
+        _details['cloneBandWidth'] = clone_band_width
 
     _details['source'] = 'BACKUP_FROM_ID'
 
@@ -22073,6 +22316,28 @@ def get_autonomous_container_database(ctx, from_json, autonomous_container_datab
     cli_util.render_response(result, ctx)
 
 
+@autonomous_container_database_backup_group.command(name=cli_util.override('db.get_autonomous_container_database_backup.command_name', 'get'), help=u"""Gets information about the specified Autonomous Container Database backup. \n[Command Reference](getAutonomousContainerDatabaseBackup)""")
+@cli_util.option('--autonomous-container-database-backup-id', required=True, help=u"""The Autonomous Container Database backup [OCID].""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'database', 'class': 'AutonomousContainerDatabaseBackup'})
+@cli_util.wrap_exceptions
+def get_autonomous_container_database_backup(ctx, from_json, autonomous_container_database_backup_id):
+
+    if isinstance(autonomous_container_database_backup_id, six.string_types) and len(autonomous_container_database_backup_id.strip()) == 0:
+        raise click.UsageError('Parameter --autonomous-container-database-backup-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('database', 'database', ctx)
+    result = client.get_autonomous_container_database_backup(
+        autonomous_container_database_backup_id=autonomous_container_database_backup_id,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
 @autonomous_container_database_dataguard_association_group.command(name=cli_util.override('db.get_autonomous_container_database_dataguard_association.command_name', 'get'), help=u"""**Deprecated.** Use the [GetAutonomousContainerDatabase] operation to get the details of an Autonomous Container Database (ACD) enabled with Autonomous Data Guard associated with the specified ACD. \n[Command Reference](getAutonomousContainerDatabaseDataguardAssociation)""")
 @cli_util.option('--autonomous-container-database-id', required=True, help=u"""The Autonomous Container Database [OCID].""")
 @cli_util.option('--autonomous-container-database-dataguard-association-id', required=True, help=u"""The Autonomous Container Database-Autonomous Data Guard association [OCID].""")
@@ -25776,6 +26041,7 @@ def list_autonomous_container_databases(ctx, from_json, all_pages, page_size, co
 @cli_util.option('--backup-destination-id', help=u"""A filter to return only resources that have the given backup destination id.""")
 @cli_util.option('--key-store-id', help=u"""A filter to return only resources that have the given key store id.""")
 @cli_util.option('--infrastructure-type', type=custom_types.CliCaseInsensitiveChoice(["CLOUD", "CLOUD_AT_CUSTOMER"]), help=u"""A filter to return only resources that match the given Infrastructure Type.""")
+@cli_util.option('--is-pitr-eligible', type=click.BOOL, help=u"""Filters backups based on the current Autonomous AI Database configuration; returns only those relevant for point-in-time recovery (PITR). Does not guarantee exclusion of backups in orphan ranges.""")
 @cli_util.option('--all', 'all_pages', is_flag=True, help="""Fetches all pages of results. If you provide this option, then you cannot provide the --limit option.""")
 @cli_util.option('--page-size', type=click.INT, help="""When fetching results, the number of results to fetch per call. Only valid when used with --all or --limit, and ignored otherwise.""")
 @json_skeleton_utils.get_cli_json_input_option({})
@@ -25783,7 +26049,7 @@ def list_autonomous_container_databases(ctx, from_json, all_pages, page_size, co
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'database', 'class': 'list[AutonomousDatabaseBackupSummary]'})
 @cli_util.wrap_exceptions
-def list_autonomous_database_backups(ctx, from_json, all_pages, page_size, autonomous_database_id, compartment_id, limit, page, sort_by, sort_order, lifecycle_state, display_name, type, backup_destination_id, key_store_id, infrastructure_type):
+def list_autonomous_database_backups(ctx, from_json, all_pages, page_size, autonomous_database_id, compartment_id, limit, page, sort_by, sort_order, lifecycle_state, display_name, type, backup_destination_id, key_store_id, infrastructure_type, is_pitr_eligible):
 
     if all_pages and limit:
         raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
@@ -25813,6 +26079,8 @@ def list_autonomous_database_backups(ctx, from_json, all_pages, page_size, auton
         kwargs['key_store_id'] = key_store_id
     if infrastructure_type is not None:
         kwargs['infrastructure_type'] = infrastructure_type
+    if is_pitr_eligible is not None:
+        kwargs['is_pitr_eligible'] = is_pitr_eligible
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
     client = cli_util.build_client('database', 'database', ctx)
     if all_pages:
@@ -26239,6 +26507,61 @@ def list_autonomous_databases(ctx, from_json, all_pages, page_size, compartment_
     else:
         result = client.list_autonomous_databases(
             compartment_id=compartment_id,
+            **kwargs
+        )
+    cli_util.render_response(result, ctx)
+
+
+@autonomous_database_in_backup_group.command(name=cli_util.override('db.list_autonomous_databases_in_autonomous_container_database_backup.command_name', 'list-autonomous-databases-in-autonomous-container-database-backup'), help=u"""Gets a list of Autonomous Databases associated with backups at the given timestamp for the specified Autonomous Container Database. If `compartmentId` is provided, filters to that compartment; otherwise, uses the container's compartment. \n[Command Reference](listAutonomousDatabasesInAutonomousContainerDatabaseBackup)""")
+@cli_util.option('--autonomous-container-database-id', required=True, help=u"""The Autonomous Container Database [OCID].""")
+@cli_util.option('--time-stamp-requested', required=True, type=custom_types.CLI_DATETIME, help=u"""The timestamp at which the list of autonomous databases present to be returned (ISO-8601 format, e.g., \"2025-12-02T06:39:15Z\"). The requested value must be after the end timestamp of the oldest available Autonomous Container Database backup.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
+@cli_util.option('--compartment-id', help=u"""The compartment [OCID]. If not provided, uses the Autonomous Container Database's compartment.""")
+@cli_util.option('--limit', type=click.INT, help=u"""The maximum number of items to return per page.""")
+@cli_util.option('--page', help=u"""The pagination token to continue listing from.""")
+@cli_util.option('--all', 'all_pages', is_flag=True, help="""Fetches all pages of results. If you provide this option, then you cannot provide the --limit option.""")
+@cli_util.option('--page-size', type=click.INT, help="""When fetching results, the number of results to fetch per call. Only valid when used with --all or --limit, and ignored otherwise.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'database', 'class': 'AutonomousDatabaseInBackupCollection'})
+@cli_util.wrap_exceptions
+def list_autonomous_databases_in_autonomous_container_database_backup(ctx, from_json, all_pages, page_size, autonomous_container_database_id, time_stamp_requested, compartment_id, limit, page):
+
+    if all_pages and limit:
+        raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
+
+    kwargs = {}
+    if compartment_id is not None:
+        kwargs['compartment_id'] = compartment_id
+    if limit is not None:
+        kwargs['limit'] = limit
+    if page is not None:
+        kwargs['page'] = page
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('database', 'database', ctx)
+    if all_pages:
+        if page_size:
+            kwargs['limit'] = page_size
+
+        result = cli_util.list_call_get_all_results(
+            client.list_autonomous_databases_in_autonomous_container_database_backup,
+            autonomous_container_database_id=autonomous_container_database_id,
+            time_stamp_requested=time_stamp_requested,
+            **kwargs
+        )
+    elif limit is not None:
+        result = cli_util.list_call_get_up_to_limit(
+            client.list_autonomous_databases_in_autonomous_container_database_backup,
+            limit,
+            page_size,
+            autonomous_container_database_id=autonomous_container_database_id,
+            time_stamp_requested=time_stamp_requested,
+            **kwargs
+        )
+    else:
+        result = client.list_autonomous_databases_in_autonomous_container_database_backup(
+            autonomous_container_database_id=autonomous_container_database_id,
+            time_stamp_requested=time_stamp_requested,
             **kwargs
         )
     cli_util.render_response(result, ctx)
@@ -27648,6 +27971,8 @@ def list_database_upgrade_history_entries(ctx, from_json, all_pages, page_size, 
 @cli_util.option('--sort-order', type=custom_types.CliCaseInsensitiveChoice(["ASC", "DESC"]), help=u"""The sort order to use, either ascending (`ASC`) or descending (`DESC`).""")
 @cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["PROVISIONING", "AVAILABLE", "UPDATING", "BACKUP_IN_PROGRESS", "UPGRADING", "CONVERTING", "TERMINATING", "TERMINATED", "RESTORE_FAILED", "FAILED"]), help=u"""A filter to return only resources that match the given lifecycle state exactly.""")
 @cli_util.option('--db-name', help=u"""A filter to return only resources that match the entire database name given. The match is not case sensitive.""")
+@cli_util.option('--managed-auto-failover', type=custom_types.CliCaseInsensitiveChoice(["REGISTERED", "UNREGISTERED", "ALL"]), help=u"""Filter the databases by managed auto failover param.""")
+@cli_util.option('--failover-targets', type=custom_types.CliCaseInsensitiveChoice(["DEFINED", "UNDEFINED", "ALL"]), help=u"""Filter the databases by failoverTargets param.""")
 @cli_util.option('--all', 'all_pages', is_flag=True, help="""Fetches all pages of results. If you provide this option, then you cannot provide the --limit option.""")
 @cli_util.option('--page-size', type=click.INT, help="""When fetching results, the number of results to fetch per call. Only valid when used with --all or --limit, and ignored otherwise.""")
 @json_skeleton_utils.get_cli_json_input_option({})
@@ -27655,7 +27980,7 @@ def list_database_upgrade_history_entries(ctx, from_json, all_pages, page_size, 
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'database', 'class': 'list[DatabaseSummary]'})
 @cli_util.wrap_exceptions
-def list_databases(ctx, from_json, all_pages, page_size, compartment_id, db_home_id, system_id, limit, page, sort_by, sort_order, lifecycle_state, db_name):
+def list_databases(ctx, from_json, all_pages, page_size, compartment_id, db_home_id, system_id, limit, page, sort_by, sort_order, lifecycle_state, db_name, managed_auto_failover, failover_targets):
 
     if all_pages and limit:
         raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
@@ -27677,6 +28002,10 @@ def list_databases(ctx, from_json, all_pages, page_size, compartment_id, db_home
         kwargs['lifecycle_state'] = lifecycle_state
     if db_name is not None:
         kwargs['db_name'] = db_name
+    if managed_auto_failover is not None:
+        kwargs['managed_auto_failover'] = managed_auto_failover
+    if failover_targets is not None:
+        kwargs['failover_targets'] = failover_targets
     client = cli_util.build_client('database', 'database', ctx)
     if all_pages:
         if page_size:
@@ -39949,23 +40278,36 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--managed-software-update-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--patch-options', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--database-admin-password', help=u"""The administrator password of the primary database in this Data Guard association.
+
+**The password MUST be the same as the primary admin password.**""")
+@cli_util.option('--protection-mode', type=custom_types.CliCaseInsensitiveChoice(["MAXIMUM_AVAILABILITY", "MAXIMUM_PERFORMANCE", "MAXIMUM_PROTECTION"]), help=u"""The protection mode of this Data Guard. For more information, see [Oracle Data Guard Protection Modes] in the Oracle Data Guard documentation.""")
+@cli_util.option('--transport-type', type=custom_types.CliCaseInsensitiveChoice(["SYNC", "ASYNC", "FASTSYNC"]), help=u"""The redo transport type to use for this Data Guard association.  Valid values depend on the specified `protectionMode`:
+
+* MAXIMUM_AVAILABILITY - SYNC or FASTSYNC * MAXIMUM_PERFORMANCE - ASYNC * MAXIMUM_PROTECTION - SYNC
+
+For more information, see [Redo Transport Services] in the Oracle Data Guard documentation.
+
+**IMPORTANT** - The only transport type currently supported by the Database service is ASYNC.""")
+@cli_util.option('--is-active-data-guard-enabled', type=click.BOOL, help=u"""True if active Data Guard is enabled.""")
+@cli_util.option('--auto-failover-configuration', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource.  The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
 @cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["PROVISIONING", "AVAILABLE", "UPDATING", "BACKUP_IN_PROGRESS", "UPGRADING", "CONVERTING", "TERMINATING", "TERMINATED", "RESTORE_FAILED", "FAILED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state PROVISIONING --wait-for-state FAILED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'db-backup-config': {'module': 'database', 'class': 'DbBackupConfig'}, 'storage-size-details': {'module': 'database', 'class': 'DatabaseStorageSizeDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'managed-software-update-details': {'module': 'database', 'class': 'ManagedSoftwareUpdateInputDetails'}, 'patch-options': {'module': 'database', 'class': 'PatchOptions'}})
+@json_skeleton_utils.get_cli_json_input_option({'db-backup-config': {'module': 'database', 'class': 'DbBackupConfig'}, 'storage-size-details': {'module': 'database', 'class': 'DatabaseStorageSizeDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'managed-software-update-details': {'module': 'database', 'class': 'ManagedSoftwareUpdateInputDetails'}, 'patch-options': {'module': 'database', 'class': 'PatchOptions'}, 'auto-failover-configuration': {'module': 'database', 'class': 'AutoFailoverConfiguration'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'db-backup-config': {'module': 'database', 'class': 'DbBackupConfig'}, 'storage-size-details': {'module': 'database', 'class': 'DatabaseStorageSizeDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'managed-software-update-details': {'module': 'database', 'class': 'ManagedSoftwareUpdateInputDetails'}, 'patch-options': {'module': 'database', 'class': 'PatchOptions'}}, output_type={'module': 'database', 'class': 'Database'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'db-backup-config': {'module': 'database', 'class': 'DbBackupConfig'}, 'storage-size-details': {'module': 'database', 'class': 'DatabaseStorageSizeDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'managed-software-update-details': {'module': 'database', 'class': 'ManagedSoftwareUpdateInputDetails'}, 'patch-options': {'module': 'database', 'class': 'PatchOptions'}, 'auto-failover-configuration': {'module': 'database', 'class': 'AutoFailoverConfiguration'}}, output_type={'module': 'database', 'class': 'Database'})
 @cli_util.wrap_exceptions
-def update_database(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, database_id, db_backup_config, db_home_id, new_admin_password, old_tde_wallet_password, new_tde_wallet_password, storage_size_details, freeform_tags, defined_tags, managed_software_update_details, patch_options, if_match):
+def update_database(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, database_id, db_backup_config, db_home_id, new_admin_password, old_tde_wallet_password, new_tde_wallet_password, storage_size_details, freeform_tags, defined_tags, managed_software_update_details, patch_options, database_admin_password, protection_mode, transport_type, is_active_data_guard_enabled, auto_failover_configuration, if_match):
 
     if isinstance(database_id, six.string_types) and len(database_id.strip()) == 0:
         raise click.UsageError('Parameter --database-id cannot be whitespace or empty string')
     if not force:
-        if db_backup_config or storage_size_details or freeform_tags or defined_tags or managed_software_update_details or patch_options:
-            if not click.confirm("WARNING: Updates to db-backup-config and storage-size-details and freeform-tags and defined-tags and managed-software-update-details and patch-options will replace any existing values. Are you sure you want to continue?"):
+        if db_backup_config or storage_size_details or freeform_tags or defined_tags or managed_software_update_details or patch_options or auto_failover_configuration:
+            if not click.confirm("WARNING: Updates to db-backup-config and storage-size-details and freeform-tags and defined-tags and managed-software-update-details and patch-options and auto-failover-configuration will replace any existing values. Are you sure you want to continue?"):
                 ctx.abort()
 
     kwargs = {}
@@ -40003,6 +40345,21 @@ def update_database(ctx, from_json, force, wait_for_state, max_wait_seconds, wai
 
     if patch_options is not None:
         _details['patchOptions'] = cli_util.parse_json_parameter("patch_options", patch_options)
+
+    if database_admin_password is not None:
+        _details['databaseAdminPassword'] = database_admin_password
+
+    if protection_mode is not None:
+        _details['protectionMode'] = protection_mode
+
+    if transport_type is not None:
+        _details['transportType'] = transport_type
+
+    if is_active_data_guard_enabled is not None:
+        _details['isActiveDataGuardEnabled'] = is_active_data_guard_enabled
+
+    if auto_failover_configuration is not None:
+        _details['autoFailoverConfiguration'] = cli_util.parse_json_parameter("auto_failover_configuration", auto_failover_configuration)
 
     client = cli_util.build_client('database', 'database', ctx)
     result = client.update_database(

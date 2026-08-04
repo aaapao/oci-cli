@@ -994,3 +994,42 @@ def update_connection_update_google_cloud_storage_connection_details_extended(ct
 
 # oci goldengate connection migrate-connection-secret-migrate-connection-details -> oci goldengate connection migrate-secret
 cli_util.rename_command(goldengate_cli, goldengate_cli.connection_group, goldengate_cli.migrate_connection_secret_migrate_connection_details, "migrate-secret")
+
+
+# oci goldengate ai-model-collection list-ai-models -> oci goldengate ai-model list
+cli_util.rename_command(goldengate_cli, goldengate_cli.ai_model_collection_group, goldengate_cli.list_ai_models, "list")
+
+
+# oci goldengate ai-model-collection -> oci goldengate ai-model
+cli_util.rename_command(goldengate_cli, goldengate_cli.goldengate_root_group, goldengate_cli.ai_model_collection_group, "ai-model")
+
+
+# oci goldengate ai-provider-collection list-ai-providers -> oci goldengate ai-provider list
+cli_util.rename_command(goldengate_cli, goldengate_cli.ai_provider_collection_group, goldengate_cli.list_ai_providers, "list")
+
+
+# oci goldengate ai-provider-collection -> oci goldengate ai-provider
+cli_util.rename_command(goldengate_cli, goldengate_cli.goldengate_root_group, goldengate_cli.ai_provider_collection_group, "ai-provider")
+
+
+# oci goldengate connection create-connection-create-ai-model-connection-details -> oci goldengate connection create-ai-model-connection
+cli_util.rename_command(goldengate_cli, goldengate_cli.connection_group, goldengate_cli.create_connection_create_ai_model_connection_details, "create-ai-model-connection")
+
+
+# oci goldengate connection update-connection-update-ai-model-connection-details -> oci goldengate connection update-ai-model-connection
+cli_util.rename_command(goldengate_cli, goldengate_cli.connection_group, goldengate_cli.update_connection_update_ai_model_connection_details, "update-ai-model-connection")
+
+
+@cli_util.copy_params_from_generated_command(goldengate_cli.list_ai_models, params_to_exclude=['region_parameterconflict'])
+@goldengate_cli.ai_model_collection_group.command(name=goldengate_cli.list_ai_models.name, help=goldengate_cli.list_ai_models.help)
+@cli_util.option('--model-region', help=u"""OCI region identifier, for example us-ashburn-1.""")
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'golden_gate', 'class': 'AiModelCollection'})
+@cli_util.wrap_exceptions
+def list_ai_models_extended(ctx, **kwargs):
+
+    if 'model_region' in kwargs:
+        kwargs['region_parameterconflict'] = kwargs['model_region']
+        kwargs.pop('model_region')
+
+    ctx.invoke(goldengate_cli.list_ai_models, **kwargs)

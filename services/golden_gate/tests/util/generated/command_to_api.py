@@ -49,6 +49,8 @@ SDK_client_map = {
     "goldengate.get_pipeline": "oci.golden_gate.GoldenGateClient.get_pipeline",
     "goldengate.get_work_request": "oci.golden_gate.GoldenGateClient.get_work_request",
     "goldengate.import_deployment_wallet": "oci.golden_gate.GoldenGateClient.import_deployment_wallet",
+    "goldengate.list_ai_models": "oci.golden_gate.GoldenGateClient.list_ai_models",
+    "goldengate.list_ai_providers": "oci.golden_gate.GoldenGateClient.list_ai_providers",
     "goldengate.list_certificates": "oci.golden_gate.GoldenGateClient.list_certificates",
     "goldengate.list_connection_assignments": "oci.golden_gate.GoldenGateClient.list_connection_assignments",
     "goldengate.list_connections": "oci.golden_gate.GoldenGateClient.list_connections",
