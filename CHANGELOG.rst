@@ -6,6 +6,62 @@ All notable changes to this project will be documented in this file.
 
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`__.
 
+3.90.1 - 2026-08-04
+-------------------
+Added
+~~~~~
+* OpenSearch service
+
+  * Support for new optional parameter ``--nsg-id``
+
+    * ``oci opensearch cluster update --nsg-id``
+
+* Self Service
+
+  * Support for Usage Based SaaS listings on Marketplace
+
+    * ``oci self partner-integeration create-subscription-usage-record-details submit-subscription-usage-batch``
+    * ``oci self partner-integeration create-subscription-usage-record-details submit-subscription-usage-records``
+    * ``oci self partner-integeration partner list``
+    * ``oci self subscription subscription cancel``
+
+* Database Service
+
+  * Support for cloning Autonomous Container Databases from backup timestamp details
+
+    * ``oci db autonomous-container-database create-autonomous-container-database-create-autonomous-container-database-from-backup-timestamp-details``
+
+  * Support for retrieving Autonomous Container Database backups and listing Autonomous Databases in an Autonomous Container Database backup
+
+    * ``oci db autonomous-container-database-backup get``
+    * ``oci db autonomous-database-in-backup list-autonomous-databases-in-autonomous-container-database-backup``
+
+  * Support for new optional parameters when cloning an Autonomous Container Database from a backup ID
+
+    * ``oci db autonomous-container-database create-autonomous-container-database-create-autonomous-container-database-from-backup-details --autonomous-databases-to-clone --clone-band-width --clone-type``
+
+  * Support for a new optional parameter when listing Autonomous Database backups
+
+    * ``oci db autonomous-database-backup list --is-pitr-eligible``
+
+  * Support for enabling managed auto failover on existing Data Guard with multiple standby
+
+    * ``oci db database update --database-admin-password --protection-mode --transport-type --is-active-data-guard-enabled --auto-failover-configuration``
+    * ``oci db database list --managed-auto-failover --failover-targets``
+
+* Marketplace Private Offer Service
+
+  * Support for the Marketplace Multi Party Private Offers feature
+
+    * ``oci marketplace-private-offer offer offer send``
+    * ``oci marketplace-private-offer offer offer withdraw``
+    * ``oci marketplace-private-offer offer-quote``
+    * ``oci marketplace-private-offer quote-attachment``
+
+Security
+~~~~~~~~
+* Updated click dependency to `>=8.3.3,<=8.4.2` for python version `>3.11` per: https://www.cve.org/CVERecord?id=CVE-2026-7246
+
 3.90.0 - 2026-07-28
 -------------------
 Added

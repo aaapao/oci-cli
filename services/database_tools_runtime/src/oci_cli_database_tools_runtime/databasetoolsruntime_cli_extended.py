@@ -69,6 +69,39 @@ def _execute_sql_database_tools_connection_without_response_model(ctx, client, c
         enforce_content_headers=True
     )
 
+
+def _set_execute_sql_response_format_defaults(input_details):
+    if not isinstance(input_details, dict):
+        return input_details
+
+    response_format = input_details.get('responseFormat')
+    if not isinstance(response_format, dict):
+        return input_details
+
+    for field_name in ['resultSetMetaData', 'statementInformation', 'statementText', 'binds', 'result', 'response']:
+        response_format.setdefault(field_name, True)
+
+    return input_details
+
+
+def _normalize_optional_multi_value(parameter_value):
+    if isinstance(parameter_value, tuple):
+        if len(parameter_value) == 0:
+            return None
+        return list(parameter_value)
+
+    return parameter_value
+
+
+def _resolve_multi_value_parameter(ctx, kwargs, parameter_name):
+    parameter_value = kwargs.get(parameter_name)
+    if parameter_value is None or (isinstance(parameter_value, tuple) and len(parameter_value) == 0):
+        if ctx.default_map and parameter_name in ctx.default_map:
+            return ctx.default_map.get(parameter_name)
+        return None
+
+    return _normalize_optional_multi_value(parameter_value)
+
 # oci dbtools-runtime user credential
 
 
@@ -338,7 +371,7 @@ def execute_sql_async_extended(ctx, **kwargs):
         kwargs['output_parameterconflict'] = cli_util.parse_json_parameter('request_output', request_output)
     if request_output is not None and output_time_of_deletion is not None:
         kwargs['output_parameterconflict']['timeOfDeletion'] = output_time_of_deletion
-    parsed_input = cli_util.parse_json_parameter('request_input', kwargs['request_input'])
+    parsed_input = _set_execute_sql_response_format_defaults(cli_util.parse_json_parameter('request_input', kwargs['request_input']))
     kwargs_for_call = {}
     if kwargs.get('if_match') is not None:
         kwargs_for_call['if_match'] = kwargs.get('if_match')
@@ -377,8 +410,25 @@ def execute_sql_sync_extended(ctx, **kwargs):
     cli_util.load_context_obj_values_from_defaults(ctx)
     if ctx.obj.get('generate_param_json_input') or ctx.obj.get('generate_full_command_json_input'):
         return
-    kwargs['input'] = kwargs.pop('request_input')
-    ctx.invoke(databasetoolsruntime_cli.execute_sql_database_tools_connection_execute_sql_database_tools_connection_synchronous_details, **kwargs)
+    connection_id = kwargs['connection_id']
+    wait_for_state = kwargs.get('wait_for_state')
+    max_wait_seconds = kwargs.get('max_wait_seconds')
+    wait_interval_seconds = kwargs.get('wait_interval_seconds')
+    parsed_input = _set_execute_sql_response_format_defaults(cli_util.parse_json_parameter('request_input', kwargs['request_input']))
+
+    kwargs_for_call = {}
+    if kwargs.get('if_match') is not None:
+        kwargs_for_call['if_match'] = kwargs.get('if_match')
+    kwargs_for_call['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    details = {
+        'type': 'SYNCHRONOUS',
+        'input': parsed_input
+    }
+
+    client = cli_util.build_client('database_tools_runtime', 'database_tools_runtime', ctx)
+    result = _execute_sql_database_tools_connection_without_response_model(ctx, client, connection_id, details, kwargs_for_call)
+    _render_async_execute_sql_response(ctx, client, result, wait_for_state, max_wait_seconds, wait_interval_seconds)
 
 
 execute_sql_sync_extended.help = 'Execute SQL synchronously using a connection.'
@@ -589,6 +639,68 @@ database_api_gateway_config_pool_auto_api_spec_create_group.add_command(database
 # oci dbtools-runtime database-api-gateway-config-pool-auto-api-spec create create-database-tools-database-api-gateway-config-pool-auto-api-spec-create-database-tools-database-api-gateway-config-pool-auto-api-spec-default-details -> oci dbtools-runtime database-api-gateway-config-pool-auto-api-spec create default
 cli_util.rename_command(databasetoolsruntime_cli, database_api_gateway_config_pool_auto_api_spec_create_group, databasetoolsruntime_cli.create_database_tools_database_api_gateway_config_pool_auto_api_spec_create_database_tools_database_api_gateway_config_pool_auto_api_spec_default_details, "default")
 
+
+@database_api_gateway_config_pool_auto_api_spec_create_group.command('default', help=databasetoolsruntime_cli.create_database_tools_database_api_gateway_config_pool_auto_api_spec_create_database_tools_database_api_gateway_config_pool_auto_api_spec_default_details.help)
+@cli_util.option('--database-api-gateway-config-id', required=True, help='''The [OCID] of a Database Tools database API gateway config.''')
+@cli_util.option('--pool-key', required=True, help='''The key of the pool config.''')
+@cli_util.option('--display-name', required=True, help='''A user-friendly name. Does not have to be unique, and it’s changeable. Avoid entering confidential information.''')
+@cli_util.option('--database-object-name', required=True, help='''The name of the database object.''')
+@cli_util.option('--database-object-type', required=True, type=custom_types.CliCaseInsensitiveChoice(["FUNCTION", "MVIEW", "PACKAGE", "PROCEDURE", "TABLE", "VIEW", "DUALITYVIEW"]), help='''The type of the database object.''')
+@cli_util.option('--description', help='''Description of the autoApiSpec.''')
+@cli_util.option('--alias', help='''Used as the URI path element for this object. When not specified the objectName lowercase is the default value.''')
+@cli_util.option('--operations', type=custom_types.CliCaseInsensitiveChoice(["READ", "WRITE"]), multiple=True, help='''The operations to limit access to this resource. If not specified then the default is ["READ","WRITE"]. Specify this option more than once to provide multiple values.''')
+@cli_util.option('--security-schemes', type=custom_types.CliCaseInsensitiveChoice(["BASIC", "BEARER"]), multiple=True, help='''The security schemes that can access this resource. If not specified then the resource is public. Specify this option more than once to provide multiple values.''')
+@cli_util.option('--scope', help='''The name of the database API gateway config privilege protecting the resource. Only valid for SCOPE JWT Profile pools and BEARER securitySchemes.''')
+@cli_util.option('--roles', type=custom_types.CLI_COMPLEX_TYPE, help='''The name of the database API gateway config roles protecting the resource. Only valid for RBAC JWT Profile pools and BEARER securitySchemes.''' + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@json_skeleton_utils.get_cli_json_input_option({'operations': {'module': 'database_tools_runtime', 'class': 'list[string]'}, 'security-schemes': {'module': 'database_tools_runtime', 'class': 'list[string]'}, 'roles': {'module': 'database_tools_runtime', 'class': 'list[string]'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'operations': {'module': 'database_tools_runtime', 'class': 'list[string]'}, 'security-schemes': {'module': 'database_tools_runtime', 'class': 'list[string]'}, 'roles': {'module': 'database_tools_runtime', 'class': 'list[string]'}}, output_type={'module': 'database_tools_runtime', 'class': 'DatabaseToolsDatabaseApiGatewayConfigPoolAutoApiSpec'})
+@cli_util.wrap_exceptions
+def database_api_gateway_config_pool_auto_api_spec_create_default_extended(ctx, **kwargs):
+    cli_util.load_context_obj_values_from_defaults(ctx)
+    if ctx.obj.get('generate_param_json_input') or ctx.obj.get('generate_full_command_json_input'):
+        return
+    operations = _resolve_multi_value_parameter(ctx, kwargs, 'operations')
+    security_schemes = _resolve_multi_value_parameter(ctx, kwargs, 'security_schemes')
+    roles = _resolve_multi_value_parameter(ctx, kwargs, 'roles')
+
+    request_kwargs = {}
+    request_kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    details = {
+        'displayName': kwargs['display_name'],
+        'databaseObjectName': kwargs['database_object_name'],
+        'databaseObjectType': kwargs['database_object_type'],
+        'type': 'DEFAULT'
+    }
+
+    if kwargs.get('description') is not None:
+        details['description'] = kwargs.get('description')
+    if kwargs.get('alias') is not None:
+        details['alias'] = kwargs.get('alias')
+    if operations is not None:
+        details['operations'] = cli_util.parse_json_parameter('operations', operations)
+    if security_schemes is not None:
+        details['securitySchemes'] = cli_util.parse_json_parameter('security_schemes', security_schemes)
+    if kwargs.get('scope') is not None:
+        details['scope'] = kwargs.get('scope')
+    if roles is not None:
+        details['roles'] = cli_util.parse_json_parameter('roles', roles)
+
+    client = cli_util.build_client('database_tools_runtime', 'database_tools_runtime', ctx)
+    result = client.create_database_tools_database_api_gateway_config_pool_auto_api_spec(
+        database_tools_database_api_gateway_config_id=kwargs['database_api_gateway_config_id'],
+        pool_key=kwargs['pool_key'],
+        create_database_tools_database_api_gateway_config_pool_auto_api_spec_details=details,
+        **request_kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
+database_api_gateway_config_pool_auto_api_spec_create_group.commands.pop('default', None)
+database_api_gateway_config_pool_auto_api_spec_create_group.add_command(database_api_gateway_config_pool_auto_api_spec_create_default_extended)
+
 # oci dbtools-runtime database-api-gateway-config-pool-auto-api-spec list-database-tools-database-api-gateway-config-pool-auto-api-specs -> oci dbtools-runtime database-api-gateway-config-pool-auto-api-spec list
 cli_util.rename_command(databasetoolsruntime_cli, databasetoolsruntime_cli.database_tools_database_api_gateway_config_pool_auto_api_spec_group, databasetoolsruntime_cli.list_database_tools_database_api_gateway_config_pool_auto_api_specs, "list")
 
@@ -616,6 +728,80 @@ database_api_gateway_config_pool_auto_api_spec_update_group.add_command(database
 
 # oci dbtools-runtime database-api-gateway-config-pool-auto-api-spec update update-database-tools-database-api-gateway-config-pool-auto-api-spec-update-database-tools-database-api-gateway-config-pool-auto-api-spec-default-details -> oci dbtools-runtime database-api-gateway-config-pool-auto-api-spec update default
 cli_util.rename_command(databasetoolsruntime_cli, database_api_gateway_config_pool_auto_api_spec_update_group, databasetoolsruntime_cli.update_database_tools_database_api_gateway_config_pool_auto_api_spec_update_database_tools_database_api_gateway_config_pool_auto_api_spec_default_details, "default")
+
+
+@database_api_gateway_config_pool_auto_api_spec_update_group.command('default', help=databasetoolsruntime_cli.update_database_tools_database_api_gateway_config_pool_auto_api_spec_update_database_tools_database_api_gateway_config_pool_auto_api_spec_default_details.help)
+@cli_util.option('--database-api-gateway-config-id', required=True, help='''The [OCID] of a Database Tools database API gateway config.''')
+@cli_util.option('--pool-key', required=True, help='''The key of the pool config.''')
+@cli_util.option('--auto-api-spec-key', required=True, help='''The key of the auto API spec config.''')
+@cli_util.option('--display-name', help='''A user-friendly name. Does not have to be unique, and it’s changeable. Avoid entering confidential information.''')
+@cli_util.option('--database-object-name', help='''The name of the database object.''')
+@cli_util.option('--database-object-type', type=custom_types.CliCaseInsensitiveChoice(["FUNCTION", "MVIEW", "PACKAGE", "PROCEDURE", "TABLE", "VIEW", "DUALITYVIEW"]), help='''The type of the database object.''')
+@cli_util.option('--description', help='''Description of the autoApiSpec.''')
+@cli_util.option('--alias', help='''Used as the URI path element for this object. When not specified the objectName lowercase is the default value.''')
+@cli_util.option('--operations', type=custom_types.CliCaseInsensitiveChoice(["READ", "WRITE"]), multiple=True, help='''The operations to limit access to this resource. If not specified then the default is ["READ","WRITE"]. Specify this option more than once to provide multiple values.''')
+@cli_util.option('--security-schemes', type=custom_types.CliCaseInsensitiveChoice(["BASIC", "BEARER"]), multiple=True, help='''The security schemes that can access this resource. If not specified then the resource is public. Specify this option more than once to provide multiple values.''')
+@cli_util.option('--scope', help='''The name of the database API gateway config privilege protecting the resource. Only valid for SCOPE JWT Profile pools and BEARER securitySchemes.''')
+@cli_util.option('--roles', type=custom_types.CLI_COMPLEX_TYPE, help='''The name of the database API gateway config roles protecting the resource. Only valid for RBAC JWT Profile pools and BEARER securitySchemes.''' + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--if-match', help='''If-Match is most often used with state-changing methods (e.g., POST, PUT, DELETE) to prevent accidental overwrites when multiple user agentss might be acting in parallel on the same resource (i.e., to prevent the "lost update" problem). In general, it can be used with any method that involves the selection or modification of a representation to abort the request if the selected representation's current entity tag is not a member within the If-Match field value. When specified on an action-specific subresource, the ETag value of the resource on which the action is requested should be provided.''')
+@cli_util.option('--force', help='''Perform update without prompting for confirmation.''', is_flag=True)
+@json_skeleton_utils.get_cli_json_input_option({'operations': {'module': 'database_tools_runtime', 'class': 'list[string]'}, 'security-schemes': {'module': 'database_tools_runtime', 'class': 'list[string]'}, 'roles': {'module': 'database_tools_runtime', 'class': 'list[string]'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'operations': {'module': 'database_tools_runtime', 'class': 'list[string]'}, 'security-schemes': {'module': 'database_tools_runtime', 'class': 'list[string]'}, 'roles': {'module': 'database_tools_runtime', 'class': 'list[string]'}}, output_type={'module': 'database_tools_runtime', 'class': 'DatabaseToolsDatabaseApiGatewayConfigPoolAutoApiSpec'})
+@cli_util.wrap_exceptions
+def database_api_gateway_config_pool_auto_api_spec_update_default_extended(ctx, **kwargs):
+    cli_util.load_context_obj_values_from_defaults(ctx)
+    if ctx.obj.get('generate_param_json_input') or ctx.obj.get('generate_full_command_json_input'):
+        return
+    operations = _resolve_multi_value_parameter(ctx, kwargs, 'operations')
+    security_schemes = _resolve_multi_value_parameter(ctx, kwargs, 'security_schemes')
+    roles = _resolve_multi_value_parameter(ctx, kwargs, 'roles')
+
+    if not kwargs.get('force'):
+        if operations is not None or security_schemes is not None or roles is not None:
+            if not click.confirm("WARNING: Updates to operations and security-schemes and roles will replace any existing values. Are you sure you want to continue?"):
+                ctx.abort()
+
+    request_kwargs = {}
+    if kwargs.get('if_match') is not None:
+        request_kwargs['if_match'] = kwargs.get('if_match')
+    request_kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    details = {'type': 'DEFAULT'}
+
+    if kwargs.get('display_name') is not None:
+        details['displayName'] = kwargs.get('display_name')
+    if kwargs.get('database_object_name') is not None:
+        details['databaseObjectName'] = kwargs.get('database_object_name')
+    if kwargs.get('database_object_type') is not None:
+        details['databaseObjectType'] = kwargs.get('database_object_type')
+    if kwargs.get('description') is not None:
+        details['description'] = kwargs.get('description')
+    if kwargs.get('alias') is not None:
+        details['alias'] = kwargs.get('alias')
+    if operations is not None:
+        details['operations'] = cli_util.parse_json_parameter('operations', operations)
+    if security_schemes is not None:
+        details['securitySchemes'] = cli_util.parse_json_parameter('security_schemes', security_schemes)
+    if kwargs.get('scope') is not None:
+        details['scope'] = kwargs.get('scope')
+    if roles is not None:
+        details['roles'] = cli_util.parse_json_parameter('roles', roles)
+
+    client = cli_util.build_client('database_tools_runtime', 'database_tools_runtime', ctx)
+    result = client.update_database_tools_database_api_gateway_config_pool_auto_api_spec(
+        database_tools_database_api_gateway_config_id=kwargs['database_api_gateway_config_id'],
+        pool_key=kwargs['pool_key'],
+        auto_api_spec_key=kwargs['auto_api_spec_key'],
+        update_database_tools_database_api_gateway_config_pool_auto_api_spec_details=details,
+        **request_kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
+database_api_gateway_config_pool_auto_api_spec_update_group.commands.pop('default', None)
+database_api_gateway_config_pool_auto_api_spec_update_group.add_command(database_api_gateway_config_pool_auto_api_spec_update_default_extended)
 
 
 # Remove validate-database-tools-identity-credential from oci database-tools-runtime database-tools-identity

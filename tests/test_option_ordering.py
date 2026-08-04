@@ -90,7 +90,9 @@ class TestOptionOrdering(unittest.TestCase):
                 full_command = command + [help_command] + ['--cli-rc-file', os.path.join('tests', 'resources', 'default_files', 'use_click_help')]
 
             result = self.invoke_operation(full_command)
-            self.assertEqual(0, result.exit_code)
+            # Click versions differ on the exit code for group help, but the help text is what we care about in this test.
+            # So we can change the expected exit code. Older click return with 0, newer with 2.
+            self.assertIn(result.exit_code, [0, 2])
             assert expected_output in result.output
 
 
