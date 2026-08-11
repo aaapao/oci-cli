@@ -278,6 +278,11 @@ service_mapping = {
         "Database Tools Runtime",
         "Others"
     ],
+    "ddfs": [
+        "ddfs",
+        "Device Data FHIR Service",
+        "Others"
+    ],
     "delegate-access-control": [
         "delegate_access_control",
         "Oracle Delegate Access Control",
@@ -310,6 +315,11 @@ service_mapping = {
     ],
     "distributed-database": [
         "distributed_database",
+        "Globally Distributed Database",
+        "Others"
+    ],
+    "distributed-database-v26": [
+        "distributed_database_v26",
         "Globally Distributed Database",
         "Others"
     ],
@@ -549,7 +559,7 @@ service_mapping = {
         "Others"
     ],
     "multicloud": [
-        "multicloud",
+        "omhub_cp",
         "Oracle Multicloud",
         "Others"
     ],
@@ -579,7 +589,7 @@ service_mapping = {
         "Databases"
     ],
     "occ": [
-        "oci_control_center",
+        "occ",
         "OCI Control Center",
         "Others"
     ],

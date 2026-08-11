@@ -3254,6 +3254,71 @@ def get_work_request(ctx, from_json, work_request_id):
     cli_util.render_response(result, ctx)
 
 
+@work_request_group.command(name=cli_util.override('resource_manager.get_work_request_log_entries.command_name', 'get-work-request-log-entries'), help=u"""Returns console log entries for the specified work request in JSON format. \n[Command Reference](getWorkRequestLogEntries)""")
+@cli_util.option('--work-request-id', required=True, help=u"""The [OCID] of the work request.""")
+@cli_util.option('--type', type=custom_types.CliCaseInsensitiveChoice(["TERRAFORM_CONSOLE"]), multiple=True, help=u"""A filter that returns only logs of a specified type.""")
+@cli_util.option('--level-greater-than-or-equal-to', type=custom_types.CliCaseInsensitiveChoice(["TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"]), help=u"""A filter that returns only log entries that match a given severity level or greater.""")
+@cli_util.option('--sort-order', type=custom_types.CliCaseInsensitiveChoice(["ASC", "DESC"]), help=u"""The sort order to use when sorting returned resources. Ascending (`ASC`) or descending (`DESC`).""")
+@cli_util.option('--limit', type=click.INT, help=u"""The number of items returned in a paginated `List` call. For information about pagination, see [List Pagination].""")
+@cli_util.option('--page', help=u"""The value of the `opc-next-page` response header from the preceding `List` call. For information about pagination, see [List Pagination].""")
+@cli_util.option('--timestamp-greater-than-or-equal-to', type=custom_types.CLI_DATETIME, help=u"""Time stamp specifying the lower time limit for which logs are returned in a query. Format is defined by RFC3339. Example: `2020-01-01T12:00:00.000Z`""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
+@cli_util.option('--timestamp-less-than-or-equal-to', type=custom_types.CLI_DATETIME, help=u"""Time stamp specifying the upper time limit for which logs are returned in a query. Format is defined by RFC3339. Example: `2020-02-01T12:00:00.000Z`""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'resource_manager', 'class': 'LogEntryCollection'})
+@cli_util.wrap_exceptions
+def get_work_request_log_entries(ctx, from_json, work_request_id, type, level_greater_than_or_equal_to, sort_order, limit, page, timestamp_greater_than_or_equal_to, timestamp_less_than_or_equal_to):
+
+    if isinstance(work_request_id, six.string_types) and len(work_request_id.strip()) == 0:
+        raise click.UsageError('Parameter --work-request-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if type is not None and len(type) > 0:
+        kwargs['type'] = type
+    if level_greater_than_or_equal_to is not None:
+        kwargs['level_greater_than_or_equal_to'] = level_greater_than_or_equal_to
+    if sort_order is not None:
+        kwargs['sort_order'] = sort_order
+    if limit is not None:
+        kwargs['limit'] = limit
+    if page is not None:
+        kwargs['page'] = page
+    if timestamp_greater_than_or_equal_to is not None:
+        kwargs['timestamp_greater_than_or_equal_to'] = timestamp_greater_than_or_equal_to
+    if timestamp_less_than_or_equal_to is not None:
+        kwargs['timestamp_less_than_or_equal_to'] = timestamp_less_than_or_equal_to
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('resource_manager', 'resource_manager', ctx)
+    result = client.get_work_request_log_entries(
+        work_request_id=work_request_id,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
+@work_request_group.command(name=cli_util.override('resource_manager.get_work_request_log_entries_content.command_name', 'get-work-request-log-entries-content'), help=u"""Returns the raw log file for the specified work request in text format. The file includes a maximum of 100,000 log entries. \n[Command Reference](getWorkRequestLogEntriesContent)""")
+@cli_util.option('--work-request-id', required=True, help=u"""The [OCID] of the work request.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def get_work_request_log_entries_content(ctx, from_json, work_request_id):
+
+    if isinstance(work_request_id, six.string_types) and len(work_request_id.strip()) == 0:
+        raise click.UsageError('Parameter --work-request-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('resource_manager', 'resource_manager', ctx)
+    result = client.get_work_request_log_entries_content(
+        work_request_id=work_request_id,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
 @configuration_source_provider_summary_group.command(name=cli_util.override('resource_manager.list_configuration_source_providers.command_name', 'list-configuration-source-providers'), help=u"""Lists configuration source providers according to the specified filter. For more information, see [Listing Configuration Source Providers]. - For `compartmentId`, lists all configuration source providers in the matching compartment. - For `configurationSourceProviderId`, lists the matching configuration source provider. \n[Command Reference](listConfigurationSourceProviders)""")
 @cli_util.option('--compartment-id', help=u"""A filter to return only resources that exist in the compartment, identified by [OCID].""")
 @cli_util.option('--configuration-source-provider-id', help=u"""A filter to return only configuration source providers that match the provided [OCID].""")
