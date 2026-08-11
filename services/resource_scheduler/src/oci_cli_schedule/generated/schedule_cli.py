@@ -218,6 +218,7 @@ Example: `2016-08-25T21:10:29.600Z`""" + custom_types.CLI_DATETIME.VALID_DATETIM
 @cli_util.option('--time-ends', type=custom_types.CLI_DATETIME, help=u"""This is the date and time the schedule ends, in the format defined by [RFC 3339]
 
 Example: `2016-08-25T21:10:29.600Z`""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
+@cli_util.option('--local-time-zone', help=u"""IANA timezone identifier (e.g., 'America/New_York', 'UTC', 'Europe/London'). This determines the timezone context for evaluating the recurrence expression.""")
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""These are free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
@@ -232,7 +233,7 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'resource-filters': {'module': 'resource_scheduler', 'class': 'list[ResourceFilter]'}, 'resources': {'module': 'resource_scheduler', 'class': 'list[Resource]'}, 'freeform-tags': {'module': 'resource_scheduler', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'resource_scheduler', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'resource_scheduler', 'class': 'Schedule'})
 @cli_util.wrap_exceptions
-def create_schedule(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, action, recurrence_details, recurrence_type, display_name, description, resource_filters, resources, time_starts, time_ends, freeform_tags, defined_tags):
+def create_schedule(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, action, recurrence_details, recurrence_type, display_name, description, resource_filters, resources, time_starts, time_ends, local_time_zone, freeform_tags, defined_tags):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
@@ -260,6 +261,9 @@ def create_schedule(ctx, from_json, wait_for_state, max_wait_seconds, wait_inter
 
     if time_ends is not None:
         _details['timeEnds'] = time_ends
+
+    if local_time_zone is not None:
+        _details['localTimeZone'] = local_time_zone
 
     if freeform_tags is not None:
         _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
@@ -774,6 +778,7 @@ Example: `2016-08-25T21:10:29.600Z`""" + custom_types.CLI_DATETIME.VALID_DATETIM
 @cli_util.option('--time-ends', type=custom_types.CLI_DATETIME, help=u"""This is the date and time the schedule ends, in the format defined by [RFC 3339]
 
 Example: `2016-08-25T21:10:29.600Z`""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
+@cli_util.option('--local-time-zone', help=u"""IANA timezone identifier (e.g., 'America/New_York', 'UTC', 'Europe/London'). This determines the timezone context for evaluating the recurrence expression.""")
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""These are free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
@@ -790,7 +795,7 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'resource-filters': {'module': 'resource_scheduler', 'class': 'list[ResourceFilter]'}, 'resources': {'module': 'resource_scheduler', 'class': 'list[Resource]'}, 'freeform-tags': {'module': 'resource_scheduler', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'resource_scheduler', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.wrap_exceptions
-def update_schedule(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, schedule_id, display_name, description, action, recurrence_details, recurrence_type, resource_filters, resources, time_starts, time_ends, freeform_tags, defined_tags, if_match):
+def update_schedule(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, schedule_id, display_name, description, action, recurrence_details, recurrence_type, resource_filters, resources, time_starts, time_ends, local_time_zone, freeform_tags, defined_tags, if_match):
 
     if isinstance(schedule_id, six.string_types) and len(schedule_id.strip()) == 0:
         raise click.UsageError('Parameter --schedule-id cannot be whitespace or empty string')
@@ -832,6 +837,9 @@ def update_schedule(ctx, from_json, force, wait_for_state, max_wait_seconds, wai
 
     if time_ends is not None:
         _details['timeEnds'] = time_ends
+
+    if local_time_zone is not None:
+        _details['localTimeZone'] = local_time_zone
 
     if freeform_tags is not None:
         _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)

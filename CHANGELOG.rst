@@ -6,6 +6,75 @@ All notable changes to this project will be documented in this file.
 
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`__.
 
+3.90.2 - 2026-08-11
+-------------------
+Added
+~~~~~
+* Globally Distributed Database Service
+
+  * Support for the Globally Distributed Database service
+
+    * ``oci distributed-database-v26``
+
+* Resource Manager Service
+
+  * Support for retrieving WorkRequestLogEntries and WorkRequestLogEntriesContent
+
+    * ``oci resource-manager work-request get-work-request-log-entries``
+    * ``oci resource-manager work-request get-work-request-log-entries-content``
+
+* Resource Scheduler Service
+
+  * Support for new optional parameter ``--local-time-zone``
+
+    * ``oci resource-scheduler schedule create --local-time-zone``
+    * ``oci resource-scheduler schedule update --local-time-zone``
+
+* Device Data FHIR Service
+
+  * Support for the Device Data FHIR Service
+
+    * ``oci ddfs``
+
+* Database Service
+
+  * Support for Autonomous Database Serverless availability domain selection during provisioning and post-provisioning updates
+
+    * ``oci db autonomous-database create --availability-domain``
+    * ``oci db autonomous-database create-adb-cross-region-data-guard-details --availability-domain``
+    * ``oci db autonomous-database create-autonomous-database-create-cross-region-disaster-recovery-details --availability-domain``
+    * ``oci db autonomous-database create-autonomous-database-gcp-key-details --availability-domain``
+    * ``oci db autonomous-database create-autonomous-database-undelete-autonomous-database-details --availability-domain``
+    * ``oci db autonomous-database create-cross-tenancy-disaster-recovery-details --availability-domain``
+    * ``oci db autonomous-database create-from-backup-id --availability-domain``
+    * ``oci db autonomous-database create-from-backup-timestamp --availability-domain``
+    * ``oci db autonomous-database create-from-clone --availability-domain``
+    * ``oci db autonomous-database create-refreshable-clone --availability-domain``
+    * ``oci db autonomous-database update --availability-domain --time-scheduled-ad-update --is-disable-ad-update-schedule --is-schedule-ad-update-to-earliest``
+    * ``oci db autonomous-database update-autonomous-database-aws-key-details --availability-domain --time-scheduled-ad-update --is-disable-ad-update-schedule --is-schedule-ad-update-to-earliest``
+    * ``oci db autonomous-database update-autonomous-database-azure-key-details --availability-domain --time-scheduled-ad-update --is-disable-ad-update-schedule --is-schedule-ad-update-to-earliest``
+    * ``oci db autonomous-database update-autonomous-database-gcp-key-details --availability-domain --time-scheduled-ad-update --is-disable-ad-update-schedule --is-schedule-ad-update-to-earliest``
+    * ``oci db autonomous-database update-autonomous-database-oci-key-details --availability-domain --time-scheduled-ad-update --is-disable-ad-update-schedule --is-schedule-ad-update-to-earliest``
+    * ``oci db autonomous-database update-autonomous-database-okv-key-details --availability-domain --time-scheduled-ad-update --is-disable-ad-update-schedule --is-schedule-ad-update-to-earliest``
+    * ``oci db autonomous-database update-autonomous-database-oracle-managed-key-details --availability-domain --time-scheduled-ad-update --is-disable-ad-update-schedule --is-schedule-ad-update-to-earliest``
+
+* Compute Service
+
+  * Support for Quick Recycle Settings in Compute Host Group commands
+
+    * ``oci compute compute-host-group create``
+    * ``oci compute compute-host-group update``
+
+* Generative AI Service
+
+  * Support for additional B300 unit shapes in Generative AI Service
+
+    * ``oci generative-ai dedicated-ai-cluster create  --unit-shape``
+
+* Object Storage Service
+
+  * Support for IPv6 dual stack endpoints in Object Storage Service
+
 3.90.1 - 2026-08-04
 -------------------
 Added

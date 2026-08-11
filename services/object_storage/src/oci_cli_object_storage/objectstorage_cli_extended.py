@@ -1225,6 +1225,7 @@ def object_get(ctx, from_json, namespace, bucket_name, name, file, version_id, i
     client = build_client('object_storage', 'object_storage', ctx)
 
     head_object = client.head_object(namespace, bucket_name, name, opc_client_request_id=ctx.obj['request_id'],
+                                     version_id=version_id,
                                      **encryption_key_params)
     if not head_object:
         raise click.ClickException('The specified object does not exist')
