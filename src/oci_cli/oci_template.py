@@ -24,7 +24,32 @@ from oci_cli import fips  # noqa F401
 
 ####################################################################
 
-from pkg_resources import load_entry_point
+try:
+    from importlib import metadata as importlib_metadata
+except ImportError:
+    import importlib_metadata
+
+
+def load_entry_point(distribution_name, group, name):
+    entry_points = importlib_metadata.distribution(
+        distribution_name
+    ).entry_points
+    entry_point = next(
+        (
+            entry_point for entry_point in entry_points
+            if entry_point.group == group and entry_point.name == name
+        ),
+        None
+    )
+    if entry_point is None:
+        raise ImportError(
+            "Entry point {!r} not found for distribution {!r}".format(
+                (group, name),
+                distribution_name
+            )
+        )
+    return entry_point.load()
+
 
 if __name__ == '__main__':
     sys.argv[0] = re.sub(r'(-script\.pyw?|\.exe)?$', '', sys.argv[0])
