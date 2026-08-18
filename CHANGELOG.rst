@@ -6,6 +6,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`__.
 
+3.90.3 - 2026-08-18
+-------------------
+Added
+~~~~~
+* Database service
+
+  * Support for creating a database from another database (out-of-place restore / iRestore)
+
+    * ``oci db database create-database-from-database``
+    * ``oci db database create-from-database --vm-cluster-id --source-encryption-key-location-details --sid-prefix --recovery-appliance-vpc-password``
+
+  * Support for new optional parameters and complex type support for database and Autonomous Container Database operations
+
+    * ``oci db database update --auto-failover-configuration --managed-software-update-details``
+
+Security
+~~~~~~~~
+* Updated dependency constraints to support cryptography 50.x and setuptools 83.x per: https://nvd.nist.gov/vuln/detail/CVE-2026-69247 and https://nvd.nist.gov/vuln/detail/CVE-2026-59890
+
 3.90.2 - 2026-08-11
 -------------------
 Added

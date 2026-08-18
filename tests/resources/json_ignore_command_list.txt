@@ -613,3 +613,5 @@ opsi, opsi-private-endpoint, update
 db, database, create-from-backupdata-safe, private-endpoint, update
 db, database, create-from-backup
 data-safe, private-endpoint, update
+db, database, create-from-database
+db, database, create-database-from-database

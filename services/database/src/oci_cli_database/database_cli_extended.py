@@ -993,7 +993,12 @@ def create_database_from_backup(ctx, wait_for_state, max_wait_seconds, wait_inte
     try:
         result = client.list_databases(db_home_id=db_home_id, compartment_id=compartment_id)
     except oci.exceptions.ServiceError:
-        click.echo("Failed retrieving database info after successfully creation.  You can view the status of databases in this DB system by executing: oci db database list -c {comp_id} --db-system-id {db_sys_id} ".format(comp_id=compartment_id, db_sys_id=kwargs['db_system_id']), file=sys.stderr)
+        target_option = '--db-system-id'
+        target_id = kwargs.get('db_system_id')
+        if not target_id:
+            target_option = '--vm-cluster-id'
+            target_id = kwargs.get('vm_cluster_id')
+        click.echo("Failed retrieving database info after successfully creation.  You can view the status of databases by executing: oci db database list -c {comp_id} {target_option} {target_id} ".format(comp_id=compartment_id, target_option=target_option, target_id=target_id), file=sys.stderr)
         sys.exit(1)
 
     # Return the first database in this newly created db-home
@@ -1002,7 +1007,110 @@ def create_database_from_backup(ctx, wait_for_state, max_wait_seconds, wait_inte
     cli_util.render(database, None, ctx)
 
 
-@cli_util.copy_params_from_generated_command(database_cli.update_database, params_to_exclude=['db_backup_config', 'auto_failover_configuration', 'managed_software_update_details'])
+@cli_util.copy_params_from_generated_command(database_cli.create_database, params_to_exclude=['source'])
+@database_cli.database_group.command(name='create-database-from-database', help="""Creates a new database in the specified Database Home from another database.""")
+@cli_util.option('--admin-password', required=True, help="""A strong password for SYS, SYSTEM, and PDB Admin. The password must be at least nine characters and contain at least two uppercase, two lowercase, two numbers, and two special characters. The special characters must be _, #, or -.""")
+@cli_util.option('--database-id', required=True, help="""The OCID of the source database.""")
+@cli_util.option('--backup-tde-password', required=False, help="""The password to open the TDE wallet.""")
+@cli_util.option('--db-name', required=False, help="""The display name of the database to be created. It must begin with an alphabetic character and can contain a maximum of eight alphanumeric characters. Special characters are not permitted.""")
+@cli_util.option('--sid-prefix', required=False, help="""Specifies a prefix for the Oracle SID of the database to be created.""")
+@cli_util.option('--recovery-appliance-vpc-password', required=False, help="""The password for the Recovery Appliance VPC administrator.""")
+@cli_util.option('--source-encryption-key-location-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The source encryption key location details for the database being created. Supported variants are:
+
+* AWS: `{\"awsEncryptionKeyId\": \"<key-ocid>\", \"providerType\": \"AWS\"}`
+* AZURE: `{\"azureEncryptionKeyId\": \"<key-ocid>\", \"providerType\": \"AZURE\"}`
+* EXTERNAL: `{\"hsmPassword\": \"<password>\", \"providerType\": \"EXTERNAL\"}`
+* GCP: `{\"googleCloudProviderEncryptionKeyId\": \"<key-ocid>\", \"providerType\": \"GCP\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].\n\nExample: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--point-in-time-recovery-timestamp', required=False, help="""The point in time of the original database from which the new database is created. If not specified, the latest backup is used to create the database.""")
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'source-encryption-key-location-details': {'module': 'database', 'class': 'EncryptionKeyLocationDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'database', 'class': 'Database'})
+@cli_util.wrap_exceptions
+def create_database_create_database_from_database(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, **kwargs):
+    kwargs_for_client = {}
+    kwargs_for_client['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    create_database_details = oci.database.models.CreateDatabaseFromAnotherDatabaseDetails()
+    if 'admin_password' in kwargs and kwargs['admin_password']:
+        create_database_details.admin_password = kwargs['admin_password']
+
+    if 'database_id' in kwargs and kwargs['database_id']:
+        create_database_details.database_id = kwargs['database_id']
+
+    if 'backup_tde_password' in kwargs and kwargs['backup_tde_password']:
+        create_database_details.backup_tde_password = kwargs['backup_tde_password']
+
+    if 'db_name' in kwargs and kwargs['db_name']:
+        create_database_details.db_name = kwargs['db_name']
+
+    if 'sid_prefix' in kwargs and kwargs['sid_prefix']:
+        create_database_details.sid_prefix = kwargs['sid_prefix']
+
+    if 'freeform_tags' in kwargs and kwargs['freeform_tags']:
+        create_database_details.freeform_tags = cli_util.parse_json_parameter('freeform_tags', kwargs['freeform_tags'])
+
+    if 'defined_tags' in kwargs and kwargs['defined_tags']:
+        create_database_details.defined_tags = cli_util.parse_json_parameter('defined_tags', kwargs['defined_tags'])
+
+    if 'recovery_appliance_vpc_password' in kwargs and kwargs['recovery_appliance_vpc_password']:
+        create_database_details.recovery_appliance_vpc_password = kwargs['recovery_appliance_vpc_password']
+
+    if 'source_encryption_key_location_details' in kwargs and kwargs['source_encryption_key_location_details']:
+        create_database_details.source_encryption_key_location_details = cli_util.parse_json_parameter(
+            'source_encryption_key_location_details',
+            kwargs['source_encryption_key_location_details']
+        )
+
+    if 'point_in_time_recovery_timestamp' in kwargs and kwargs['point_in_time_recovery_timestamp']:
+        create_database_details.time_stamp_for_point_in_time_recovery = kwargs['point_in_time_recovery_timestamp']
+
+    _details = {
+        'dbHomeId': kwargs['db_home_id'],
+        'database': create_database_details,
+        'source': 'DATABASE'
+    }
+
+    if kwargs['db_version'] is not None:
+        _details['dbVersion'] = kwargs['db_version']
+
+    if kwargs['kms_key_id'] is not None:
+        _details['kmsKeyId'] = kwargs['kms_key_id']
+
+    if kwargs['kms_key_version_id'] is not None:
+        _details['kmsKeyVersionId'] = kwargs['kms_key_version_id']
+
+    client = cli_util.build_client('database', 'database', ctx)
+    result = client.create_database(
+        create_new_database_details=_details,
+        **kwargs_for_client
+    )
+
+    if wait_for_state:
+        if hasattr(client, 'get_database') and callable(getattr(client, 'get_database')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+
+                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_database(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@cli_util.copy_params_from_generated_command(database_cli.update_database, params_to_exclude=['db_backup_config'])
 @database_cli.database_group.command(name='update', help="""Update a Database based on the request parameters you provide.""")
 @cli_util.option('--msu-details', type=custom_types.CLI_COMPLEX_TYPE, help="""This is a complex type whose value must be valid JSON. The value can be provided as a string on the command line or passed in as a file using
 the file://path/to/file syntax.
@@ -1083,19 +1191,40 @@ def update_database_extended(ctx, **kwargs):
 # This is similar to what was done for create_database_from_backup.
 # Db home is not exposed to the end user.
 @cli_util.copy_params_from_generated_command(database_cli.create_db_home, params_to_exclude=['database', 'display_name', 'db_version', 'source'])
-@database_cli.database_group.command(name='create-from-database', help="""Creates a new database in the given DB System from another database.""")
-@cli_util.option('--db-system-id', required=False, help="""The Db System Id to clone this database under.""")
+@database_cli.database_group.command(name='create-from-database', help="""Creates a new database in the given DB System or VM Cluster from another database.""")
+@cli_util.option('--vm-cluster-id', required=False, help="""The Vm Cluster Id to create this database under. Either --db-system-id or --vm-cluster-id must be specified, but if both are passed, --vm-cluster-id will be ignored.""")
+@cli_util.option('--db-system-id', required=False, help="""The Db System Id to clone this database under. Either --db-system-id or --vm-cluster-id must be specified, but if both are passed, --vm-cluster-id will be ignored.""")
 @cli_util.option('--admin-password', required=True, help="""A strong password for SYS, SYSTEM, and PDB Admin. The password must be at least nine characters and contain at least two uppercase, two lowercase, two numbers, and two special characters. The special characters must be _, #, or -.""")
 @cli_util.option('--database-id', required=True, help="""The OCID of the from-database.""")
 @cli_util.option('--backup-tde-password', required=False, help="""The password to open the TDE wallet.""")
 @cli_util.option('--point-in-time-recovery-timestamp', required=False, help="""The point in time of the original database from which the new database is created. If not specifed, the latest backup is used to create the database.""")
 @cli_util.option('--db-name', required=False, help="""The display name of the database to be created. It must begin with an alphabetic character and can contain a maximum of eight alphanumeric characters. Special characters are not permitted.""")
+@cli_util.option('--sid-prefix', required=False, help="""Specifies a prefix for the Oracle SID of the database to be created.""")
+@cli_util.option('--recovery-appliance-vpc-password', required=False, help="""The password for the Recovery Appliance VPC administrator.""")
+@cli_util.option('--source-encryption-key-location-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The source encryption key location details for the database being created. Supported variants are:
+
+* AWS: `{\"awsEncryptionKeyId\": \"<key-ocid>\", \"providerType\": \"AWS\"}`
+* AZURE: `{\"azureEncryptionKeyId\": \"<key-ocid>\", \"providerType\": \"AZURE\"}`
+* EXTERNAL: `{\"hsmPassword\": \"<password>\", \"providerType\": \"EXTERNAL\"}`
+* GCP: `{\"googleCloudProviderEncryptionKeyId\": \"<key-ocid>\", \"providerType\": \"GCP\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'database', 'class': 'DatabaseSummary'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'source-encryption-key-location-details': {'module': 'database', 'class': 'EncryptionKeyLocationDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'database', 'class': 'DatabaseSummary'})
 @cli_util.wrap_exceptions
 def create_database_from_another_database(ctx, wait_for_state, max_wait_seconds, wait_interval_seconds, **kwargs):
-    create_db_home_with_system_details = oci.database.models.CreateDbHomeWithDbSystemIdFromDatabaseDetails()
     create_database_details = oci.database.models.CreateDatabaseFromAnotherDatabaseDetails()
+    if 'db_system_id' in kwargs and kwargs['db_system_id']:
+        create_db_home_with_system_details = oci.database.models.CreateDbHomeWithDbSystemIdFromDatabaseDetails()
+        create_db_home_with_system_details.db_system_id = kwargs['db_system_id']
+        source = 'DATABASE'
+    else:
+        if 'vm_cluster_id' in kwargs and kwargs['vm_cluster_id']:
+            create_db_home_with_system_details = oci.database.models.CreateDbHomeWithVmClusterIdFromDatabaseDetails()
+            create_db_home_with_system_details.vm_cluster_id = kwargs['vm_cluster_id']
+            source = 'VM_CLUSTER_DATABASE'
+        else:
+            click.echo(message="Missing a required parameter. Either --db-system-id or --vm-cluster-id must be specified.", file=sys.stderr)
+            sys.exit(1)
+
     if 'admin_password' in kwargs and kwargs['admin_password']:
         create_database_details.admin_password = kwargs['admin_password']
 
@@ -1108,25 +1237,49 @@ def create_database_from_another_database(ctx, wait_for_state, max_wait_seconds,
     if 'db_name' in kwargs and kwargs['db_name']:
         create_database_details.db_name = kwargs['db_name']
 
+    if 'sid_prefix' in kwargs and kwargs['sid_prefix']:
+        create_database_details.sid_prefix = kwargs['sid_prefix']
+
+    if 'recovery_appliance_vpc_password' in kwargs and kwargs['recovery_appliance_vpc_password']:
+        create_database_details.recovery_appliance_vpc_password = kwargs['recovery_appliance_vpc_password']
+
+    if 'source_encryption_key_location_details' in kwargs and kwargs['source_encryption_key_location_details']:
+        create_database_details.source_encryption_key_location_details = cli_util.parse_json_parameter(
+            'source_encryption_key_location_details',
+            kwargs['source_encryption_key_location_details']
+        )
+
     if 'point_in_time_recovery_timestamp' in kwargs and kwargs['point_in_time_recovery_timestamp']:
         create_database_details.time_stamp_for_point_in_time_recovery = kwargs['point_in_time_recovery_timestamp']
 
     create_db_home_with_system_details.database = create_database_details
 
-    if 'db_system_id' in kwargs and kwargs['db_system_id']:
-        create_db_home_with_system_details.db_system_id = kwargs['db_system_id']
-
     if 'database_software_image_id' in kwargs and kwargs['database_software_image_id']:
         create_db_home_with_system_details.database_software_image_id = kwargs['database_software_image_id']
+
+    if 'kms_key_id' in kwargs and kwargs['kms_key_id']:
+        create_db_home_with_system_details.kms_key_id = kwargs['kms_key_id']
+
+    if 'kms_key_version_id' in kwargs and kwargs['kms_key_version_id']:
+        create_db_home_with_system_details.kms_key_version_id = kwargs['kms_key_version_id']
+
+    if 'freeform_tags' in kwargs and kwargs['freeform_tags']:
+        create_db_home_with_system_details.freeform_tags = cli_util.parse_json_parameter("freeform_tags", kwargs['freeform_tags'])
+
+    if 'defined_tags' in kwargs and kwargs['defined_tags']:
+        create_db_home_with_system_details.defined_tags = cli_util.parse_json_parameter("defined_tags", kwargs['defined_tags'])
 
     if 'is_desupported_version' in kwargs and kwargs['is_desupported_version']:
         create_db_home_with_system_details.is_desupported_version = kwargs['is_desupported_version']
 
-    create_db_home_with_system_details.source = 'DATABASE'
+    if kwargs['is_unified_auditing_enabled'] is not None:
+        create_db_home_with_system_details.is_unified_auditing_enabled = kwargs['is_unified_auditing_enabled']
+
+    create_db_home_with_system_details.source = source
 
     client = cli_util.build_client('database', 'database', ctx)
 
-    result = client.create_db_home(create_db_home_with_system_details)
+    result = client.create_db_home(create_db_home_with_db_system_id_details=create_db_home_with_system_details)
 
     db_home_id = result.data.id
     compartment_id = result.data.compartment_id
@@ -1160,7 +1313,12 @@ def create_database_from_another_database(ctx, wait_for_state, max_wait_seconds,
     try:
         result = client.list_databases(db_home_id=db_home_id, compartment_id=compartment_id)
     except oci.exceptions.ServiceError:
-        click.echo("Failed retrieving database info after successfully creation.  You can view the status of databases in this DB system by executing: oci db database list -c {comp_id} --db-system-id {db_sys_id} ".format(comp_id=compartment_id, db_sys_id=kwargs['db_system_id']), file=sys.stderr)
+        target_option = '--db-system-id'
+        target_id = kwargs.get('db_system_id')
+        if not target_id:
+            target_option = '--vm-cluster-id'
+            target_id = kwargs.get('vm_cluster_id')
+        click.echo("Failed retrieving database info after successfully creation.  You can view the status of databases by executing: oci db database list -c {comp_id} {target_option} {target_id} ".format(comp_id=compartment_id, target_option=target_option, target_id=target_id), file=sys.stderr)
         sys.exit(1)
 
     # there is only one database per db-home
