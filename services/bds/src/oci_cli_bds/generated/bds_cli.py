@@ -58,6 +58,12 @@ def work_request_group():
     pass
 
 
+@click.command(cli_util.override('bds.bds_capacity_reservation_group.command_name', 'bds-capacity-reservation'), cls=CommandGroupWithAlias, help="""A reusable BDS capacity reservation resource.""")
+@cli_util.help_option_group
+def bds_capacity_reservation_group():
+    pass
+
+
 @click.command(cli_util.override('bds.bds_metastore_configuration_group.command_name', 'bds-metastore-configuration'), cls=CommandGroupWithAlias, help="""The metastore configuration information.""")
 @cli_util.help_option_group
 def bds_metastore_configuration_group():
@@ -106,12 +112,19 @@ def node_backup_configuration_group():
     pass
 
 
+@click.command(cli_util.override('bds.bds_capacity_reservation_configuration_group.command_name', 'bds-capacity-reservation-configuration'), cls=CommandGroupWithAlias, help="""A configuration between a BDS cluster and a BDS capacity reservation.""")
+@cli_util.help_option_group
+def bds_capacity_reservation_configuration_group():
+    pass
+
+
 bds_root_group.add_command(node_backup_group)
 bds_root_group.add_command(bds_capacity_report_group)
 bds_root_group.add_command(work_request_log_entry_group)
 bds_root_group.add_command(identity_configuration_group)
 bds_root_group.add_command(node_replace_configuration_group)
 bds_root_group.add_command(work_request_group)
+bds_root_group.add_command(bds_capacity_reservation_group)
 bds_root_group.add_command(bds_metastore_configuration_group)
 bds_root_group.add_command(bds_instance_group)
 bds_root_group.add_command(bds_certificate_configuration_group)
@@ -120,6 +133,63 @@ bds_root_group.add_command(bds_api_key_group)
 bds_root_group.add_command(work_request_error_group)
 bds_root_group.add_command(bds_cluster_version_group)
 bds_root_group.add_command(node_backup_configuration_group)
+bds_root_group.add_command(bds_capacity_reservation_configuration_group)
+
+
+@bds_capacity_reservation_configuration_group.command(name=cli_util.override('bds.activate_bds_capacity_reservation_configuration.command_name', 'activate'), help=u"""Activates the BDS capacity reservation configuration identified by the given ID. \n[Command Reference](activateBdsCapacityReservationConfiguration)""")
+@cli_util.option('--bds-instance-id', required=True, help=u"""The OCID of the cluster.""")
+@cli_util.option('--bds-capacity-reservation-configuration-id', required=True, help=u"""The OCID of the BDS capacity reservation configuration.""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "ACTIVE", "INACTIVE", "UPDATING", "DELETING", "DELETED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state CREATING --wait-for-state DELETED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'bds', 'class': 'BdsCapacityReservationConfiguration'})
+@cli_util.wrap_exceptions
+def activate_bds_capacity_reservation_configuration(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, bds_instance_id, bds_capacity_reservation_configuration_id, if_match):
+
+    if isinstance(bds_instance_id, six.string_types) and len(bds_instance_id.strip()) == 0:
+        raise click.UsageError('Parameter --bds-instance-id cannot be whitespace or empty string')
+
+    if isinstance(bds_capacity_reservation_configuration_id, six.string_types) and len(bds_capacity_reservation_configuration_id.strip()) == 0:
+        raise click.UsageError('Parameter --bds-capacity-reservation-configuration-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('bds', 'bds', ctx)
+    result = client.activate_bds_capacity_reservation_configuration(
+        bds_instance_id=bds_instance_id,
+        bds_capacity_reservation_configuration_id=bds_capacity_reservation_configuration_id,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_bds_capacity_reservation_configuration') and callable(getattr(client, 'get_bds_capacity_reservation_configuration')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+
+                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_bds_capacity_reservation_configuration(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
 
 
 @bds_metastore_configuration_group.command(name=cli_util.override('bds.activate_bds_metastore_configuration.command_name', 'activate'), help=u"""Activate specified metastore configuration. \n[Command Reference](activateBdsMetastoreConfiguration)""")
@@ -1570,6 +1640,37 @@ def certificate_service_info(ctx, from_json, bds_instance_id, services, if_match
     cli_util.render_response(result, ctx)
 
 
+@bds_capacity_reservation_group.command(name=cli_util.override('bds.change_bds_capacity_reservation_compartment.command_name', 'change-compartment'), help=u"""Moves a BDS capacity reservation into a different compartment. \n[Command Reference](changeBdsCapacityReservationCompartment)""")
+@cli_util.option('--bds-capacity-reservation-id', required=True, help=u"""The OCID of the BDS capacity reservation.""")
+@cli_util.option('--compartment-id', required=True, help=u"""The OCID of the compartment to move the BDS capacity reservation to.""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def change_bds_capacity_reservation_compartment(ctx, from_json, bds_capacity_reservation_id, compartment_id, if_match):
+
+    if isinstance(bds_capacity_reservation_id, six.string_types) and len(bds_capacity_reservation_id.strip()) == 0:
+        raise click.UsageError('Parameter --bds-capacity-reservation-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['compartmentId'] = compartment_id
+
+    client = cli_util.build_client('bds', 'bds', ctx)
+    result = client.change_bds_capacity_reservation_compartment(
+        bds_capacity_reservation_id=bds_capacity_reservation_id,
+        change_bds_capacity_reservation_compartment_details=_details,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
 @bds_instance_group.command(name=cli_util.override('bds.change_bds_instance_compartment.command_name', 'change-compartment'), help=u"""Moves a Big Data Service cluster into a different compartment. \n[Command Reference](changeBdsInstanceCompartment)""")
 @cli_util.option('--bds-instance-id', required=True, help=u"""The OCID of the cluster.""")
 @cli_util.option('--compartment-id', required=True, help=u"""The OCID of the compartment.""")
@@ -1795,6 +1896,131 @@ def create_bds_capacity_report(ctx, from_json, compartment_id, shape_availabilit
     cli_util.render_response(result, ctx)
 
 
+@bds_capacity_reservation_group.command(name=cli_util.override('bds.create_bds_capacity_reservation.command_name', 'create'), help=u"""Creates a reusable BDS capacity reservation resource. \n[Command Reference](createBdsCapacityReservation)""")
+@cli_util.option('--display-name', required=True, help=u"""A user-friendly name for the BDS capacity reservation.""")
+@cli_util.option('--compartment-id', required=True, help=u"""The OCID of the compartment in which to create the BDS capacity reservation.""")
+@cli_util.option('--compute-capacity-reservations', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Simple key-value pair that is applied without any predefined name, type, or scope. Exists for cross-compatibility only. For example, `{\"bar-key\": \"value\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For example, `{\"foo-namespace\": {\"bar-key\": \"value\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'compute-capacity-reservations': {'module': 'bds', 'class': 'ComputeCapacityReservations'}, 'freeform-tags': {'module': 'bds', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'bds', 'class': 'dict(str, dict(str, object))'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'compute-capacity-reservations': {'module': 'bds', 'class': 'ComputeCapacityReservations'}, 'freeform-tags': {'module': 'bds', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'bds', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'bds', 'class': 'BdsCapacityReservation'})
+@cli_util.wrap_exceptions
+def create_bds_capacity_reservation(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, display_name, compartment_id, compute_capacity_reservations, freeform_tags, defined_tags):
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['displayName'] = display_name
+    _details['compartmentId'] = compartment_id
+    _details['computeCapacityReservations'] = cli_util.parse_json_parameter("compute_capacity_reservations", compute_capacity_reservations)
+
+    if freeform_tags is not None:
+        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
+
+    if defined_tags is not None:
+        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    client = cli_util.build_client('bds', 'bds', ctx)
+    result = client.create_bds_capacity_reservation(
+        create_bds_capacity_reservation_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@bds_capacity_reservation_configuration_group.command(name=cli_util.override('bds.create_bds_capacity_reservation_configuration.command_name', 'create'), help=u"""Creates a configuration between the specified BDS cluster and a BDS capacity reservation. \n[Command Reference](createBdsCapacityReservationConfiguration)""")
+@cli_util.option('--bds-instance-id', required=True, help=u"""The OCID of the cluster.""")
+@cli_util.option('--display-name', required=True, help=u"""A user-friendly name for the BDS capacity reservation configuration.""")
+@cli_util.option('--bds-capacity-reservation-id', required=True, help=u"""The OCID of the BDS capacity reservation to associate with the BDS cluster.""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'bds', 'class': 'BdsCapacityReservationConfiguration'})
+@cli_util.wrap_exceptions
+def create_bds_capacity_reservation_configuration(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, bds_instance_id, display_name, bds_capacity_reservation_id):
+
+    if isinstance(bds_instance_id, six.string_types) and len(bds_instance_id.strip()) == 0:
+        raise click.UsageError('Parameter --bds-instance-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['displayName'] = display_name
+    _details['bdsCapacityReservationId'] = bds_capacity_reservation_id
+
+    client = cli_util.build_client('bds', 'bds', ctx)
+    result = client.create_bds_capacity_reservation_configuration(
+        bds_instance_id=bds_instance_id,
+        create_bds_capacity_reservation_configuration_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
 @bds_instance_group.command(name=cli_util.override('bds.create_bds_certificate_configuration.command_name', 'create-bds-certificate-configuration'), help=u"""Create a BDS certificate configuration for the cluster. \n[Command Reference](createBdsCertificateConfiguration)""")
 @cli_util.option('--bds-instance-id', required=True, help=u"""The OCID of the cluster.""")
 @cli_util.option('--display-name', required=True, help=u"""The display name of the BDS certificate configuration.""")
@@ -1876,6 +2102,9 @@ def create_bds_certificate_configuration(ctx, from_json, wait_for_state, max_wai
 @cli_util.option('--is-secret-reused', type=click.BOOL, help=u"""Boolean flag specifying whether or not to persist the provided secret OCID and reuse it for future operations.""")
 @cli_util.option('--network-config', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--bootstrap-script-url', help=u"""Pre-authenticated URL of the script in Object Store that is downloaded and executed.""")
+@cli_util.option('--bds-capacity-reservation-configurations', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Optional BDS capacity reservation configurations to associate with the cluster during creation.
+
+This option is a JSON list with items of type CreateBdsCapacityReservationConfigurationDetails.  For documentation on CreateBdsCapacityReservationConfigurationDetails please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/bds/20190531/datatypes/CreateBdsCapacityReservationConfigurationDetails.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--kerberos-realm-name', help=u"""The user-defined kerberos realm name.""")
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Simple key-value pair that is applied without any predefined name, type, or scope. Exists for cross-compatibility only. For example, `{\"bar-key\": \"value\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For example, `{\"foo-namespace\": {\"bar-key\": \"value\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
@@ -1885,12 +2114,12 @@ def create_bds_certificate_configuration(ctx, from_json, wait_for_state, max_wai
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'network-config': {'module': 'bds', 'class': 'NetworkConfig'}, 'nodes': {'module': 'bds', 'class': 'list[CreateNodeDetails]'}, 'freeform-tags': {'module': 'bds', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'bds', 'class': 'dict(str, dict(str, object))'}, 'bds-cluster-version-summary': {'module': 'bds', 'class': 'BdsClusterVersionSummary'}})
+@json_skeleton_utils.get_cli_json_input_option({'network-config': {'module': 'bds', 'class': 'NetworkConfig'}, 'nodes': {'module': 'bds', 'class': 'list[CreateNodeDetails]'}, 'bds-capacity-reservation-configurations': {'module': 'bds', 'class': 'list[CreateBdsCapacityReservationConfigurationDetails]'}, 'freeform-tags': {'module': 'bds', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'bds', 'class': 'dict(str, dict(str, object))'}, 'bds-cluster-version-summary': {'module': 'bds', 'class': 'BdsClusterVersionSummary'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'network-config': {'module': 'bds', 'class': 'NetworkConfig'}, 'nodes': {'module': 'bds', 'class': 'list[CreateNodeDetails]'}, 'freeform-tags': {'module': 'bds', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'bds', 'class': 'dict(str, dict(str, object))'}, 'bds-cluster-version-summary': {'module': 'bds', 'class': 'BdsClusterVersionSummary'}})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'network-config': {'module': 'bds', 'class': 'NetworkConfig'}, 'nodes': {'module': 'bds', 'class': 'list[CreateNodeDetails]'}, 'bds-capacity-reservation-configurations': {'module': 'bds', 'class': 'list[CreateBdsCapacityReservationConfigurationDetails]'}, 'freeform-tags': {'module': 'bds', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'bds', 'class': 'dict(str, dict(str, object))'}, 'bds-cluster-version-summary': {'module': 'bds', 'class': 'BdsClusterVersionSummary'}})
 @cli_util.wrap_exceptions
-def create_bds_instance(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, display_name, cluster_version, cluster_public_key, is_high_availability, is_secure, nodes, cluster_admin_password, secret_id, is_secret_reused, network_config, bootstrap_script_url, kerberos_realm_name, freeform_tags, defined_tags, kms_key_id, cluster_profile, bds_cluster_version_summary):
+def create_bds_instance(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, display_name, cluster_version, cluster_public_key, is_high_availability, is_secure, nodes, cluster_admin_password, secret_id, is_secret_reused, network_config, bootstrap_script_url, bds_capacity_reservation_configurations, kerberos_realm_name, freeform_tags, defined_tags, kms_key_id, cluster_profile, bds_cluster_version_summary):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
@@ -1918,6 +2147,9 @@ def create_bds_instance(ctx, from_json, wait_for_state, max_wait_seconds, wait_i
 
     if bootstrap_script_url is not None:
         _details['bootstrapScriptUrl'] = bootstrap_script_url
+
+    if bds_capacity_reservation_configurations is not None:
+        _details['bdsCapacityReservationConfigurations'] = cli_util.parse_json_parameter("bds_capacity_reservation_configurations", bds_capacity_reservation_configurations)
 
     if kerberos_realm_name is not None:
         _details['kerberosRealmName'] = kerberos_realm_name
@@ -2656,6 +2888,62 @@ def create_resource_principal_configuration(ctx, from_json, wait_for_state, max_
     cli_util.render_response(result, ctx)
 
 
+@bds_capacity_reservation_configuration_group.command(name=cli_util.override('bds.deactivate_bds_capacity_reservation_configuration.command_name', 'deactivate'), help=u"""Deactivates the BDS capacity reservation configuration identified by the given ID. \n[Command Reference](deactivateBdsCapacityReservationConfiguration)""")
+@cli_util.option('--bds-instance-id', required=True, help=u"""The OCID of the cluster.""")
+@cli_util.option('--bds-capacity-reservation-configuration-id', required=True, help=u"""The OCID of the BDS capacity reservation configuration.""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "ACTIVE", "INACTIVE", "UPDATING", "DELETING", "DELETED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state CREATING --wait-for-state DELETED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'bds', 'class': 'BdsCapacityReservationConfiguration'})
+@cli_util.wrap_exceptions
+def deactivate_bds_capacity_reservation_configuration(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, bds_instance_id, bds_capacity_reservation_configuration_id, if_match):
+
+    if isinstance(bds_instance_id, six.string_types) and len(bds_instance_id.strip()) == 0:
+        raise click.UsageError('Parameter --bds-instance-id cannot be whitespace or empty string')
+
+    if isinstance(bds_capacity_reservation_configuration_id, six.string_types) and len(bds_capacity_reservation_configuration_id.strip()) == 0:
+        raise click.UsageError('Parameter --bds-capacity-reservation-configuration-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('bds', 'bds', ctx)
+    result = client.deactivate_bds_capacity_reservation_configuration(
+        bds_instance_id=bds_instance_id,
+        bds_capacity_reservation_configuration_id=bds_capacity_reservation_configuration_id,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_bds_capacity_reservation_configuration') and callable(getattr(client, 'get_bds_capacity_reservation_configuration')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+
+                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_bds_capacity_reservation_configuration(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
 @identity_configuration_group.command(name=cli_util.override('bds.deactivate_iam_user_sync_configuration.command_name', 'deactivate-iam-user-sync-configuration'), help=u"""Deactivate the IAM user sync configuration. \n[Command Reference](deactivateIamUserSyncConfiguration)""")
 @cli_util.option('--bds-instance-id', required=True, help=u"""The OCID of the cluster.""")
 @cli_util.option('--identity-configuration-id', required=True, help=u"""The OCID of the identity configuration""")
@@ -2858,6 +3146,101 @@ def delete_bds_api_key(ctx, from_json, wait_for_state, max_wait_seconds, wait_in
                 raise
         else:
             click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@bds_capacity_reservation_group.command(name=cli_util.override('bds.delete_bds_capacity_reservation.command_name', 'delete'), help=u"""Deletes the BDS capacity reservation identified by the given ID. \n[Command Reference](deleteBdsCapacityReservation)""")
+@cli_util.option('--bds-capacity-reservation-id', required=True, help=u"""The OCID of the BDS capacity reservation.""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.confirm_delete_option
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "ACTIVE", "UPDATING", "DELETING", "DELETED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state CREATING --wait-for-state DELETED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def delete_bds_capacity_reservation(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, bds_capacity_reservation_id, if_match):
+
+    if isinstance(bds_capacity_reservation_id, six.string_types) and len(bds_capacity_reservation_id.strip()) == 0:
+        raise click.UsageError('Parameter --bds-capacity-reservation-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('bds', 'bds', ctx)
+    result = client.delete_bds_capacity_reservation(
+        bds_capacity_reservation_id=bds_capacity_reservation_id,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_bds_capacity_reservation') and callable(getattr(client, 'get_bds_capacity_reservation')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+
+                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                oci.wait_until(client, client.get_bds_capacity_reservation(bds_capacity_reservation_id), 'lifecycle_state', wait_for_state, succeed_on_not_found=True, **wait_period_kwargs)
+            except oci.exceptions.ServiceError as e:
+                # We make an initial service call so we can pass the result to oci.wait_until(), however if we are waiting on the
+                # outcome of a delete operation it is possible that the resource is already gone and so the initial service call
+                # will result in an exception that reflects a HTTP 404. In this case, we can exit with success (rather than raising
+                # the exception) since this would have been the behaviour in the waiter anyway (as for delete we provide the argument
+                # succeed_on_not_found=True to the waiter).
+                #
+                # Any non-404 should still result in the exception being thrown.
+                if e.status == 404:
+                    pass
+                else:
+                    raise
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the resource entered the specified state. Please retrieve the resource to find its current state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@bds_capacity_reservation_configuration_group.command(name=cli_util.override('bds.delete_bds_capacity_reservation_configuration.command_name', 'delete'), help=u"""Deletes the BDS capacity reservation configuration identified by the given ID. \n[Command Reference](deleteBdsCapacityReservationConfiguration)""")
+@cli_util.option('--bds-instance-id', required=True, help=u"""The OCID of the cluster.""")
+@cli_util.option('--bds-capacity-reservation-configuration-id', required=True, help=u"""The OCID of the BDS capacity reservation configuration.""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.confirm_delete_option
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def delete_bds_capacity_reservation_configuration(ctx, from_json, bds_instance_id, bds_capacity_reservation_configuration_id, if_match):
+
+    if isinstance(bds_instance_id, six.string_types) and len(bds_instance_id.strip()) == 0:
+        raise click.UsageError('Parameter --bds-instance-id cannot be whitespace or empty string')
+
+    if isinstance(bds_capacity_reservation_configuration_id, six.string_types) and len(bds_capacity_reservation_configuration_id.strip()) == 0:
+        raise click.UsageError('Parameter --bds-capacity-reservation-configuration-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('bds', 'bds', ctx)
+    result = client.delete_bds_capacity_reservation_configuration(
+        bds_instance_id=bds_instance_id,
+        bds_capacity_reservation_configuration_id=bds_capacity_reservation_configuration_id,
+        **kwargs
+    )
     cli_util.render_response(result, ctx)
 
 
@@ -3783,6 +4166,55 @@ def get_bds_api_key(ctx, from_json, bds_instance_id, api_key_id):
     result = client.get_bds_api_key(
         bds_instance_id=bds_instance_id,
         api_key_id=api_key_id,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
+@bds_capacity_reservation_group.command(name=cli_util.override('bds.get_bds_capacity_reservation.command_name', 'get'), help=u"""Returns information about the BDS capacity reservation identified by the given ID. \n[Command Reference](getBdsCapacityReservation)""")
+@cli_util.option('--bds-capacity-reservation-id', required=True, help=u"""The OCID of the BDS capacity reservation.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'bds', 'class': 'BdsCapacityReservation'})
+@cli_util.wrap_exceptions
+def get_bds_capacity_reservation(ctx, from_json, bds_capacity_reservation_id):
+
+    if isinstance(bds_capacity_reservation_id, six.string_types) and len(bds_capacity_reservation_id.strip()) == 0:
+        raise click.UsageError('Parameter --bds-capacity-reservation-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('bds', 'bds', ctx)
+    result = client.get_bds_capacity_reservation(
+        bds_capacity_reservation_id=bds_capacity_reservation_id,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
+@bds_capacity_reservation_configuration_group.command(name=cli_util.override('bds.get_bds_capacity_reservation_configuration.command_name', 'get'), help=u"""Returns information about the BDS capacity reservation configuration identified by the given ID. \n[Command Reference](getBdsCapacityReservationConfiguration)""")
+@cli_util.option('--bds-instance-id', required=True, help=u"""The OCID of the cluster.""")
+@cli_util.option('--bds-capacity-reservation-configuration-id', required=True, help=u"""The OCID of the BDS capacity reservation configuration.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'bds', 'class': 'BdsCapacityReservationConfiguration'})
+@cli_util.wrap_exceptions
+def get_bds_capacity_reservation_configuration(ctx, from_json, bds_instance_id, bds_capacity_reservation_configuration_id):
+
+    if isinstance(bds_instance_id, six.string_types) and len(bds_instance_id.strip()) == 0:
+        raise click.UsageError('Parameter --bds-instance-id cannot be whitespace or empty string')
+
+    if isinstance(bds_capacity_reservation_configuration_id, six.string_types) and len(bds_capacity_reservation_configuration_id.strip()) == 0:
+        raise click.UsageError('Parameter --bds-capacity-reservation-configuration-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('bds', 'bds', ctx)
+    result = client.get_bds_capacity_reservation_configuration(
+        bds_instance_id=bds_instance_id,
+        bds_capacity_reservation_configuration_id=bds_capacity_reservation_configuration_id,
         **kwargs
     )
     cli_util.render_response(result, ctx)
@@ -4897,6 +5329,196 @@ def list_bds_api_keys(ctx, from_json, all_pages, page_size, bds_instance_id, lif
     else:
         result = client.list_bds_api_keys(
             bds_instance_id=bds_instance_id,
+            **kwargs
+        )
+    cli_util.render_response(result, ctx)
+
+
+@bds_capacity_reservation_configuration_group.command(name=cli_util.override('bds.list_bds_capacity_reservation_associated_configurations.command_name', 'list-bds-capacity-reservation-associated-configurations'), help=u"""Returns a list of BDS capacity reservation configurations associated with the specified BDS capacity reservation. \n[Command Reference](listBdsCapacityReservationAssociatedConfigurations)""")
+@cli_util.option('--bds-capacity-reservation-id', required=True, help=u"""The OCID of the BDS capacity reservation.""")
+@cli_util.option('--compartment-id', required=True, help=u"""The OCID of the compartment.""")
+@cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "ACTIVE", "INACTIVE", "UPDATING", "DELETING", "DELETED"]), help=u"""The lifecycle state of the BDS capacity reservation configuration.""")
+@cli_util.option('--page', help=u"""The page token representing the page at which to start retrieving results. This is usually retrieved from a previous list call.""")
+@cli_util.option('--limit', type=click.INT, help=u"""The maximum number of items to return.""")
+@cli_util.option('--sort-by', type=custom_types.CliCaseInsensitiveChoice(["timeCreated", "displayName"]), help=u"""The field to sort by. Only one sort order may be provided. Default order for timeCreated is descending. Default order for displayName is ascending. If no value is specified timeCreated is default.""")
+@cli_util.option('--sort-order', type=custom_types.CliCaseInsensitiveChoice(["ASC", "DESC"]), help=u"""The sort order to use, either 'asc' or 'desc'.""")
+@cli_util.option('--display-name', help=u"""A filter to return only resources that match the entire display name given.""")
+@cli_util.option('--all', 'all_pages', is_flag=True, help="""Fetches all pages of results. If you provide this option, then you cannot provide the --limit option.""")
+@cli_util.option('--page-size', type=click.INT, help="""When fetching results, the number of results to fetch per call. Only valid when used with --all or --limit, and ignored otherwise.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'bds', 'class': 'BdsCapacityReservationAssociatedConfigurationCollection'})
+@cli_util.wrap_exceptions
+def list_bds_capacity_reservation_associated_configurations(ctx, from_json, all_pages, page_size, bds_capacity_reservation_id, compartment_id, lifecycle_state, page, limit, sort_by, sort_order, display_name):
+
+    if all_pages and limit:
+        raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
+
+    if isinstance(bds_capacity_reservation_id, six.string_types) and len(bds_capacity_reservation_id.strip()) == 0:
+        raise click.UsageError('Parameter --bds-capacity-reservation-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if lifecycle_state is not None:
+        kwargs['lifecycle_state'] = lifecycle_state
+    if page is not None:
+        kwargs['page'] = page
+    if limit is not None:
+        kwargs['limit'] = limit
+    if sort_by is not None:
+        kwargs['sort_by'] = sort_by
+    if sort_order is not None:
+        kwargs['sort_order'] = sort_order
+    if display_name is not None:
+        kwargs['display_name'] = display_name
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('bds', 'bds', ctx)
+    if all_pages:
+        if page_size:
+            kwargs['limit'] = page_size
+
+        result = cli_util.list_call_get_all_results(
+            client.list_bds_capacity_reservation_associated_configurations,
+            bds_capacity_reservation_id=bds_capacity_reservation_id,
+            compartment_id=compartment_id,
+            **kwargs
+        )
+    elif limit is not None:
+        result = cli_util.list_call_get_up_to_limit(
+            client.list_bds_capacity_reservation_associated_configurations,
+            limit,
+            page_size,
+            bds_capacity_reservation_id=bds_capacity_reservation_id,
+            compartment_id=compartment_id,
+            **kwargs
+        )
+    else:
+        result = client.list_bds_capacity_reservation_associated_configurations(
+            bds_capacity_reservation_id=bds_capacity_reservation_id,
+            compartment_id=compartment_id,
+            **kwargs
+        )
+    cli_util.render_response(result, ctx)
+
+
+@bds_capacity_reservation_configuration_group.command(name=cli_util.override('bds.list_bds_capacity_reservation_configurations.command_name', 'list'), help=u"""Returns a list of BDS capacity reservation configurations for the specified BDS cluster. \n[Command Reference](listBdsCapacityReservationConfigurations)""")
+@cli_util.option('--bds-instance-id', required=True, help=u"""The OCID of the cluster.""")
+@cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "ACTIVE", "INACTIVE", "UPDATING", "DELETING", "DELETED"]), help=u"""The lifecycle state of the BDS capacity reservation configuration.""")
+@cli_util.option('--page', help=u"""The page token representing the page at which to start retrieving results. This is usually retrieved from a previous list call.""")
+@cli_util.option('--limit', type=click.INT, help=u"""The maximum number of items to return.""")
+@cli_util.option('--sort-by', type=custom_types.CliCaseInsensitiveChoice(["timeCreated", "displayName"]), help=u"""The field to sort by. Only one sort order may be provided. Default order for timeCreated is descending. Default order for displayName is ascending. If no value is specified timeCreated is default.""")
+@cli_util.option('--sort-order', type=custom_types.CliCaseInsensitiveChoice(["ASC", "DESC"]), help=u"""The sort order to use, either 'asc' or 'desc'.""")
+@cli_util.option('--display-name', help=u"""A filter to return only resources that match the entire display name given.""")
+@cli_util.option('--all', 'all_pages', is_flag=True, help="""Fetches all pages of results. If you provide this option, then you cannot provide the --limit option.""")
+@cli_util.option('--page-size', type=click.INT, help="""When fetching results, the number of results to fetch per call. Only valid when used with --all or --limit, and ignored otherwise.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'bds', 'class': 'BdsCapacityReservationConfigurationCollection'})
+@cli_util.wrap_exceptions
+def list_bds_capacity_reservation_configurations(ctx, from_json, all_pages, page_size, bds_instance_id, lifecycle_state, page, limit, sort_by, sort_order, display_name):
+
+    if all_pages and limit:
+        raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
+
+    if isinstance(bds_instance_id, six.string_types) and len(bds_instance_id.strip()) == 0:
+        raise click.UsageError('Parameter --bds-instance-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if lifecycle_state is not None:
+        kwargs['lifecycle_state'] = lifecycle_state
+    if page is not None:
+        kwargs['page'] = page
+    if limit is not None:
+        kwargs['limit'] = limit
+    if sort_by is not None:
+        kwargs['sort_by'] = sort_by
+    if sort_order is not None:
+        kwargs['sort_order'] = sort_order
+    if display_name is not None:
+        kwargs['display_name'] = display_name
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('bds', 'bds', ctx)
+    if all_pages:
+        if page_size:
+            kwargs['limit'] = page_size
+
+        result = cli_util.list_call_get_all_results(
+            client.list_bds_capacity_reservation_configurations,
+            bds_instance_id=bds_instance_id,
+            **kwargs
+        )
+    elif limit is not None:
+        result = cli_util.list_call_get_up_to_limit(
+            client.list_bds_capacity_reservation_configurations,
+            limit,
+            page_size,
+            bds_instance_id=bds_instance_id,
+            **kwargs
+        )
+    else:
+        result = client.list_bds_capacity_reservation_configurations(
+            bds_instance_id=bds_instance_id,
+            **kwargs
+        )
+    cli_util.render_response(result, ctx)
+
+
+@bds_capacity_reservation_group.command(name=cli_util.override('bds.list_bds_capacity_reservations.command_name', 'list'), help=u"""Returns a list of BDS capacity reservations in a compartment. \n[Command Reference](listBdsCapacityReservations)""")
+@cli_util.option('--compartment-id', required=True, help=u"""The OCID of the compartment.""")
+@cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "ACTIVE", "UPDATING", "DELETING", "DELETED"]), help=u"""The lifecycle state of the BDS capacity reservation.""")
+@cli_util.option('--page', help=u"""The page token representing the page at which to start retrieving results. This is usually retrieved from a previous list call.""")
+@cli_util.option('--limit', type=click.INT, help=u"""The maximum number of items to return.""")
+@cli_util.option('--sort-by', type=custom_types.CliCaseInsensitiveChoice(["timeCreated", "displayName"]), help=u"""The field to sort by. Only one sort order may be provided. Default order for timeCreated is descending. Default order for displayName is ascending. If no value is specified timeCreated is default.""")
+@cli_util.option('--sort-order', type=custom_types.CliCaseInsensitiveChoice(["ASC", "DESC"]), help=u"""The sort order to use, either 'asc' or 'desc'.""")
+@cli_util.option('--display-name', help=u"""A filter to return only resources that match the entire display name given.""")
+@cli_util.option('--all', 'all_pages', is_flag=True, help="""Fetches all pages of results. If you provide this option, then you cannot provide the --limit option.""")
+@cli_util.option('--page-size', type=click.INT, help="""When fetching results, the number of results to fetch per call. Only valid when used with --all or --limit, and ignored otherwise.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'bds', 'class': 'BdsCapacityReservationCollection'})
+@cli_util.wrap_exceptions
+def list_bds_capacity_reservations(ctx, from_json, all_pages, page_size, compartment_id, lifecycle_state, page, limit, sort_by, sort_order, display_name):
+
+    if all_pages and limit:
+        raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
+
+    kwargs = {}
+    if lifecycle_state is not None:
+        kwargs['lifecycle_state'] = lifecycle_state
+    if page is not None:
+        kwargs['page'] = page
+    if limit is not None:
+        kwargs['limit'] = limit
+    if sort_by is not None:
+        kwargs['sort_by'] = sort_by
+    if sort_order is not None:
+        kwargs['sort_order'] = sort_order
+    if display_name is not None:
+        kwargs['display_name'] = display_name
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('bds', 'bds', ctx)
+    if all_pages:
+        if page_size:
+            kwargs['limit'] = page_size
+
+        result = cli_util.list_call_get_all_results(
+            client.list_bds_capacity_reservations,
+            compartment_id=compartment_id,
+            **kwargs
+        )
+    elif limit is not None:
+        result = cli_util.list_call_get_up_to_limit(
+            client.list_bds_capacity_reservations,
+            limit,
+            page_size,
+            compartment_id=compartment_id,
+            **kwargs
+        )
+    else:
+        result = client.list_bds_capacity_reservations(
+            compartment_id=compartment_id,
             **kwargs
         )
     cli_util.render_response(result, ctx)
@@ -7808,6 +8430,150 @@ def update_auto_scaling_configuration_update_schedule_based_vertical_scaling_pol
                 raise
         else:
             click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@bds_capacity_reservation_group.command(name=cli_util.override('bds.update_bds_capacity_reservation.command_name', 'update'), help=u"""Updates the BDS capacity reservation identified by the given ID. \n[Command Reference](updateBdsCapacityReservation)""")
+@cli_util.option('--bds-capacity-reservation-id', required=True, help=u"""The OCID of the BDS capacity reservation.""")
+@cli_util.option('--display-name', help=u"""A user-friendly name for the BDS capacity reservation.""")
+@cli_util.option('--compute-capacity-reservations', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Simple key-value pair that is applied without any predefined name, type, or scope. Exists for cross-compatibility only. For example, `{\"bar-key\": \"value\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For example, `{\"foo-namespace\": {\"bar-key\": \"value\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "ACTIVE", "UPDATING", "DELETING", "DELETED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state CREATING --wait-for-state DELETED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'compute-capacity-reservations': {'module': 'bds', 'class': 'ComputeCapacityReservations'}, 'freeform-tags': {'module': 'bds', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'bds', 'class': 'dict(str, dict(str, object))'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'compute-capacity-reservations': {'module': 'bds', 'class': 'ComputeCapacityReservations'}, 'freeform-tags': {'module': 'bds', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'bds', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'bds', 'class': 'BdsCapacityReservation'})
+@cli_util.wrap_exceptions
+def update_bds_capacity_reservation(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, bds_capacity_reservation_id, display_name, compute_capacity_reservations, freeform_tags, defined_tags, if_match):
+
+    if isinstance(bds_capacity_reservation_id, six.string_types) and len(bds_capacity_reservation_id.strip()) == 0:
+        raise click.UsageError('Parameter --bds-capacity-reservation-id cannot be whitespace or empty string')
+    if not force:
+        if compute_capacity_reservations or freeform_tags or defined_tags:
+            if not click.confirm("WARNING: Updates to compute-capacity-reservations and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
+                ctx.abort()
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+
+    if display_name is not None:
+        _details['displayName'] = display_name
+
+    if compute_capacity_reservations is not None:
+        _details['computeCapacityReservations'] = cli_util.parse_json_parameter("compute_capacity_reservations", compute_capacity_reservations)
+
+    if freeform_tags is not None:
+        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
+
+    if defined_tags is not None:
+        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    client = cli_util.build_client('bds', 'bds', ctx)
+    result = client.update_bds_capacity_reservation(
+        bds_capacity_reservation_id=bds_capacity_reservation_id,
+        update_bds_capacity_reservation_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_bds_capacity_reservation') and callable(getattr(client, 'get_bds_capacity_reservation')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+
+                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_bds_capacity_reservation(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@bds_capacity_reservation_configuration_group.command(name=cli_util.override('bds.update_bds_capacity_reservation_configuration.command_name', 'update'), help=u"""Updates the BDS capacity reservation configuration identified by the given ID. \n[Command Reference](updateBdsCapacityReservationConfiguration)""")
+@cli_util.option('--bds-instance-id', required=True, help=u"""The OCID of the cluster.""")
+@cli_util.option('--bds-capacity-reservation-configuration-id', required=True, help=u"""The OCID of the BDS capacity reservation configuration.""")
+@cli_util.option('--bds-capacity-reservation-id', help=u"""The OCID of the BDS capacity reservation to associate with the BDS cluster.""")
+@cli_util.option('--display-name', help=u"""A user-friendly name for the BDS capacity reservation configuration.""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "ACTIVE", "INACTIVE", "UPDATING", "DELETING", "DELETED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state CREATING --wait-for-state DELETED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'bds', 'class': 'BdsCapacityReservationConfiguration'})
+@cli_util.wrap_exceptions
+def update_bds_capacity_reservation_configuration(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, bds_instance_id, bds_capacity_reservation_configuration_id, bds_capacity_reservation_id, display_name, if_match):
+
+    if isinstance(bds_instance_id, six.string_types) and len(bds_instance_id.strip()) == 0:
+        raise click.UsageError('Parameter --bds-instance-id cannot be whitespace or empty string')
+
+    if isinstance(bds_capacity_reservation_configuration_id, six.string_types) and len(bds_capacity_reservation_configuration_id.strip()) == 0:
+        raise click.UsageError('Parameter --bds-capacity-reservation-configuration-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+
+    if bds_capacity_reservation_id is not None:
+        _details['bdsCapacityReservationId'] = bds_capacity_reservation_id
+
+    if display_name is not None:
+        _details['displayName'] = display_name
+
+    client = cli_util.build_client('bds', 'bds', ctx)
+    result = client.update_bds_capacity_reservation_configuration(
+        bds_instance_id=bds_instance_id,
+        bds_capacity_reservation_configuration_id=bds_capacity_reservation_configuration_id,
+        update_bds_capacity_reservation_configuration_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_bds_capacity_reservation_configuration') and callable(getattr(client, 'get_bds_capacity_reservation_configuration')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+
+                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_bds_capacity_reservation_configuration(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
     cli_util.render_response(result, ctx)
 
 

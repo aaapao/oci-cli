@@ -6,9 +6,9 @@
 import oci
 from oci_cli.cli_clients import CLIENT_MAP
 from oci_cli.cli_clients import MODULE_TO_TYPE_MAPPINGS
-from oci.generative_ai_data import GetEnrichmentJobClient
+from oci.generative_ai_data import GenerateSqlClient
 
 MODULE_TO_TYPE_MAPPINGS["generative_ai_data"] = oci.generative_ai_data.models.generative_ai_data_type_mapping
 if CLIENT_MAP.get("generative_ai_data") is None:
     CLIENT_MAP["generative_ai_data"] = {}
-CLIENT_MAP["generative_ai_data"]["get_enrichment_job"] = GetEnrichmentJobClient
+CLIENT_MAP["generative_ai_data"]["generate_sql"] = GenerateSqlClient

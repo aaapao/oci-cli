@@ -6,6 +6,101 @@ All notable changes to this project will be documented in this file.
 
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`__.
 
+3.91.0 - 2026-08-25
+-------------------
+Added
+~~~~~
+* Network Service
+
+  * Support for Network Firewall as a source type for Virtual Test Access Points (VTAPs)
+
+    * ``oci network vtap create --source-type NETWORK_FIREWALL``
+    * ``oci network vtap update --source-type NETWORK_FIREWALL``
+
+* Generative AI Data Service
+
+  * Support for NL2SQL Model Selection, Annotation, Background mode and Delta Enrichment
+
+    * ``oci generative-ai-data generate-sql generate-sql-from-nl-job generate-sql-from-nl``
+    * ``oci generative-ai-data generate-sql generate-sql-from-nl-job get``
+
+* Generative AI Service
+
+  * Support for NL2SQL Model Selection, Annotation, Background mode and Delta Enrichment in semantic-store operations
+
+    * ``oci generative-ai semantic-store create-semantic-store-custom-semantic-store-model-selection``
+    * ``oci generative-ai semantic-store create-semantic-store-default-semantic-store-model-selection``
+    * ``oci generative-ai semantic-store update-semantic-store-custom-semantic-store-model-selection``
+    * ``oci generative-ai semantic-store update-semantic-store-default-semantic-store-model-selection``
+    * ``oci generative-ai semantic-store create --is-user-defined-semantics-enabled --model-selection``
+    * ``oci generative-ai semantic-store update --is-user-defined-semantics-enabled --model-selection``
+
+  * Support for additional B200, B300, L40S, and MI300X Dedicated AI Cluster unit shapes
+
+    * ``oci generative-ai dedicated-ai-cluster create --unit-shape``
+
+* MySQL Database Service
+
+  * Support for blue/green deployments
+
+    * ``oci mysql blue-green-deployment``
+
+* Big Data Service
+
+  * Support for BDS Capacity Reservations and BDS Capacity Reservation Configurations
+
+    * ``oci bds bds-capacity-reservation``
+    * ``oci bds bds-capacity-reservation-configuration``
+
+  * Support for associating a BDS Capacity Reservation when creating a BDS Instance
+
+    * ``oci bds instance create --bds-capacity-reservation-configurations``
+
+* Oracle Database Autonomous Recovery Service
+
+  * Support for long-term backup lifecycle operations
+
+    * ``oci recovery long-term-backup``
+    * ``oci recovery long-term-backup-collection list-long-term-backups``
+
+  * Support for new optional parameter ``--security-attributes``
+
+    * ``oci recovery recovery-service-subnet create --security-attributes``
+    * ``oci recovery recovery-service-subnet update --security-attributes``
+
+  * Support for new optional filters ``--backup-cloud-location`` and ``--must-enforce-cloud-locality``
+
+    * ``oci recovery protected-database-collection list-protected-databases --backup-cloud-location``
+    * ``oci recovery protection-policy-collection list-protection-policies --must-enforce-cloud-locality``
+
+Changed
+~~~~~~~
+* Oracle Database Autonomous Recovery Service
+
+  * ``--compartment-id`` is now an optional parameter
+
+    * ``oci recovery protected-database-collection list-protected-databases --compartment-id``
+    * ``oci recovery protection-policy-collection list-protection-policies --compartment-id``
+    * ``oci recovery recovery-service-subnet-collection list-recovery-service-subnets --compartment-id``
+    * ``oci recovery work-request-summary-collection list-work-requests --compartment-id``
+
+* Generative AI Data Service
+
+  * [BREAKING] Moved commands from ``oci generative-ai-data`` to ``oci generative-ai-data enrichment-job``
+
+    * ``oci generative-ai-data enrichment-job enrichment-job cancel``
+    * ``oci generative-ai-data enrichment-job enrichment-job generate``
+    * ``oci generative-ai-data enrichment-job enrichment-job generate-enrichment-job-delta-refresh-enrichment-job-configuration``
+    * ``oci generative-ai-data enrichment-job enrichment-job generate-enrichment-job-full-build-enrichment-job-configuration``
+    * ``oci generative-ai-data enrichment-job enrichment-job generate-enrichment-job-partial-build-enrichment-job-configuration``
+    * ``oci generative-ai-data enrichment-job enrichment-job get``
+    * ``oci generative-ai-data enrichment-job enrichment-job-collection list-enrichment-jobs``
+
+Security
+~~~~~~~~
+* The supported `pyOpenSSL` dependency range has changed to `>=17.5.0,<22.0.0` for Python 3.7 and earlier, and `>=26.2.0,<27.0.0` for Python 3.8 and later. Python 3.7 and earlier retain residual CVE-2026-27448 risk.
+* The supported `cryptography` dependency range has changed to `>=3.2.1,<=37.0.2` for Python 3.7 and earlier.
+
 3.90.3 - 2026-08-18
 -------------------
 Added

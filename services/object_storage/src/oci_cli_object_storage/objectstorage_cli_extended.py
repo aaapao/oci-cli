@@ -11,6 +11,7 @@ import hashlib
 import math
 import os
 import os.path
+import re
 import shutil
 import stat
 import sys
@@ -47,8 +48,39 @@ from services.object_storage.src.oci_cli_object_storage.object_storage_transfer_
     DeleteUploadTask, DeleteReplicationPolicyTask, DeletePreAuthenticatedRequestTask, DeleteObjectTask
 
 
+NAMESPACE_HOST_LABEL_PATTERN = re.compile(r'\A[A-Za-z0-9_.-]+\Z')
+NAMESPACE_VALIDATION_ERROR = 'must contain only letters, digits, underscores, hyphens, and periods'
+WRAPPED_NAMESPACE_PARAM_IDS = set()
+
+
 def is_python2():
     return sys.version_info[0] < 3
+
+
+def validate_namespace_name(value):
+    if value is None:
+        return value
+
+    if isinstance(value, six.string_types):
+        if not value or value != value.strip() or not NAMESPACE_HOST_LABEL_PATTERN.match(value):
+            raise click.BadParameter(NAMESPACE_VALIDATION_ERROR)
+
+    return value
+
+
+def _wrap_namespace_param_callback(param):
+    if id(param) in WRAPPED_NAMESPACE_PARAM_IDS:
+        return
+
+    existing_callback = param.callback
+
+    def validate_object_storage_namespace(ctx, click_param, value):
+        if existing_callback:
+            value = existing_callback(ctx, click_param, value)
+        return validate_namespace_name(value)
+
+    param.callback = validate_object_storage_namespace
+    WRAPPED_NAMESPACE_PARAM_IDS.add(id(param))
 
 
 # For namespace parameter within object storage commands, if not explicitly provided we make a SDK API call to
@@ -85,6 +117,7 @@ def remove_namespace_required_objectstorage():
     for command in commands:
         for param in command.params:
             if param.name in ['namespace_name', 'namespace', 'ns']:
+                _wrap_namespace_param_callback(param)
                 param.required = False
                 if param.help.endswith(' [required]'):
                     # Remove ' [required]'
