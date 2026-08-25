@@ -28,6 +28,12 @@ def protection_policy_group():
     pass
 
 
+@click.command(cli_util.override('recovery.long_term_backup_group.command_name', 'long-term-backup'), cls=CommandGroupWithAlias, help="""The details of a Long Term Backup.""")
+@cli_util.help_option_group
+def long_term_backup_group():
+    pass
+
+
 @click.command(cli_util.override('recovery.work_request_error_collection_group.command_name', 'work-request-error-collection'), cls=CommandGroupWithAlias, help="""Results of a workRequestError search. Contains both WorkRequestError items and other information, such as metadata.""")
 @cli_util.help_option_group
 def work_request_error_collection_group():
@@ -49,6 +55,12 @@ def recovery_service_subnet_group():
 @click.command(cli_util.override('recovery.protection_policy_collection_group.command_name', 'protection-policy-collection'), cls=CommandGroupWithAlias, help="""Results of a Protection Policy search. Contains both Protection Policy Summary items and other information, such as metadata.""")
 @cli_util.help_option_group
 def protection_policy_collection_group():
+    pass
+
+
+@click.command(cli_util.override('recovery.long_term_backup_collection_group.command_name', 'long-term-backup-collection'), cls=CommandGroupWithAlias, help="""Results of a long term backup search. Contains both long term backup Summary items and other information, such as metadata.""")
+@cli_util.help_option_group
+def long_term_backup_collection_group():
     pass
 
 
@@ -83,15 +95,72 @@ def work_request_log_entry_collection_group():
 
 
 recovery_root_group.add_command(protection_policy_group)
+recovery_root_group.add_command(long_term_backup_group)
 recovery_root_group.add_command(work_request_error_collection_group)
 recovery_root_group.add_command(work_request_summary_collection_group)
 recovery_root_group.add_command(recovery_service_subnet_group)
 recovery_root_group.add_command(protection_policy_collection_group)
+recovery_root_group.add_command(long_term_backup_collection_group)
 recovery_root_group.add_command(protected_database_group)
 recovery_root_group.add_command(work_request_group)
 recovery_root_group.add_command(protected_database_collection_group)
 recovery_root_group.add_command(recovery_service_subnet_collection_group)
 recovery_root_group.add_command(work_request_log_entry_collection_group)
+
+
+@long_term_backup_group.command(name=cli_util.override('recovery.cancel_long_term_backup.command_name', 'cancel'), help=u"""Cancels a long-term backup that is being created or scheduled to be created. You must specify the unique identifier or OCID of the long-term backup that you want to cancel. You can cancel a long-term backup only if the current state of the backup resource is WAITING_FOR_BACKUP_FROM_DB, or SCHEDULED_FOR_ARCHIVAL, or ARCHIVAL_IN_PROGRESS. \n[Command Reference](cancelLongTermBackup)""")
+@cli_util.option('--long-term-backup-id', required=True, help=u"""The long term backup OCID.""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "WAITING", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def cancel_long_term_backup(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, long_term_backup_id, if_match):
+
+    if isinstance(long_term_backup_id, six.string_types) and len(long_term_backup_id.strip()) == 0:
+        raise click.UsageError('Parameter --long-term-backup-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('recovery', 'database_recovery', ctx)
+    result = client.cancel_long_term_backup(
+        long_term_backup_id=long_term_backup_id,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
 
 
 @protected_database_group.command(name=cli_util.override('recovery.cancel_protected_database_deletion.command_name', 'cancel-protected-database-deletion'), help=u"""Cancels the scheduled deletion of a protected database, and returns the protected database to an ACTIVE state. You can cancel the deletion only if the protected database is in the DELETE SCHEDULED state. \n[Command Reference](cancelProtectedDatabaseDeletion)""")
@@ -369,6 +438,81 @@ def change_recovery_service_subnet_compartment(ctx, from_json, wait_for_state, m
     cli_util.render_response(result, ctx)
 
 
+@long_term_backup_group.command(name=cli_util.override('recovery.create_long_term_backup.command_name', 'create'), help=u"""Creates a long-term backup of a specified protected database. \n[Command Reference](createLongTermBackup)""")
+@cli_util.option('--protected-database-id', required=True, help=u"""The OCID of the protected database for which you want to create the long-term backup.""")
+@cli_util.option('--retention-period', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""The maximum period to retain the long-term backup. Specify the retention period type and the duration for the long-term backup. If you have chosen the retention period type as 'DAYS', then specify a duration ranging from 90 days to 3650 days. If you have chosen the retention period type as 'YEARS', then specify a duration ranging from 1 year to 10 years.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--display-name', help=u"""A user provided name for the long term backup. The 'displayName' does not have to be unique, and it can be modified. Avoid entering confidential information.""")
+@cli_util.option('--retention-scn', type=click.INT, help=u"""The desired target point (SCN) at which you want to create the long-term backup of the database.For example, specify the value as 1000 if you want to create the long-term backup until SCN 1000. If you want to specify the target point as a time expression instead of the SCN value, then use the longTermRetentionPointInTime parameter.""")
+@cli_util.option('--retention-point-in-time', type=custom_types.CLI_DATETIME, help=u"""An RFC3339 formatted datetime string that indicates the desired target point in time in the database at which you want to create the long-term backup. For example, if you want the long-term backup to include all the changes until May 22 at 9:10 PM, then specify the value as, '2020-05-22T21:10:00.000Z'. If you want to specify the target point as an SCN value instead of the target time, then use the databaseSCN parameter.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
+@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Simple key-value pair that is applied without any predefined name, type or scope. Exists for cross-compatibility only. Example: `{\"bar-key\": \"value\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. Example: `{\"foo-namespace\": {\"bar-key\": \"value\"}}`. For more information, see [Resource Tags]""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "WAITING", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'retention-period': {'module': 'recovery', 'class': 'list[RetentionPeriodValue]'}, 'freeform-tags': {'module': 'recovery', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'recovery', 'class': 'dict(str, dict(str, object))'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'retention-period': {'module': 'recovery', 'class': 'list[RetentionPeriodValue]'}, 'freeform-tags': {'module': 'recovery', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'recovery', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'recovery', 'class': 'LongTermBackup'})
+@cli_util.wrap_exceptions
+def create_long_term_backup(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, protected_database_id, retention_period, display_name, retention_scn, retention_point_in_time, freeform_tags, defined_tags):
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['protectedDatabaseId'] = protected_database_id
+    _details['retentionPeriod'] = cli_util.parse_json_parameter("retention_period", retention_period)
+
+    if display_name is not None:
+        _details['displayName'] = display_name
+
+    if retention_scn is not None:
+        _details['retentionScn'] = retention_scn
+
+    if retention_point_in_time is not None:
+        _details['retentionPointInTime'] = retention_point_in_time
+
+    if freeform_tags is not None:
+        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
+
+    if defined_tags is not None:
+        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    client = cli_util.build_client('recovery', 'database_recovery', ctx)
+    result = client.create_long_term_backup(
+        create_long_term_backup_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
 @protected_database_group.command(name=cli_util.override('recovery.create_protected_database.command_name', 'create'), help=u"""Creates a new Protected Database. \n[Command Reference](createProtectedDatabase)""")
 @cli_util.option('--display-name', required=True, help=u"""The protected database name. You can change the displayName. Avoid entering confidential information.""")
 @cli_util.option('--db-unique-name', required=True, help=u"""The dbUniqueName of the protected database in Recovery Service. You cannot change the unique name.""")
@@ -563,17 +707,20 @@ def create_protection_policy(ctx, from_json, wait_for_state, max_wait_seconds, w
 @cli_util.option('--subnet-id', help=u"""Deprecated. One of the subnets associated with the Recovery Service subnet.""")
 @cli_util.option('--subnets', type=custom_types.CLI_COMPLEX_TYPE, help=u"""A list of OCIDs of the subnets associated with the Recovery Service subnet.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--nsg-ids', type=custom_types.CLI_COMPLEX_TYPE, help=u"""A list of network security group (NSG) OCIDs that are associated with the Recovery Service subnet. You can specify a maximum of 5 unique OCIDs, which implies that you can associate a maximum of 5 NSGs to each Recovery Service subnet. Specify an empty array if you want to remove all the associated NSGs from a Recovery Service subnet. See [Network Security Groups] for more information.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--security-attributes', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Security attributes for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].
+
+Example: `{\"Oracle-ZPR\": {\"MaxEgressCount\": {\"value\": \"42\", \"mode\": \"enforce\"}}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Simple key-value pair that is applied without any predefined name, type or scope. Exists for cross-compatibility only. Example: `{\"bar-key\": \"value\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. Example: `{\"foo-namespace\": {\"bar-key\": \"value\"}}`. For more information, see [Resource Tags]""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "WAITING", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'subnets': {'module': 'recovery', 'class': 'list[string]'}, 'nsg-ids': {'module': 'recovery', 'class': 'list[string]'}, 'freeform-tags': {'module': 'recovery', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'recovery', 'class': 'dict(str, dict(str, object))'}})
+@json_skeleton_utils.get_cli_json_input_option({'subnets': {'module': 'recovery', 'class': 'list[string]'}, 'nsg-ids': {'module': 'recovery', 'class': 'list[string]'}, 'security-attributes': {'module': 'recovery', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'recovery', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'recovery', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'subnets': {'module': 'recovery', 'class': 'list[string]'}, 'nsg-ids': {'module': 'recovery', 'class': 'list[string]'}, 'freeform-tags': {'module': 'recovery', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'recovery', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'recovery', 'class': 'RecoveryServiceSubnet'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'subnets': {'module': 'recovery', 'class': 'list[string]'}, 'nsg-ids': {'module': 'recovery', 'class': 'list[string]'}, 'security-attributes': {'module': 'recovery', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'recovery', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'recovery', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'recovery', 'class': 'RecoveryServiceSubnet'})
 @cli_util.wrap_exceptions
-def create_recovery_service_subnet(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, display_name, vcn_id, compartment_id, subnet_id, subnets, nsg_ids, freeform_tags, defined_tags):
+def create_recovery_service_subnet(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, display_name, vcn_id, compartment_id, subnet_id, subnets, nsg_ids, security_attributes, freeform_tags, defined_tags):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
@@ -591,6 +738,9 @@ def create_recovery_service_subnet(ctx, from_json, wait_for_state, max_wait_seco
 
     if nsg_ids is not None:
         _details['nsgIds'] = cli_util.parse_json_parameter("nsg_ids", nsg_ids)
+
+    if security_attributes is not None:
+        _details['securityAttributes'] = cli_util.parse_json_parameter("security_attributes", security_attributes)
 
     if freeform_tags is not None:
         _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
@@ -633,7 +783,63 @@ def create_recovery_service_subnet(ctx, from_json, wait_for_state, max_wait_seco
     cli_util.render_response(result, ctx)
 
 
-@protected_database_group.command(name=cli_util.override('recovery.delete_protected_database.command_name', 'delete'), help=u"""Deletes a protected database based on the specified protected database ID. \n[Command Reference](deleteProtectedDatabase)""")
+@long_term_backup_group.command(name=cli_util.override('recovery.delete_long_term_backup.command_name', 'delete'), help=u"""Deletes a long-term backup. You can delete a long-term backup only if the current state of the backup is ACTIVE, FAILED, or CANCELED. \n[Command Reference](deleteLongTermBackup)""")
+@cli_util.option('--long-term-backup-id', required=True, help=u"""The long term backup OCID.""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.confirm_delete_option
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "WAITING", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def delete_long_term_backup(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, long_term_backup_id, if_match):
+
+    if isinstance(long_term_backup_id, six.string_types) and len(long_term_backup_id.strip()) == 0:
+        raise click.UsageError('Parameter --long-term-backup-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('recovery', 'database_recovery', ctx)
+    result = client.delete_long_term_backup(
+        long_term_backup_id=long_term_backup_id,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Please retrieve the work request to find its current state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@protected_database_group.command(name=cli_util.override('recovery.delete_protected_database.command_name', 'delete'), help=u"""Deletes a protected database based on the specified protected database ID. Only the user or the Oracle Database service that created the protected database is allowed to modify or delete it. \n[Command Reference](deleteProtectedDatabase)""")
 @cli_util.option('--protected-database-id', required=True, help=u"""The protected database OCID.""")
 @cli_util.option('--deletion-schedule', type=custom_types.CliCaseInsensitiveChoice(["DELETE_AFTER_RETENTION_PERIOD", "DELETE_AFTER_72_HOURS"]), help=u"""Defines a preferred schedule to delete a protected database after you terminate the source database. * The default schedule is DELETE_AFTER_72_HOURS, so that the delete operation can occur 72 hours (3 days) after the source database is terminated . * The alternate schedule is DELETE_AFTER_RETENTION_PERIOD. Specify this option if you want to delete a protected database only after the policy-defined backup retention period expires.""")
 @cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
@@ -860,6 +1066,28 @@ def fetch_protected_database_configuration(ctx, from_json, file, protected_datab
         file.close()
 
 
+@long_term_backup_group.command(name=cli_util.override('recovery.get_long_term_backup.command_name', 'get'), help=u"""Retrieves information regarding a long-term backup. \n[Command Reference](getLongTermBackup)""")
+@cli_util.option('--long-term-backup-id', required=True, help=u"""The long term backup OCID.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'recovery', 'class': 'LongTermBackup'})
+@cli_util.wrap_exceptions
+def get_long_term_backup(ctx, from_json, long_term_backup_id):
+
+    if isinstance(long_term_backup_id, six.string_types) and len(long_term_backup_id.strip()) == 0:
+        raise click.UsageError('Parameter --long-term-backup-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('recovery', 'database_recovery', ctx)
+    result = client.get_long_term_backup(
+        long_term_backup_id=long_term_backup_id,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
 @protected_database_group.command(name=cli_util.override('recovery.get_protected_database.command_name', 'get'), help=u"""Gets information about a specified protected database. \n[Command Reference](getProtectedDatabase)""")
 @cli_util.option('--protected-database-id', required=True, help=u"""The protected database OCID.""")
 @json_skeleton_utils.get_cli_json_input_option({})
@@ -948,13 +1176,79 @@ def get_work_request(ctx, from_json, work_request_id):
     cli_util.render_response(result, ctx)
 
 
+@long_term_backup_collection_group.command(name=cli_util.override('recovery.list_long_term_backups.command_name', 'list-long-term-backups'), help=u"""Lists the long-term backups associated with a protected database. You can filter the results using the unique identifier (OCID) of a specific compartment, a protected database, or a long-term backup. \n[Command Reference](listLongTermBackups)""")
+@cli_util.option('--compartment-id', help=u"""The compartment OCID.""")
+@cli_util.option('--id', help=u"""The long-term backup OCID. Use longTermBackupId to filter a long-term backup based on its unique identifier.""")
+@cli_util.option('--display-name', help=u"""A filter to return only resources that match the entire 'displayname' given.""")
+@cli_util.option('--protected-database-id', help=u"""The protected database OCID. Use protectedDatabaseId to list the long-term backups of a specific protected database.""")
+@cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "UPDATING", "ACTIVE", "DELETE_SCHEDULED", "DELETING", "DELETED", "FAILED"]), help=u"""A filter to return only the resources that match the specified lifecycle state.""")
+@cli_util.option('--limit', type=click.INT, help=u"""The maximum number of items to return per page.""")
+@cli_util.option('--page', help=u"""The page token representing the page at which to start retrieving results. This is usually retrieved from a previous list call.""")
+@cli_util.option('--sort-order', type=custom_types.CliCaseInsensitiveChoice(["ASC", "DESC"]), help=u"""The sort order to use, either ascending (ASC) or descending (DESC). Allowed values are:   - ASC   - DESC""")
+@cli_util.option('--sort-by', type=custom_types.CliCaseInsensitiveChoice(["timeCreated", "displayName"]), help=u"""The field to sort by. You can provide one sort order (sortOrder). Default order for TIMECREATED is descending. Default order for DISPLAYNAME is ascending. If you do not specify a value, then TIMECREATED is used as the default sort order. Allowed values are:   - TIMECREATED   - DISPLAYNAME""")
+@cli_util.option('--all', 'all_pages', is_flag=True, help="""Fetches all pages of results. If you provide this option, then you cannot provide the --limit option.""")
+@cli_util.option('--page-size', type=click.INT, help="""When fetching results, the number of results to fetch per call. Only valid when used with --all or --limit, and ignored otherwise.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'recovery', 'class': 'LongTermBackupCollection'})
+@cli_util.wrap_exceptions
+def list_long_term_backups(ctx, from_json, all_pages, page_size, compartment_id, id, display_name, protected_database_id, lifecycle_state, limit, page, sort_order, sort_by):
+
+    if all_pages and limit:
+        raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
+
+    kwargs = {}
+    if compartment_id is not None:
+        kwargs['compartment_id'] = compartment_id
+    if id is not None:
+        kwargs['id'] = id
+    if display_name is not None:
+        kwargs['display_name'] = display_name
+    if protected_database_id is not None:
+        kwargs['protected_database_id'] = protected_database_id
+    if lifecycle_state is not None:
+        kwargs['lifecycle_state'] = lifecycle_state
+    if limit is not None:
+        kwargs['limit'] = limit
+    if page is not None:
+        kwargs['page'] = page
+    if sort_order is not None:
+        kwargs['sort_order'] = sort_order
+    if sort_by is not None:
+        kwargs['sort_by'] = sort_by
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('recovery', 'database_recovery', ctx)
+    if all_pages:
+        if page_size:
+            kwargs['limit'] = page_size
+
+        result = cli_util.list_call_get_all_results(
+            client.list_long_term_backups,
+            **kwargs
+        )
+    elif limit is not None:
+        result = cli_util.list_call_get_up_to_limit(
+            client.list_long_term_backups,
+            limit,
+            page_size,
+            **kwargs
+        )
+    else:
+        result = client.list_long_term_backups(
+            **kwargs
+        )
+    cli_util.render_response(result, ctx)
+
+
 @protected_database_collection_group.command(name=cli_util.override('recovery.list_protected_databases.command_name', 'list-protected-databases'), help=u"""Lists the protected databases based on the specified parameters. \n[Command Reference](listProtectedDatabases)""")
-@cli_util.option('--compartment-id', required=True, help=u"""The compartment OCID.""")
+@cli_util.option('--compartment-id', help=u"""The compartment OCID.""")
 @cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "UPDATING", "ACTIVE", "DELETE_SCHEDULED", "DELETING", "DELETED", "FAILED"]), help=u"""A filter to return only the resources that match the specified lifecycle state.""")
 @cli_util.option('--display-name', help=u"""A filter to return only resources that match the entire 'displayname' given.""")
 @cli_util.option('--id', help=u"""The protected database OCID.""")
 @cli_util.option('--protection-policy-id', help=u"""The protection policy OCID.""")
 @cli_util.option('--recovery-service-subnet-id', help=u"""The recovery service subnet OCID.""")
+@cli_util.option('--backup-cloud-location', type=custom_types.CliCaseInsensitiveChoice(["AZURE", "OCI", "GCP", "AWS"]), help=u"""Filter for cloud location of protected database.""")
 @cli_util.option('--limit', type=click.INT, help=u"""The maximum number of items to return per page.""")
 @cli_util.option('--page', help=u"""The page token representing the page at which to start retrieving results. This is usually retrieved from a previous list call.""")
 @cli_util.option('--sort-order', type=custom_types.CliCaseInsensitiveChoice(["ASC", "DESC"]), help=u"""The sort order to use, either ascending (ASC) or descending (DESC). Allowed values are:   - ASC   - DESC""")
@@ -966,12 +1260,14 @@ def get_work_request(ctx, from_json, work_request_id):
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'recovery', 'class': 'ProtectedDatabaseCollection'})
 @cli_util.wrap_exceptions
-def list_protected_databases(ctx, from_json, all_pages, page_size, compartment_id, lifecycle_state, display_name, id, protection_policy_id, recovery_service_subnet_id, limit, page, sort_order, sort_by):
+def list_protected_databases(ctx, from_json, all_pages, page_size, compartment_id, lifecycle_state, display_name, id, protection_policy_id, recovery_service_subnet_id, backup_cloud_location, limit, page, sort_order, sort_by):
 
     if all_pages and limit:
         raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
 
     kwargs = {}
+    if compartment_id is not None:
+        kwargs['compartment_id'] = compartment_id
     if lifecycle_state is not None:
         kwargs['lifecycle_state'] = lifecycle_state
     if display_name is not None:
@@ -982,6 +1278,8 @@ def list_protected_databases(ctx, from_json, all_pages, page_size, compartment_i
         kwargs['protection_policy_id'] = protection_policy_id
     if recovery_service_subnet_id is not None:
         kwargs['recovery_service_subnet_id'] = recovery_service_subnet_id
+    if backup_cloud_location is not None:
+        kwargs['backup_cloud_location'] = backup_cloud_location
     if limit is not None:
         kwargs['limit'] = limit
     if page is not None:
@@ -998,7 +1296,6 @@ def list_protected_databases(ctx, from_json, all_pages, page_size, compartment_i
 
         result = cli_util.list_call_get_all_results(
             client.list_protected_databases,
-            compartment_id=compartment_id,
             **kwargs
         )
     elif limit is not None:
@@ -1006,23 +1303,22 @@ def list_protected_databases(ctx, from_json, all_pages, page_size, compartment_i
             client.list_protected_databases,
             limit,
             page_size,
-            compartment_id=compartment_id,
             **kwargs
         )
     else:
         result = client.list_protected_databases(
-            compartment_id=compartment_id,
             **kwargs
         )
     cli_util.render_response(result, ctx)
 
 
 @protection_policy_collection_group.command(name=cli_util.override('recovery.list_protection_policies.command_name', 'list-protection-policies'), help=u"""Gets a list of protection policies based on the specified parameters. \n[Command Reference](listProtectionPolicies)""")
-@cli_util.option('--compartment-id', required=True, help=u"""The compartment OCID.""")
+@cli_util.option('--compartment-id', help=u"""The compartment OCID.""")
 @cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "UPDATING", "ACTIVE", "DELETE_SCHEDULED", "DELETING", "DELETED", "FAILED"]), help=u"""A filter to return only resources their lifecycleState matches the given lifecycleState.""")
 @cli_util.option('--display-name', help=u"""A filter to return only resources that match the entire 'displayname' given.""")
 @cli_util.option('--protection-policy-id', help=u"""The protection policy OCID.""")
 @cli_util.option('--owner', type=custom_types.CliCaseInsensitiveChoice(["oracle", "customer"]), help=u"""A filter to return only the policies that match the owner as 'Customer' or 'Oracle'.""")
+@cli_util.option('--must-enforce-cloud-locality', type=click.BOOL, help=u"""A filter to return only the protection policies that enforce backup colocation (mustEnforceCloudLocality is set to TRUE).""")
 @cli_util.option('--limit', type=click.INT, help=u"""The maximum number of items to return. Specify a value greater than 4.""")
 @cli_util.option('--page', help=u"""The page token representing the page at which to start retrieving results. This is usually retrieved from a previous list call.""")
 @cli_util.option('--sort-order', type=custom_types.CliCaseInsensitiveChoice(["ASC", "DESC"]), help=u"""The sort order to use, either ascending (ASC) or descending (DESC). Allowed values are:   - ASC   - DESC""")
@@ -1034,12 +1330,14 @@ def list_protected_databases(ctx, from_json, all_pages, page_size, compartment_i
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'recovery', 'class': 'ProtectionPolicyCollection'})
 @cli_util.wrap_exceptions
-def list_protection_policies(ctx, from_json, all_pages, page_size, compartment_id, lifecycle_state, display_name, protection_policy_id, owner, limit, page, sort_order, sort_by):
+def list_protection_policies(ctx, from_json, all_pages, page_size, compartment_id, lifecycle_state, display_name, protection_policy_id, owner, must_enforce_cloud_locality, limit, page, sort_order, sort_by):
 
     if all_pages and limit:
         raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
 
     kwargs = {}
+    if compartment_id is not None:
+        kwargs['compartment_id'] = compartment_id
     if lifecycle_state is not None:
         kwargs['lifecycle_state'] = lifecycle_state
     if display_name is not None:
@@ -1048,6 +1346,8 @@ def list_protection_policies(ctx, from_json, all_pages, page_size, compartment_i
         kwargs['protection_policy_id'] = protection_policy_id
     if owner is not None:
         kwargs['owner'] = owner
+    if must_enforce_cloud_locality is not None:
+        kwargs['must_enforce_cloud_locality'] = must_enforce_cloud_locality
     if limit is not None:
         kwargs['limit'] = limit
     if page is not None:
@@ -1064,7 +1364,6 @@ def list_protection_policies(ctx, from_json, all_pages, page_size, compartment_i
 
         result = cli_util.list_call_get_all_results(
             client.list_protection_policies,
-            compartment_id=compartment_id,
             **kwargs
         )
     elif limit is not None:
@@ -1072,19 +1371,17 @@ def list_protection_policies(ctx, from_json, all_pages, page_size, compartment_i
             client.list_protection_policies,
             limit,
             page_size,
-            compartment_id=compartment_id,
             **kwargs
         )
     else:
         result = client.list_protection_policies(
-            compartment_id=compartment_id,
             **kwargs
         )
     cli_util.render_response(result, ctx)
 
 
 @recovery_service_subnet_collection_group.command(name=cli_util.override('recovery.list_recovery_service_subnets.command_name', 'list-recovery-service-subnets'), help=u"""Returns a list of Recovery Service Subnets. \n[Command Reference](listRecoveryServiceSubnets)""")
-@cli_util.option('--compartment-id', required=True, help=u"""The compartment OCID.""")
+@cli_util.option('--compartment-id', help=u"""The compartment OCID.""")
 @cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "UPDATING", "ACTIVE", "DELETE_SCHEDULED", "DELETING", "DELETED", "FAILED"]), help=u"""A filter to return only the resources that match the specified lifecycle state.""")
 @cli_util.option('--display-name', help=u"""A filter to return only resources that match the entire 'displayname' given.""")
 @cli_util.option('--id', help=u"""The recovery service subnet OCID.""")
@@ -1106,6 +1403,8 @@ def list_recovery_service_subnets(ctx, from_json, all_pages, page_size, compartm
         raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
 
     kwargs = {}
+    if compartment_id is not None:
+        kwargs['compartment_id'] = compartment_id
     if lifecycle_state is not None:
         kwargs['lifecycle_state'] = lifecycle_state
     if display_name is not None:
@@ -1130,7 +1429,6 @@ def list_recovery_service_subnets(ctx, from_json, all_pages, page_size, compartm
 
         result = cli_util.list_call_get_all_results(
             client.list_recovery_service_subnets,
-            compartment_id=compartment_id,
             **kwargs
         )
     elif limit is not None:
@@ -1138,12 +1436,10 @@ def list_recovery_service_subnets(ctx, from_json, all_pages, page_size, compartm
             client.list_recovery_service_subnets,
             limit,
             page_size,
-            compartment_id=compartment_id,
             **kwargs
         )
     else:
         result = client.list_recovery_service_subnets(
-            compartment_id=compartment_id,
             **kwargs
         )
     cli_util.render_response(result, ctx)
@@ -1264,7 +1560,7 @@ def list_work_request_logs(ctx, from_json, all_pages, page_size, work_request_id
 
 
 @work_request_summary_collection_group.command(name=cli_util.override('recovery.list_work_requests.command_name', 'list-work-requests'), help=u"""Lists the work requests in a compartment. \n[Command Reference](listWorkRequests)""")
-@cli_util.option('--compartment-id', required=True, help=u"""The compartment OCID.""")
+@cli_util.option('--compartment-id', help=u"""The compartment OCID.""")
 @cli_util.option('--work-request-id', help=u"""Unique Oracle-assigned identifier of the work request.""")
 @cli_util.option('--status', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "WAITING", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), help=u"""A filter to return only resources their lifecycleState matches the given OperationStatus.""")
 @cli_util.option('--resource-id', help=u"""The ID of the resource affected by the work request.""")
@@ -1285,6 +1581,8 @@ def list_work_requests(ctx, from_json, all_pages, page_size, compartment_id, wor
         raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
 
     kwargs = {}
+    if compartment_id is not None:
+        kwargs['compartment_id'] = compartment_id
     if work_request_id is not None:
         kwargs['work_request_id'] = work_request_id
     if status is not None:
@@ -1307,7 +1605,6 @@ def list_work_requests(ctx, from_json, all_pages, page_size, compartment_id, wor
 
         result = cli_util.list_call_get_all_results(
             client.list_work_requests,
-            compartment_id=compartment_id,
             **kwargs
         )
     elif limit is not None:
@@ -1315,18 +1612,18 @@ def list_work_requests(ctx, from_json, all_pages, page_size, compartment_id, wor
             client.list_work_requests,
             limit,
             page_size,
-            compartment_id=compartment_id,
             **kwargs
         )
     else:
         result = client.list_work_requests(
-            compartment_id=compartment_id,
             **kwargs
         )
     cli_util.render_response(result, ctx)
 
 
-@protected_database_group.command(name=cli_util.override('recovery.schedule_protected_database_deletion.command_name', 'schedule-protected-database-deletion'), help=u"""Defines a preferred schedule to delete a protected database after you terminate the source database. The default schedule is DELETE_AFTER_72_HOURS, so that the delete operation can occur 72 hours (3 days) after the source database is terminated. The alternate schedule is DELETE_AFTER_RETENTION_PERIOD. Specify this option if you want to delete a protected database only after the policy-defined backup retention period expires. \n[Command Reference](scheduleProtectedDatabaseDeletion)""")
+@protected_database_group.command(name=cli_util.override('recovery.schedule_protected_database_deletion.command_name', 'schedule-protected-database-deletion'), help=u"""Defines a preferred schedule to delete a protected database after you terminate the source database. Only the user or the Oracle Database service that created the protected database is allowed to modify or delete it.
+
+The default schedule is DELETE_AFTER_72_HOURS, so that the delete operation can occur 72 hours (3 days) after the source database is terminated. The alternate schedule is DELETE_AFTER_RETENTION_PERIOD. Specify this option if you want to delete a protected database only after the policy-defined backup retention period expires. \n[Command Reference](scheduleProtectedDatabaseDeletion)""")
 @cli_util.option('--protected-database-id', required=True, help=u"""The protected database OCID.""")
 @cli_util.option('--deletion-schedule', type=custom_types.CliCaseInsensitiveChoice(["DELETE_AFTER_RETENTION_PERIOD", "DELETE_AFTER_72_HOURS"]), help=u"""Defines a preferred schedule to delete a protected database after you terminate the source database. * The default schedule is DELETE_AFTER_72_HOURS, so that the delete operation can occur 72 hours (3 days) after the source database is terminated. * The alternate schedule is DELETE_AFTER_RETENTION_PERIOD. Specify this option if you want to delete a protected database only after the policy-defined backup retention period expires.""")
 @cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
@@ -1357,6 +1654,88 @@ def schedule_protected_database_deletion(ctx, from_json, wait_for_state, max_wai
     result = client.schedule_protected_database_deletion(
         protected_database_id=protected_database_id,
         schedule_protected_database_deletion_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@long_term_backup_group.command(name=cli_util.override('recovery.update_long_term_backup.command_name', 'update'), help=u"""Updates the specified long term backup. \n[Command Reference](updateLongTermBackup)""")
+@cli_util.option('--long-term-backup-id', required=True, help=u"""The long term backup OCID.""")
+@cli_util.option('--display-name', help=u"""A user provided name for the long term backup. The 'displayName' does not have to be unique, and it can be modified. Avoid entering confidential information.""")
+@cli_util.option('--retention-period', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The maximum period to retain the long-term backup. Specify the retention period type and the duration for the long-term backup. If you have chosen the retention period type as 'DAYS', then specify a duration ranging from 90 days to 3650 days. If you have chosen the retention period type as 'YEARS', then specify a duration ranging from 1 year to 10 years.
+
+This option is a JSON list with items of type RetentionPeriodValue.  For documentation on RetentionPeriodValue please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/databaserecovery/20210216/datatypes/RetentionPeriodValue.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Simple key-value pair that is applied without any predefined name, type or scope. Exists for cross-compatibility only. Example: `{\"bar-key\": \"value\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. Example: `{\"foo-namespace\": {\"bar-key\": \"value\"}}`. For more information, see [Resource Tags]""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "WAITING", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'retention-period': {'module': 'recovery', 'class': 'list[RetentionPeriodValue]'}, 'freeform-tags': {'module': 'recovery', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'recovery', 'class': 'dict(str, dict(str, object))'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'retention-period': {'module': 'recovery', 'class': 'list[RetentionPeriodValue]'}, 'freeform-tags': {'module': 'recovery', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'recovery', 'class': 'dict(str, dict(str, object))'}})
+@cli_util.wrap_exceptions
+def update_long_term_backup(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, long_term_backup_id, display_name, retention_period, freeform_tags, defined_tags, if_match):
+
+    if isinstance(long_term_backup_id, six.string_types) and len(long_term_backup_id.strip()) == 0:
+        raise click.UsageError('Parameter --long-term-backup-id cannot be whitespace or empty string')
+    if not force:
+        if retention_period or freeform_tags or defined_tags:
+            if not click.confirm("WARNING: Updates to retention-period and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
+                ctx.abort()
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+
+    if display_name is not None:
+        _details['displayName'] = display_name
+
+    if retention_period is not None:
+        _details['retentionPeriod'] = cli_util.parse_json_parameter("retention_period", retention_period)
+
+    if freeform_tags is not None:
+        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
+
+    if defined_tags is not None:
+        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    client = cli_util.build_client('recovery', 'database_recovery', ctx)
+    result = client.update_long_term_backup(
+        long_term_backup_id=long_term_backup_id,
+        update_long_term_backup_details=_details,
         **kwargs
     )
     if wait_for_state:
@@ -1582,6 +1961,9 @@ def update_protection_policy(ctx, from_json, force, wait_for_state, max_wait_sec
 @cli_util.option('--display-name', help=u"""A user-provided name for the recovery service subnet. The 'displayName' does not have to be unique, and it can be modified. Avoid entering confidential information.""")
 @cli_util.option('--subnets', type=custom_types.CLI_COMPLEX_TYPE, help=u"""A list of OCIDs of the subnets associated with the recovery service subnet.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--nsg-ids', type=custom_types.CLI_COMPLEX_TYPE, help=u"""A list of network security group (NSG) OCIDs that are associated with the Recovery Service subnet. You can specify a maximum of 5 unique OCIDs, which implies that you can associate a maximum of 5 NSGs to each Recovery Service subnet. Specify an empty array if you want to remove all the associated NSGs from a Recovery Service subnet. See [Network Security Groups] for more information.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--security-attributes', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Security attributes for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].
+
+Example: `{\"Oracle-ZPR\": {\"MaxEgressCount\": {\"value\": \"42\", \"mode\": \"enforce\"}}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Simple key-value pair that is applied without any predefined name, type or scope. Exists for cross-compatibility only. Example: `{\"bar-key\": \"value\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. Example: `{\"foo-namespace\": {\"bar-key\": \"value\"}}`. For more information, see [Resource Tags]""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
@@ -1589,18 +1971,18 @@ def update_protection_policy(ctx, from_json, force, wait_for_state, max_wait_sec
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "WAITING", "IN_PROGRESS", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'subnets': {'module': 'recovery', 'class': 'list[string]'}, 'nsg-ids': {'module': 'recovery', 'class': 'list[string]'}, 'freeform-tags': {'module': 'recovery', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'recovery', 'class': 'dict(str, dict(str, object))'}})
+@json_skeleton_utils.get_cli_json_input_option({'subnets': {'module': 'recovery', 'class': 'list[string]'}, 'nsg-ids': {'module': 'recovery', 'class': 'list[string]'}, 'security-attributes': {'module': 'recovery', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'recovery', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'recovery', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'subnets': {'module': 'recovery', 'class': 'list[string]'}, 'nsg-ids': {'module': 'recovery', 'class': 'list[string]'}, 'freeform-tags': {'module': 'recovery', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'recovery', 'class': 'dict(str, dict(str, object))'}})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'subnets': {'module': 'recovery', 'class': 'list[string]'}, 'nsg-ids': {'module': 'recovery', 'class': 'list[string]'}, 'security-attributes': {'module': 'recovery', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'recovery', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'recovery', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.wrap_exceptions
-def update_recovery_service_subnet(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, recovery_service_subnet_id, display_name, subnets, nsg_ids, freeform_tags, defined_tags, if_match):
+def update_recovery_service_subnet(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, recovery_service_subnet_id, display_name, subnets, nsg_ids, security_attributes, freeform_tags, defined_tags, if_match):
 
     if isinstance(recovery_service_subnet_id, six.string_types) and len(recovery_service_subnet_id.strip()) == 0:
         raise click.UsageError('Parameter --recovery-service-subnet-id cannot be whitespace or empty string')
     if not force:
-        if subnets or nsg_ids or freeform_tags or defined_tags:
-            if not click.confirm("WARNING: Updates to subnets and nsg-ids and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
+        if subnets or nsg_ids or security_attributes or freeform_tags or defined_tags:
+            if not click.confirm("WARNING: Updates to subnets and nsg-ids and security-attributes and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
                 ctx.abort()
 
     kwargs = {}
@@ -1618,6 +2000,9 @@ def update_recovery_service_subnet(ctx, from_json, force, wait_for_state, max_wa
 
     if nsg_ids is not None:
         _details['nsgIds'] = cli_util.parse_json_parameter("nsg_ids", nsg_ids)
+
+    if security_attributes is not None:
+        _details['securityAttributes'] = cli_util.parse_json_parameter("security_attributes", security_attributes)
 
     if freeform_tags is not None:
         _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)

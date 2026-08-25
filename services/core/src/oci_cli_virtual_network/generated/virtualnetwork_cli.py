@@ -5319,7 +5319,7 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @cli_util.option('--is-vtap-enabled', type=click.BOOL, help=u"""Used to start or stop a `Vtap` resource.
 
 * `TRUE` directs the VTAP to start mirroring traffic. * `FALSE` (Default) directs the VTAP to stop mirroring traffic.""")
-@cli_util.option('--source-type', type=custom_types.CliCaseInsensitiveChoice(["VNIC", "SUBNET", "LOAD_BALANCER", "DB_SYSTEM", "EXADATA_VM_CLUSTER", "AUTONOMOUS_DATA_WAREHOUSE"]), help=u"""The source type for the VTAP.""")
+@cli_util.option('--source-type', type=custom_types.CliCaseInsensitiveChoice(["VNIC", "SUBNET", "LOAD_BALANCER", "DB_SYSTEM", "EXADATA_VM_CLUSTER", "AUTONOMOUS_DATA_WAREHOUSE", "NETWORK_FIREWALL"]), help=u"""The source type for the VTAP.""")
 @cli_util.option('--traffic-mode', type=custom_types.CliCaseInsensitiveChoice(["DEFAULT", "PRIORITY"]), help=u"""Used to control the priority of traffic. It is an optional field. If it not passed, the value is DEFAULT""")
 @cli_util.option('--max-packet-size', type=click.INT, help=u"""The maximum size of the packets to be included in the filter.""")
 @cli_util.option('--target-type', type=custom_types.CliCaseInsensitiveChoice(["VNIC", "NETWORK_LOAD_BALANCER", "IP_ADDRESS"]), help=u"""The target type for the VTAP.""")
@@ -15652,7 +15652,7 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @cli_util.option('--source-private-endpoint-ip', help=u"""The IP Address of the source private endpoint.""")
 @cli_util.option('--source-private-endpoint-subnet-id', help=u"""The [OCID] of the subnet that source private endpoint belongs to.""")
 @cli_util.option('--target-type', type=custom_types.CliCaseInsensitiveChoice(["VNIC", "NETWORK_LOAD_BALANCER", "IP_ADDRESS"]), help=u"""The target type for the VTAP.""")
-@cli_util.option('--source-type', type=custom_types.CliCaseInsensitiveChoice(["VNIC", "SUBNET", "LOAD_BALANCER", "DB_SYSTEM", "EXADATA_VM_CLUSTER", "AUTONOMOUS_DATA_WAREHOUSE"]), help=u"""The source type for the VTAP.""")
+@cli_util.option('--source-type', type=custom_types.CliCaseInsensitiveChoice(["VNIC", "SUBNET", "LOAD_BALANCER", "DB_SYSTEM", "EXADATA_VM_CLUSTER", "AUTONOMOUS_DATA_WAREHOUSE", "NETWORK_FIREWALL"]), help=u"""The source type for the VTAP.""")
 @cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
 @cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["PROVISIONING", "AVAILABLE", "UPDATING", "TERMINATING", "TERMINATED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state PROVISIONING --wait-for-state TERMINATED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
