@@ -615,3 +615,5 @@ db, database, create-from-backup
 data-safe, private-endpoint, update
 db, database, create-from-database
 db, database, create-database-from-database
+iot, iot-flow-runtime, update-iot-flow-runtime-flows
+iot, flow-runtime, update-flows

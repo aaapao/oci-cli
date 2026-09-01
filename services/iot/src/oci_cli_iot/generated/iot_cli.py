@@ -63,6 +63,12 @@ def digital_twin_adapter_group():
     pass
 
 
+@click.command(cli_util.override('iot.iot_flow_runtime_group.command_name', 'iot-flow-runtime'), cls=CommandGroupWithAlias, help="""An IoT flow runtime is a managed Node-RED runtime in an IoT domain for building and running Node-RED flows.""")
+@cli_util.help_option_group
+def iot_flow_runtime_group():
+    pass
+
+
 @click.command(cli_util.override('iot.work_request_group.command_name', 'work-request'), cls=CommandGroupWithAlias, help="""An asynchronous work request helps monitor long-running operations. When you initiate a long-running operation, the service creates a work request. This work request acts as an activity log, allowing you to track each step of the operation\u2019s progress. Each work request has an OCID, enabling programmatic interaction and automation.""")
 @cli_util.help_option_group
 def work_request_group():
@@ -82,8 +88,64 @@ iot_root_group.add_command(digital_twin_relationship_group)
 iot_root_group.add_command(digital_twin_model_group)
 iot_root_group.add_command(iot_domain_group_group)
 iot_root_group.add_command(digital_twin_adapter_group)
+iot_root_group.add_command(iot_flow_runtime_group)
 iot_root_group.add_command(work_request_group)
 iot_root_group.add_command(digital_twin_instance_group)
+
+
+@iot_flow_runtime_group.command(name=cli_util.override('iot.activate_iot_flow_runtime.command_name', 'activate'), help=u"""Activates the IoT flow runtime identified by the specified OCID. \n[Command Reference](activateIotFlowRuntime)""")
+@cli_util.option('--iot-flow-runtime-id', required=True, help=u"""The [OCID] of an IoT flow runtime.""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "NEEDS_ATTENTION", "FAILED", "SUCCEEDED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state SUCCEEDED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def activate_iot_flow_runtime(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, iot_flow_runtime_id, if_match):
+
+    if isinstance(iot_flow_runtime_id, six.string_types) and len(iot_flow_runtime_id.strip()) == 0:
+        raise click.UsageError('Parameter --iot-flow-runtime-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('iot', 'iot', ctx)
+    result = client.activate_iot_flow_runtime(
+        iot_flow_runtime_id=iot_flow_runtime_id,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
 
 
 @iot_domain_group.command(name=cli_util.override('iot.change_iot_domain_compartment.command_name', 'change-compartment'), help=u"""Moves an IoT domain to a different compartment within the same tenancy. For information about moving resources between compartments, see [Moving Resources to a Different Compartment]. \n[Command Reference](changeIotDomainCompartment)""")
@@ -239,6 +301,67 @@ def change_iot_domain_group_compartment(ctx, from_json, wait_for_state, max_wait
     result = client.change_iot_domain_group_compartment(
         iot_domain_group_id=iot_domain_group_id,
         change_iot_domain_group_compartment_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@iot_flow_runtime_group.command(name=cli_util.override('iot.change_iot_flow_runtime_compartment.command_name', 'change-compartment'), help=u"""Moves an IoT flow runtime to a different compartment within the same tenancy. For information about moving resources between compartments, see [Moving Resources to a Different Compartment]. \n[Command Reference](changeIotFlowRuntimeCompartment)""")
+@cli_util.option('--iot-flow-runtime-id', required=True, help=u"""The [OCID] of an IoT flow runtime.""")
+@cli_util.option('--compartment-id', required=True, help=u"""The [OCID] of the compartment corresponding to the resource.""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "NEEDS_ATTENTION", "FAILED", "SUCCEEDED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state SUCCEEDED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def change_iot_flow_runtime_compartment(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, iot_flow_runtime_id, compartment_id, if_match):
+
+    if isinstance(iot_flow_runtime_id, six.string_types) and len(iot_flow_runtime_id.strip()) == 0:
+        raise click.UsageError('Parameter --iot-flow-runtime-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['compartmentId'] = compartment_id
+
+    client = cli_util.build_client('iot', 'iot', ctx)
+    result = client.change_iot_flow_runtime_compartment(
+        iot_flow_runtime_id=iot_flow_runtime_id,
+        change_iot_flow_runtime_compartment_details=_details,
         **kwargs
     )
     if wait_for_state:
@@ -671,7 +794,7 @@ def create_digital_twin_adapter(ctx, from_json, wait_for_state, max_wait_seconds
 
 @digital_twin_instance_group.command(name=cli_util.override('iot.create_digital_twin_instance.command_name', 'create'), help=u"""Creates a new digital twin instance. \n[Command Reference](createDigitalTwinInstance)""")
 @cli_util.option('--iot-domain-id', required=True, help=u"""The [OCID] of the IoT domain.""")
-@cli_util.option('--connectivity-type', type=custom_types.CliCaseInsensitiveChoice(["DIRECT", "INDIRECT", "GATEWAY", "NONE"]), help=u"""Connectivity type of the digital twin instance""")
+@cli_util.option('--connectivity-type', type=custom_types.CliCaseInsensitiveChoice(["DIRECT", "INDIRECT", "GATEWAY", "NONE"]), help=u"""Connectivity type of the digital twin instance.""")
 @cli_util.option('--auth-id', help=u"""The [OCID] of the resource (like VaultSecret, ClientCertificate etc.,) used to authenticate the digital twin instance.""")
 @cli_util.option('--external-key', help=u"""A unique identifier for the physical entity (typically an IoT device) represented by the digital twin instance. This could be a Bluetooth address, Ethernet MAC address, or serial number, depending on the use case. If not provided, the system will automatically generate one.""")
 @cli_util.option('--display-name', help=u"""A user-friendly name. Does not have to be unique, and it's changeable. Avoid entering confidential information.""")
@@ -1036,6 +1159,148 @@ def create_iot_domain_group(ctx, from_json, wait_for_state, max_wait_seconds, wa
     client = cli_util.build_client('iot', 'iot', ctx)
     result = client.create_iot_domain_group(
         create_iot_domain_group_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@iot_flow_runtime_group.command(name=cli_util.override('iot.create_iot_flow_runtime.command_name', 'create'), help=u"""Creates an IoT flow runtime. \n[Command Reference](createIotFlowRuntime)""")
+@cli_util.option('--iot-domain-id', required=True, help=u"""The [OCID] of the IoT domain.""")
+@cli_util.option('--compartment-id', required=True, help=u"""The [OCID] of the compartment corresponding to the resource.""")
+@cli_util.option('--scale', type=custom_types.CliCaseInsensitiveChoice(["LOWEST", "LOW", "MEDIUM", "HIGH", "HIGHEST"]), help=u"""The scale of the IoT flow runtime. Larger values allocate more CPU and memory for higher throughput and operational headroom. MEDIUM is the default value.""")
+@cli_util.option('--network-config', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--log-config', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--display-name', help=u"""A user-friendly name. Does not have to be unique, and it's changeable. Avoid entering confidential information.""")
+@cli_util.option('--description', help=u"""A short description of the resource.""")
+@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
+
+Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].
+
+Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "NEEDS_ATTENTION", "FAILED", "SUCCEEDED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state SUCCEEDED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'network-config': {'module': 'iot', 'class': 'NetworkConfigDetails'}, 'log-config': {'module': 'iot', 'class': 'LogConfigDetails'}, 'freeform-tags': {'module': 'iot', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'iot', 'class': 'dict(str, dict(str, object))'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'network-config': {'module': 'iot', 'class': 'NetworkConfigDetails'}, 'log-config': {'module': 'iot', 'class': 'LogConfigDetails'}, 'freeform-tags': {'module': 'iot', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'iot', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'iot', 'class': 'IotFlowRuntime'})
+@cli_util.wrap_exceptions
+def create_iot_flow_runtime(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, iot_domain_id, compartment_id, scale, network_config, log_config, display_name, description, freeform_tags, defined_tags):
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['iotDomainId'] = iot_domain_id
+    _details['compartmentId'] = compartment_id
+
+    if scale is not None:
+        _details['scale'] = scale
+
+    if network_config is not None:
+        _details['networkConfig'] = cli_util.parse_json_parameter("network_config", network_config)
+
+    if log_config is not None:
+        _details['logConfig'] = cli_util.parse_json_parameter("log_config", log_config)
+
+    if display_name is not None:
+        _details['displayName'] = display_name
+
+    if description is not None:
+        _details['description'] = description
+
+    if freeform_tags is not None:
+        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
+
+    if defined_tags is not None:
+        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    client = cli_util.build_client('iot', 'iot', ctx)
+    result = client.create_iot_flow_runtime(
+        create_iot_flow_runtime_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@iot_flow_runtime_group.command(name=cli_util.override('iot.deactivate_iot_flow_runtime.command_name', 'deactivate'), help=u"""Deactivates the IoT flow runtime identified by the specified OCID. \n[Command Reference](deactivateIotFlowRuntime)""")
+@cli_util.option('--iot-flow-runtime-id', required=True, help=u"""The [OCID] of an IoT flow runtime.""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "NEEDS_ATTENTION", "FAILED", "SUCCEEDED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state SUCCEEDED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def deactivate_iot_flow_runtime(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, iot_flow_runtime_id, if_match):
+
+    if isinstance(iot_flow_runtime_id, six.string_types) and len(iot_flow_runtime_id.strip()) == 0:
+        raise click.UsageError('Parameter --iot-flow-runtime-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('iot', 'iot', ctx)
+    result = client.deactivate_iot_flow_runtime(
+        iot_flow_runtime_id=iot_flow_runtime_id,
         **kwargs
     )
     if wait_for_state:
@@ -1436,6 +1701,62 @@ def delete_iot_domain_group(ctx, from_json, wait_for_state, max_wait_seconds, wa
     cli_util.render_response(result, ctx)
 
 
+@iot_flow_runtime_group.command(name=cli_util.override('iot.delete_iot_flow_runtime.command_name', 'delete'), help=u"""Deletes the IoT flow runtime identified by the specified OCID. \n[Command Reference](deleteIotFlowRuntime)""")
+@cli_util.option('--iot-flow-runtime-id', required=True, help=u"""The [OCID] of an IoT flow runtime.""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.confirm_delete_option
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "NEEDS_ATTENTION", "FAILED", "SUCCEEDED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state SUCCEEDED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def delete_iot_flow_runtime(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, iot_flow_runtime_id, if_match):
+
+    if isinstance(iot_flow_runtime_id, six.string_types) and len(iot_flow_runtime_id.strip()) == 0:
+        raise click.UsageError('Parameter --iot-flow-runtime-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('iot', 'iot', ctx)
+    result = client.delete_iot_flow_runtime(
+        iot_flow_runtime_id=iot_flow_runtime_id,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Please retrieve the work request to find its current state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
 @digital_twin_adapter_group.command(name=cli_util.override('iot.get_digital_twin_adapter.command_name', 'get'), help=u"""Retrieves the digital twin adapter identified by the specified OCID. \n[Command Reference](getDigitalTwinAdapter)""")
 @cli_util.option('--digital-twin-adapter-id', required=True, help=u"""The [OCID] of the digital twin adapter.""")
 @json_skeleton_utils.get_cli_json_input_option({})
@@ -1610,6 +1931,50 @@ def get_iot_domain_group(ctx, from_json, iot_domain_group_id):
     client = cli_util.build_client('iot', 'iot', ctx)
     result = client.get_iot_domain_group(
         iot_domain_group_id=iot_domain_group_id,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
+@iot_flow_runtime_group.command(name=cli_util.override('iot.get_iot_flow_runtime.command_name', 'get'), help=u"""Gets the IoT flow runtime identified by the specified OCID. \n[Command Reference](getIotFlowRuntime)""")
+@cli_util.option('--iot-flow-runtime-id', required=True, help=u"""The [OCID] of an IoT flow runtime.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'iot', 'class': 'IotFlowRuntime'})
+@cli_util.wrap_exceptions
+def get_iot_flow_runtime(ctx, from_json, iot_flow_runtime_id):
+
+    if isinstance(iot_flow_runtime_id, six.string_types) and len(iot_flow_runtime_id.strip()) == 0:
+        raise click.UsageError('Parameter --iot-flow-runtime-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('iot', 'iot', ctx)
+    result = client.get_iot_flow_runtime(
+        iot_flow_runtime_id=iot_flow_runtime_id,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
+@iot_flow_runtime_group.command(name=cli_util.override('iot.get_iot_flow_runtime_flows.command_name', 'get-iot-flow-runtime-flows'), help=u"""Gets the opaque flows document for the IoT flow runtime identified by the specified OCID. \n[Command Reference](getIotFlowRuntimeFlows)""")
+@cli_util.option('--iot-flow-runtime-id', required=True, help=u"""The [OCID] of an IoT flow runtime.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def get_iot_flow_runtime_flows(ctx, from_json, iot_flow_runtime_id):
+
+    if isinstance(iot_flow_runtime_id, six.string_types) and len(iot_flow_runtime_id.strip()) == 0:
+        raise click.UsageError('Parameter --iot-flow-runtime-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('iot', 'iot', ctx)
+    result = client.get_iot_flow_runtime_flows(
+        iot_flow_runtime_id=iot_flow_runtime_id,
         **kwargs
     )
     cli_util.render_response(result, ctx)
@@ -1830,7 +2195,7 @@ def invoke_raw_command_invoke_raw_json_command_details(ctx, from_json, digital_t
 
 
 @digital_twin_adapter_group.command(name=cli_util.override('iot.list_digital_twin_adapters.command_name', 'list'), help=u"""Retrieves a list of digital twin adapters within the specified IoT domain. \n[Command Reference](listDigitalTwinAdapters)""")
-@cli_util.option('--iot-domain-id', required=True, help=u"""The [OCID] of the IoT domain in which to list digital twin resources.""")
+@cli_util.option('--iot-domain-id', required=True, help=u"""The [OCID] of the IoT domain in which to list IoT resources.""")
 @cli_util.option('--id', help=u"""Filter resources by [OCID]. Must be a valid OCID of the resource type.""")
 @cli_util.option('--digital-twin-model-spec-uri', help=u"""Filter resources that match the specified URI (DTMI) of the digital twin model.""")
 @cli_util.option('--digital-twin-model-id', help=u"""Filter resources that match the specified [OCID] of the digital twin model.""")
@@ -1899,7 +2264,7 @@ def list_digital_twin_adapters(ctx, from_json, all_pages, page_size, iot_domain_
 
 
 @digital_twin_instance_group.command(name=cli_util.override('iot.list_digital_twin_instances.command_name', 'list'), help=u"""Retrieves a list of digital twin instances within the specified IoT domain. \n[Command Reference](listDigitalTwinInstances)""")
-@cli_util.option('--iot-domain-id', required=True, help=u"""The [OCID] of the IoT domain in which to list digital twin resources.""")
+@cli_util.option('--iot-domain-id', required=True, help=u"""The [OCID] of the IoT domain in which to list IoT resources.""")
 @cli_util.option('--display-name', help=u"""Filter resources whose display name matches the specified value.""")
 @cli_util.option('--limit', type=click.INT, help=u"""For list pagination. The maximum number of results per page, or items to return in a paginated \"List\" call. For important details about how pagination works, see [List Pagination].""")
 @cli_util.option('--page', help=u"""Page representing the requested page of items.""")
@@ -1971,7 +2336,7 @@ def list_digital_twin_instances(ctx, from_json, all_pages, page_size, iot_domain
 
 
 @digital_twin_model_group.command(name=cli_util.override('iot.list_digital_twin_models.command_name', 'list'), help=u"""Retrieves a list of digital twin models within the specified IoT domain. \n[Command Reference](listDigitalTwinModels)""")
-@cli_util.option('--iot-domain-id', required=True, help=u"""The [OCID] of the IoT domain in which to list digital twin resources.""")
+@cli_util.option('--iot-domain-id', required=True, help=u"""The [OCID] of the IoT domain in which to list IoT resources.""")
 @cli_util.option('--id', help=u"""Filter resources by [OCID]. Must be a valid OCID of the resource type.""")
 @cli_util.option('--display-name', help=u"""Filter resources whose display name matches the specified value.""")
 @cli_util.option('--spec-uri-starts-with', help=u"""Filters resources by spec URI prefix. For example, to search all versions of the `dtmi:example:device;1` model, pass the prefix without the version: `dtmi:example:device`.""")
@@ -2037,7 +2402,7 @@ def list_digital_twin_models(ctx, from_json, all_pages, page_size, iot_domain_id
 
 
 @digital_twin_relationship_group.command(name=cli_util.override('iot.list_digital_twin_relationships.command_name', 'list'), help=u"""Retrieves a list of digital twin relationships within the specified IoT domain. \n[Command Reference](listDigitalTwinRelationships)""")
-@cli_util.option('--iot-domain-id', required=True, help=u"""The [OCID] of the IoT domain in which to list digital twin resources.""")
+@cli_util.option('--iot-domain-id', required=True, help=u"""The [OCID] of the IoT domain in which to list IoT resources.""")
 @cli_util.option('--display-name', help=u"""Filter resources whose display name matches the specified value.""")
 @cli_util.option('--content-path', help=u"""Filters resources that match the content path of the digital twin relationship.""")
 @cli_util.option('--source-digital-twin-instance-id', help=u"""Filter resources that match the specified [OCID] of source digital twin instance.""")
@@ -2113,7 +2478,7 @@ def list_digital_twin_relationships(ctx, from_json, all_pages, page_size, iot_do
 @cli_util.option('--id', help=u"""Filter resources by [OCID]. Must be a valid OCID of the resource type.""")
 @cli_util.option('--display-name', help=u"""Filter resources whose display name matches the specified value.""")
 @cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "UPDATING", "ACTIVE", "DELETING", "DELETED", "FAILED"]), help=u"""Filter resources whose lifecycleState matches the specified value.""")
-@cli_util.option('--type', type=custom_types.CliCaseInsensitiveChoice(["PRODUCTION", "DEVELOPMENT", "STANDARD", "LIGHTWEIGHT"]), help=u"""Filter resources by type. Valid values are LIGHTWEIGHT or STANDARD.""")
+@cli_util.option('--type', type=custom_types.CliCaseInsensitiveChoice(["PRODUCTION", "DEVELOPMENT", "STANDARD", "LIGHTWEIGHT"]), help=u"""Filter resources by type. Valid values are DEVELOPMENT or PRODUCTION. LIGHTWEIGHT and STANDARD are deprecated aliases for DEVELOPMENT and PRODUCTION, respectively.""")
 @cli_util.option('--limit', type=click.INT, help=u"""For list pagination. The maximum number of results per page, or items to return in a paginated \"List\" call. For important details about how pagination works, see [List Pagination].""")
 @cli_util.option('--page', help=u"""For list pagination: The value of the opc-next-page response header from the previous \"List\" call. For important details on how pagination works, see [List Pagination].""")
 @cli_util.option('--sort-order', type=custom_types.CliCaseInsensitiveChoice(["ASC", "DESC"]), help=u"""Specifies sort order to use, either ASC (ascending) or DESC (descending).""")
@@ -2234,6 +2599,72 @@ def list_iot_domains(ctx, from_json, all_pages, page_size, compartment_id, id, i
         )
     else:
         result = client.list_iot_domains(
+            compartment_id=compartment_id,
+            **kwargs
+        )
+    cli_util.render_response(result, ctx)
+
+
+@iot_flow_runtime_group.command(name=cli_util.override('iot.list_iot_flow_runtimes.command_name', 'list'), help=u"""Lists IoT flow runtimes in the specified compartment. \n[Command Reference](listIotFlowRuntimes)""")
+@cli_util.option('--compartment-id', required=True, help=u"""The [OCID] of the compartment in which to list resources.""")
+@cli_util.option('--id', help=u"""Filter resources by [OCID]. Must be a valid OCID of the resource type.""")
+@cli_util.option('--iot-domain-id', help=u"""The [OCID] of the IoT domain in which to list flow runtime.""")
+@cli_util.option('--display-name', help=u"""Filter resources whose display name matches the specified value.""")
+@cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "UPDATING", "ACTIVE", "INACTIVE", "DELETING", "DELETED", "FAILED"]), help=u"""Filter resources whose lifecycleState matches the specified value.""")
+@cli_util.option('--limit', type=click.INT, help=u"""For list pagination. The maximum number of results per page, or items to return in a paginated \"List\" call. For important details about how pagination works, see [List Pagination].""")
+@cli_util.option('--page', help=u"""For list pagination: The value of the opc-next-page response header from the previous \"List\" call. For important details on how pagination works, see [List Pagination].""")
+@cli_util.option('--sort-order', type=custom_types.CliCaseInsensitiveChoice(["ASC", "DESC"]), help=u"""Specifies sort order to use, either ASC (ascending) or DESC (descending).""")
+@cli_util.option('--sort-by', type=custom_types.CliCaseInsensitiveChoice(["timeCreated", "displayName"]), help=u"""The field to sort by. Only one sort order may be provided. Default order for timeCreated is descending. Default order for displayName is ascending.""")
+@cli_util.option('--all', 'all_pages', is_flag=True, help="""Fetches all pages of results. If you provide this option, then you cannot provide the --limit option.""")
+@cli_util.option('--page-size', type=click.INT, help="""When fetching results, the number of results to fetch per call. Only valid when used with --all or --limit, and ignored otherwise.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'iot', 'class': 'IotFlowRuntimeCollection'})
+@cli_util.wrap_exceptions
+def list_iot_flow_runtimes(ctx, from_json, all_pages, page_size, compartment_id, id, iot_domain_id, display_name, lifecycle_state, limit, page, sort_order, sort_by):
+
+    if all_pages and limit:
+        raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
+
+    kwargs = {}
+    if id is not None:
+        kwargs['id'] = id
+    if iot_domain_id is not None:
+        kwargs['iot_domain_id'] = iot_domain_id
+    if display_name is not None:
+        kwargs['display_name'] = display_name
+    if lifecycle_state is not None:
+        kwargs['lifecycle_state'] = lifecycle_state
+    if limit is not None:
+        kwargs['limit'] = limit
+    if page is not None:
+        kwargs['page'] = page
+    if sort_order is not None:
+        kwargs['sort_order'] = sort_order
+    if sort_by is not None:
+        kwargs['sort_by'] = sort_by
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('iot', 'iot', ctx)
+    if all_pages:
+        if page_size:
+            kwargs['limit'] = page_size
+
+        result = cli_util.list_call_get_all_results(
+            client.list_iot_flow_runtimes,
+            compartment_id=compartment_id,
+            **kwargs
+        )
+    elif limit is not None:
+        result = cli_util.list_call_get_up_to_limit(
+            client.list_iot_flow_runtimes,
+            limit,
+            page_size,
+            compartment_id=compartment_id,
+            **kwargs
+        )
+    else:
+        result = client.list_iot_flow_runtimes(
             compartment_id=compartment_id,
             **kwargs
         )
@@ -2509,6 +2940,7 @@ def update_digital_twin_adapter(ctx, from_json, force, wait_for_state, max_wait_
 
 @digital_twin_instance_group.command(name=cli_util.override('iot.update_digital_twin_instance.command_name', 'update'), help=u"""Updates the details of digital twin instance identified by the specified OCID. \n[Command Reference](updateDigitalTwinInstance)""")
 @cli_util.option('--digital-twin-instance-id', required=True, help=u"""The [OCID] of digital twin instance.""")
+@cli_util.option('--connectivity-type', type=custom_types.CliCaseInsensitiveChoice(["DIRECT", "INDIRECT", "GATEWAY", "NONE"]), help=u"""Connectivity type of the digital twin instance.""")
 @cli_util.option('--auth-id', help=u"""The [OCID] of the resource (like VaultSecret, ClientCertificate etc.,) used to authenticate the digital twin instance.""")
 @cli_util.option('--external-key', help=u"""A unique identifier for the physical entity (typically an IoT device) represented by the digital twin instance. This could be a Bluetooth address, Ethernet MAC address, or serial number, depending on the use case. If not provided, the system will automatically generate one.""")
 @cli_util.option('--display-name', help=u"""A user-friendly name. Does not have to be unique, and it's changeable. Avoid entering confidential information.""")
@@ -2533,7 +2965,7 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'gateways': {'module': 'iot', 'class': 'list[string]'}, 'freeform-tags': {'module': 'iot', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'iot', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'iot', 'class': 'DigitalTwinInstance'})
 @cli_util.wrap_exceptions
-def update_digital_twin_instance(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, digital_twin_instance_id, auth_id, external_key, display_name, description, digital_twin_adapter_id, digital_twin_model_id, digital_twin_model_spec_uri, gateways, freeform_tags, defined_tags, if_match):
+def update_digital_twin_instance(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, digital_twin_instance_id, connectivity_type, auth_id, external_key, display_name, description, digital_twin_adapter_id, digital_twin_model_id, digital_twin_model_spec_uri, gateways, freeform_tags, defined_tags, if_match):
 
     if isinstance(digital_twin_instance_id, six.string_types) and len(digital_twin_instance_id.strip()) == 0:
         raise click.UsageError('Parameter --digital-twin-instance-id cannot be whitespace or empty string')
@@ -2548,6 +2980,9 @@ def update_digital_twin_instance(ctx, from_json, force, wait_for_state, max_wait
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
     _details = {}
+
+    if connectivity_type is not None:
+        _details['connectivityType'] = connectivity_type
 
     if auth_id is not None:
         _details['authId'] = auth_id
@@ -2940,4 +3375,127 @@ def update_iot_domain_group(ctx, from_json, force, wait_for_state, max_wait_seco
                 raise
         else:
             click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@iot_flow_runtime_group.command(name=cli_util.override('iot.update_iot_flow_runtime.command_name', 'update'), help=u"""Updates the IoT flow runtime identified by the specified OCID. \n[Command Reference](updateIotFlowRuntime)""")
+@cli_util.option('--iot-flow-runtime-id', required=True, help=u"""The [OCID] of an IoT flow runtime.""")
+@cli_util.option('--display-name', help=u"""A user-friendly name. Does not have to be unique, and it's changeable. Avoid entering confidential information.""")
+@cli_util.option('--description', help=u"""A short description of the resource.""")
+@cli_util.option('--scale', type=custom_types.CliCaseInsensitiveChoice(["LOWEST", "LOW", "MEDIUM", "HIGH", "HIGHEST"]), help=u"""The scale of the IoT flow runtime. Larger values allocate more CPU and memory for higher throughput and operational headroom. MEDIUM is the default value.""")
+@cli_util.option('--network-config', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--log-config', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
+
+Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].
+
+Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "NEEDS_ATTENTION", "FAILED", "SUCCEEDED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state SUCCEEDED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'network-config': {'module': 'iot', 'class': 'NetworkConfigDetails'}, 'log-config': {'module': 'iot', 'class': 'LogConfigDetails'}, 'freeform-tags': {'module': 'iot', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'iot', 'class': 'dict(str, dict(str, object))'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'network-config': {'module': 'iot', 'class': 'NetworkConfigDetails'}, 'log-config': {'module': 'iot', 'class': 'LogConfigDetails'}, 'freeform-tags': {'module': 'iot', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'iot', 'class': 'dict(str, dict(str, object))'}})
+@cli_util.wrap_exceptions
+def update_iot_flow_runtime(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, iot_flow_runtime_id, display_name, description, scale, network_config, log_config, freeform_tags, defined_tags, if_match):
+
+    if isinstance(iot_flow_runtime_id, six.string_types) and len(iot_flow_runtime_id.strip()) == 0:
+        raise click.UsageError('Parameter --iot-flow-runtime-id cannot be whitespace or empty string')
+    if not force:
+        if network_config or log_config or freeform_tags or defined_tags:
+            if not click.confirm("WARNING: Updates to network-config and log-config and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
+                ctx.abort()
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+
+    if display_name is not None:
+        _details['displayName'] = display_name
+
+    if description is not None:
+        _details['description'] = description
+
+    if scale is not None:
+        _details['scale'] = scale
+
+    if network_config is not None:
+        _details['networkConfig'] = cli_util.parse_json_parameter("network_config", network_config)
+
+    if log_config is not None:
+        _details['logConfig'] = cli_util.parse_json_parameter("log_config", log_config)
+
+    if freeform_tags is not None:
+        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
+
+    if defined_tags is not None:
+        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    client = cli_util.build_client('iot', 'iot', ctx)
+    result = client.update_iot_flow_runtime(
+        iot_flow_runtime_id=iot_flow_runtime_id,
+        update_iot_flow_runtime_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@iot_flow_runtime_group.command(name=cli_util.override('iot.update_iot_flow_runtime_flows.command_name', 'update-iot-flow-runtime-flows'), help=u"""Replaces the complete flows document for the IoT flow runtime identified by the specified OCID. \n[Command Reference](updateIotFlowRuntimeFlows)""")
+@cli_util.option('--iot-flow-runtime-id', required=True, help=u"""The [OCID] of an IoT flow runtime.""")
+@cli_util.option('--flows-document', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""The opaque flows document for the IoT flow runtime.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@json_skeleton_utils.get_cli_json_input_option({'flows-document': {'module': 'iot', 'class': ''}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'flows-document': {'module': 'iot', 'class': ''}})
+@cli_util.wrap_exceptions
+def update_iot_flow_runtime_flows(ctx, from_json, iot_flow_runtime_id, flows_document, if_match):
+
+    if isinstance(iot_flow_runtime_id, six.string_types) and len(iot_flow_runtime_id.strip()) == 0:
+        raise click.UsageError('Parameter --iot-flow-runtime-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('iot', 'iot', ctx)
+    result = client.update_iot_flow_runtime_flows(
+        iot_flow_runtime_id=iot_flow_runtime_id,
+        flows_document=cli_util.parse_json_parameter("flows_document", flows_document),
+        **kwargs
+    )
     cli_util.render_response(result, ctx)

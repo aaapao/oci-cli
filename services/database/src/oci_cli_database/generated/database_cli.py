@@ -24438,7 +24438,6 @@ These subnets are used by the Oracle Clusterware private interconnect on the dat
 @cli_util.option('--shape', required=True, help=u"""The shape of the DB system. The shape determines resources allocated to the DB system. - For virtual machine shapes, the number of CPU cores and memory - For bare metal and Exadata shapes, the number of CPU cores, memory, and storage
 
 To get a list of shapes, use the [ListDbSystemShapes] operation.""")
-@cli_util.option('--ssh-public-keys', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""The public key portion of the key pair to use for SSH access to the DB system. Multiple public keys can be provided. The length of the combined keys cannot exceed 40,000 characters.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--hostname', required=True, help=u"""The hostname for the DB system. The hostname must begin with an alphabetic character, and can contain alphanumeric characters and hyphens (-). The maximum length of the hostname is 16 characters for bare metal and virtual machine DB systems, and 12 characters for Exadata DB systems.
 
 The maximum length of the combined hostname and domain is 63 characters.
@@ -24463,6 +24462,7 @@ Example: `FAULT-DOMAIN-1`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--db-system-options', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--storage-volume-performance-mode', type=custom_types.CliCaseInsensitiveChoice(["BALANCED", "HIGH_PERFORMANCE"]), help=u"""The block storage volume performance level. Valid values are `BALANCED` and `HIGH_PERFORMANCE`. See [Block Volume Performance] for more information.""")
 @cli_util.option('--sparse-diskgroup', type=click.BOOL, help=u"""If true, Sparse Diskgroup is configured for Exadata dbsystem. If False, Sparse diskgroup is not configured.""")
+@cli_util.option('--ssh-public-keys', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The public key portion of the key pair to use for SSH access to the DB system. Multiple public keys can be provided. The length of the combined keys cannot exceed 40,000 characters.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--domain', help=u"""A domain name used for the DB system. If the Oracle-provided Internet and VCN Resolver is enabled for the specified subnet, the domain name for the subnet is used (do not provide one). Otherwise, provide a valid DNS domain name. Hyphens (-) are not permitted.""")
 @cli_util.option('--cpu-core-count', type=click.INT, help=u"""The number of CPU cores to enable for a bare metal or Exadata DB system or AMD VMDB Systems. The valid values depend on the specified shape:
 
@@ -24497,7 +24497,7 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'fault-domains': {'module': 'database', 'class': 'list[string]'}, 'nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'backup-network-nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'db-system-options': {'module': 'database', 'class': 'DbSystemOptions'}, 'ssh-public-keys': {'module': 'database', 'class': 'list[string]'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'data-collection-options': {'module': 'database', 'class': 'DataCollectionOptions'}}, output_type={'module': 'database', 'class': 'DbSystem'})
 @cli_util.wrap_exceptions
-def launch_db_system(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, availability_domain, subnet_id, shape, ssh_public_keys, hostname, fault_domains, display_name, backup_subnet_id, nsg_ids, backup_network_nsg_ids, time_zone, db_system_options, storage_volume_performance_mode, sparse_diskgroup, domain, cpu_core_count, cluster_name, data_storage_percentage, initial_data_storage_size_in_gb, kms_key_id, kms_key_version_id, node_count, freeform_tags, defined_tags, security_attributes, source, private_ip, private_ip_v6, cluster_placement_group_id, subscription_id, data_collection_options, compute_model, compute_count, opc_dry_run):
+def launch_db_system(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, availability_domain, subnet_id, shape, hostname, fault_domains, display_name, backup_subnet_id, nsg_ids, backup_network_nsg_ids, time_zone, db_system_options, storage_volume_performance_mode, sparse_diskgroup, ssh_public_keys, domain, cpu_core_count, cluster_name, data_storage_percentage, initial_data_storage_size_in_gb, kms_key_id, kms_key_version_id, node_count, freeform_tags, defined_tags, security_attributes, source, private_ip, private_ip_v6, cluster_placement_group_id, subscription_id, data_collection_options, compute_model, compute_count, opc_dry_run):
 
     kwargs = {}
     if opc_dry_run is not None:
@@ -24508,7 +24508,6 @@ def launch_db_system(ctx, from_json, wait_for_state, max_wait_seconds, wait_inte
     _details['availabilityDomain'] = availability_domain
     _details['subnetId'] = subnet_id
     _details['shape'] = shape
-    _details['sshPublicKeys'] = cli_util.parse_json_parameter("ssh_public_keys", ssh_public_keys)
     _details['hostname'] = hostname
 
     if fault_domains is not None:
@@ -24537,6 +24536,9 @@ def launch_db_system(ctx, from_json, wait_for_state, max_wait_seconds, wait_inte
 
     if sparse_diskgroup is not None:
         _details['sparseDiskgroup'] = sparse_diskgroup
+
+    if ssh_public_keys is not None:
+        _details['sshPublicKeys'] = cli_util.parse_json_parameter("ssh_public_keys", ssh_public_keys)
 
     if domain is not None:
         _details['domain'] = domain
@@ -24645,7 +24647,6 @@ These subnets are used by the Oracle Clusterware private interconnect on the dat
 @cli_util.option('--shape', required=True, help=u"""The shape of the DB system. The shape determines resources allocated to the DB system. - For virtual machine shapes, the number of CPU cores and memory - For bare metal and Exadata shapes, the number of CPU cores, memory, and storage
 
 To get a list of shapes, use the [ListDbSystemShapes] operation.""")
-@cli_util.option('--ssh-public-keys', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""The public key portion of the key pair to use for SSH access to the DB system. Multiple public keys can be provided. The length of the combined keys cannot exceed 40,000 characters.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--hostname', required=True, help=u"""The hostname for the DB system. The hostname must begin with an alphabetic character, and can contain alphanumeric characters and hyphens (-). The maximum length of the hostname is 16 characters for bare metal and virtual machine DB systems, and 12 characters for Exadata DB systems.
 
 The maximum length of the combined hostname and domain is 63 characters.
@@ -24672,6 +24673,7 @@ Example: `FAULT-DOMAIN-1`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--db-system-options', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--storage-volume-performance-mode', type=custom_types.CliCaseInsensitiveChoice(["BALANCED", "HIGH_PERFORMANCE"]), help=u"""The block storage volume performance level. Valid values are `BALANCED` and `HIGH_PERFORMANCE`. See [Block Volume Performance] for more information.""")
 @cli_util.option('--sparse-diskgroup', type=click.BOOL, help=u"""If true, Sparse Diskgroup is configured for Exadata dbsystem. If False, Sparse diskgroup is not configured.""")
+@cli_util.option('--ssh-public-keys', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The public key portion of the key pair to use for SSH access to the DB system. Multiple public keys can be provided. The length of the combined keys cannot exceed 40,000 characters.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--domain', help=u"""A domain name used for the DB system. If the Oracle-provided Internet and VCN Resolver is enabled for the specified subnet, the domain name for the subnet is used (do not provide one). Otherwise, provide a valid DNS domain name. Hyphens (-) are not permitted.""")
 @cli_util.option('--cpu-core-count', type=click.INT, help=u"""The number of CPU cores to enable for a bare metal or Exadata DB system or AMD VMDB Systems. The valid values depend on the specified shape:
 
@@ -24708,7 +24710,7 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'fault-domains': {'module': 'database', 'class': 'list[string]'}, 'nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'backup-network-nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'db-system-options': {'module': 'database', 'class': 'DbSystemOptions'}, 'ssh-public-keys': {'module': 'database', 'class': 'list[string]'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'data-collection-options': {'module': 'database', 'class': 'DataCollectionOptions'}, 'db-home': {'module': 'database', 'class': 'CreateDbHomeDetails'}, 'maintenance-window-details': {'module': 'database', 'class': 'MaintenanceWindow'}}, output_type={'module': 'database', 'class': 'DbSystem'})
 @cli_util.wrap_exceptions
-def launch_db_system_launch_db_system_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, availability_domain, subnet_id, shape, ssh_public_keys, hostname, db_home, database_edition, fault_domains, display_name, backup_subnet_id, nsg_ids, backup_network_nsg_ids, time_zone, db_system_options, storage_volume_performance_mode, sparse_diskgroup, domain, cpu_core_count, cluster_name, data_storage_percentage, initial_data_storage_size_in_gb, kms_key_id, kms_key_version_id, node_count, freeform_tags, defined_tags, security_attributes, private_ip, private_ip_v6, cluster_placement_group_id, subscription_id, data_collection_options, compute_model, compute_count, disk_redundancy, license_model, maintenance_window_details, opc_dry_run):
+def launch_db_system_launch_db_system_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, availability_domain, subnet_id, shape, hostname, db_home, database_edition, fault_domains, display_name, backup_subnet_id, nsg_ids, backup_network_nsg_ids, time_zone, db_system_options, storage_volume_performance_mode, sparse_diskgroup, ssh_public_keys, domain, cpu_core_count, cluster_name, data_storage_percentage, initial_data_storage_size_in_gb, kms_key_id, kms_key_version_id, node_count, freeform_tags, defined_tags, security_attributes, private_ip, private_ip_v6, cluster_placement_group_id, subscription_id, data_collection_options, compute_model, compute_count, disk_redundancy, license_model, maintenance_window_details, opc_dry_run):
 
     kwargs = {}
     if opc_dry_run is not None:
@@ -24719,7 +24721,6 @@ def launch_db_system_launch_db_system_details(ctx, from_json, wait_for_state, ma
     _details['availabilityDomain'] = availability_domain
     _details['subnetId'] = subnet_id
     _details['shape'] = shape
-    _details['sshPublicKeys'] = cli_util.parse_json_parameter("ssh_public_keys", ssh_public_keys)
     _details['hostname'] = hostname
     _details['dbHome'] = cli_util.parse_json_parameter("db_home", db_home)
     _details['databaseEdition'] = database_edition
@@ -24750,6 +24751,9 @@ def launch_db_system_launch_db_system_details(ctx, from_json, wait_for_state, ma
 
     if sparse_diskgroup is not None:
         _details['sparseDiskgroup'] = sparse_diskgroup
+
+    if ssh_public_keys is not None:
+        _details['sshPublicKeys'] = cli_util.parse_json_parameter("ssh_public_keys", ssh_public_keys)
 
     if domain is not None:
         _details['domain'] = domain
@@ -24866,7 +24870,6 @@ These subnets are used by the Oracle Clusterware private interconnect on the dat
 @cli_util.option('--shape', required=True, help=u"""The shape of the DB system. The shape determines resources allocated to the DB system. - For virtual machine shapes, the number of CPU cores and memory - For bare metal and Exadata shapes, the number of CPU cores, memory, and storage
 
 To get a list of shapes, use the [ListDbSystemShapes] operation.""")
-@cli_util.option('--ssh-public-keys', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""The public key portion of the key pair to use for SSH access to the DB system. Multiple public keys can be provided. The length of the combined keys cannot exceed 40,000 characters.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--hostname', required=True, help=u"""The hostname for the DB system. The hostname must begin with an alphabetic character, and can contain alphanumeric characters and hyphens (-). The maximum length of the hostname is 16 characters for bare metal and virtual machine DB systems, and 12 characters for Exadata DB systems.
 
 The maximum length of the combined hostname and domain is 63 characters.
@@ -24893,6 +24896,7 @@ Example: `FAULT-DOMAIN-1`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--db-system-options', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--storage-volume-performance-mode', type=custom_types.CliCaseInsensitiveChoice(["BALANCED", "HIGH_PERFORMANCE"]), help=u"""The block storage volume performance level. Valid values are `BALANCED` and `HIGH_PERFORMANCE`. See [Block Volume Performance] for more information.""")
 @cli_util.option('--sparse-diskgroup', type=click.BOOL, help=u"""If true, Sparse Diskgroup is configured for Exadata dbsystem. If False, Sparse diskgroup is not configured.""")
+@cli_util.option('--ssh-public-keys', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The public key portion of the key pair to use for SSH access to the DB system. Multiple public keys can be provided. The length of the combined keys cannot exceed 40,000 characters.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--domain', help=u"""A domain name used for the DB system. If the Oracle-provided Internet and VCN Resolver is enabled for the specified subnet, the domain name for the subnet is used (do not provide one). Otherwise, provide a valid DNS domain name. Hyphens (-) are not permitted.""")
 @cli_util.option('--cpu-core-count', type=click.INT, help=u"""The number of CPU cores to enable for a bare metal or Exadata DB system or AMD VMDB Systems. The valid values depend on the specified shape:
 
@@ -24927,7 +24931,7 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'fault-domains': {'module': 'database', 'class': 'list[string]'}, 'nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'backup-network-nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'db-system-options': {'module': 'database', 'class': 'DbSystemOptions'}, 'ssh-public-keys': {'module': 'database', 'class': 'list[string]'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'data-collection-options': {'module': 'database', 'class': 'DataCollectionOptions'}, 'db-home': {'module': 'database', 'class': 'CreateDbHomeForStandbyDbSystem'}}, output_type={'module': 'database', 'class': 'DbSystem'})
 @cli_util.wrap_exceptions
-def launch_db_system_launch_standby_db_system_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, availability_domain, subnet_id, shape, ssh_public_keys, hostname, primary_db_system_id, db_home, fault_domains, display_name, backup_subnet_id, nsg_ids, backup_network_nsg_ids, time_zone, db_system_options, storage_volume_performance_mode, sparse_diskgroup, domain, cpu_core_count, cluster_name, data_storage_percentage, initial_data_storage_size_in_gb, kms_key_id, kms_key_version_id, node_count, freeform_tags, defined_tags, security_attributes, private_ip, private_ip_v6, cluster_placement_group_id, subscription_id, data_collection_options, compute_model, compute_count, license_model, opc_dry_run):
+def launch_db_system_launch_standby_db_system_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, availability_domain, subnet_id, shape, hostname, primary_db_system_id, db_home, fault_domains, display_name, backup_subnet_id, nsg_ids, backup_network_nsg_ids, time_zone, db_system_options, storage_volume_performance_mode, sparse_diskgroup, ssh_public_keys, domain, cpu_core_count, cluster_name, data_storage_percentage, initial_data_storage_size_in_gb, kms_key_id, kms_key_version_id, node_count, freeform_tags, defined_tags, security_attributes, private_ip, private_ip_v6, cluster_placement_group_id, subscription_id, data_collection_options, compute_model, compute_count, license_model, opc_dry_run):
 
     kwargs = {}
     if opc_dry_run is not None:
@@ -24938,7 +24942,6 @@ def launch_db_system_launch_standby_db_system_details(ctx, from_json, wait_for_s
     _details['availabilityDomain'] = availability_domain
     _details['subnetId'] = subnet_id
     _details['shape'] = shape
-    _details['sshPublicKeys'] = cli_util.parse_json_parameter("ssh_public_keys", ssh_public_keys)
     _details['hostname'] = hostname
     _details['primaryDbSystemId'] = primary_db_system_id
     _details['dbHome'] = cli_util.parse_json_parameter("db_home", db_home)
@@ -24969,6 +24972,9 @@ def launch_db_system_launch_standby_db_system_details(ctx, from_json, wait_for_s
 
     if sparse_diskgroup is not None:
         _details['sparseDiskgroup'] = sparse_diskgroup
+
+    if ssh_public_keys is not None:
+        _details['sshPublicKeys'] = cli_util.parse_json_parameter("ssh_public_keys", ssh_public_keys)
 
     if domain is not None:
         _details['domain'] = domain
@@ -25079,7 +25085,6 @@ These subnets are used by the Oracle Clusterware private interconnect on the dat
 @cli_util.option('--shape', required=True, help=u"""The shape of the DB system. The shape determines resources allocated to the DB system. - For virtual machine shapes, the number of CPU cores and memory - For bare metal and Exadata shapes, the number of CPU cores, memory, and storage
 
 To get a list of shapes, use the [ListDbSystemShapes] operation.""")
-@cli_util.option('--ssh-public-keys', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""The public key portion of the key pair to use for SSH access to the DB system. Multiple public keys can be provided. The length of the combined keys cannot exceed 40,000 characters.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--hostname', required=True, help=u"""The hostname for the DB system. The hostname must begin with an alphabetic character, and can contain alphanumeric characters and hyphens (-). The maximum length of the hostname is 16 characters for bare metal and virtual machine DB systems, and 12 characters for Exadata DB systems.
 
 The maximum length of the combined hostname and domain is 63 characters.
@@ -25106,6 +25111,7 @@ Example: `FAULT-DOMAIN-1`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--db-system-options', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--storage-volume-performance-mode', type=custom_types.CliCaseInsensitiveChoice(["BALANCED", "HIGH_PERFORMANCE"]), help=u"""The block storage volume performance level. Valid values are `BALANCED` and `HIGH_PERFORMANCE`. See [Block Volume Performance] for more information.""")
 @cli_util.option('--sparse-diskgroup', type=click.BOOL, help=u"""If true, Sparse Diskgroup is configured for Exadata dbsystem. If False, Sparse diskgroup is not configured.""")
+@cli_util.option('--ssh-public-keys', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The public key portion of the key pair to use for SSH access to the DB system. Multiple public keys can be provided. The length of the combined keys cannot exceed 40,000 characters.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--domain', help=u"""A domain name used for the DB system. If the Oracle-provided Internet and VCN Resolver is enabled for the specified subnet, the domain name for the subnet is used (do not provide one). Otherwise, provide a valid DNS domain name. Hyphens (-) are not permitted.""")
 @cli_util.option('--cpu-core-count', type=click.INT, help=u"""The number of CPU cores to enable for a bare metal or Exadata DB system or AMD VMDB Systems. The valid values depend on the specified shape:
 
@@ -25140,7 +25146,7 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'fault-domains': {'module': 'database', 'class': 'list[string]'}, 'nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'backup-network-nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'db-system-options': {'module': 'database', 'class': 'DbSystemOptions'}, 'ssh-public-keys': {'module': 'database', 'class': 'list[string]'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'data-collection-options': {'module': 'database', 'class': 'DataCollectionOptions'}, 'db-home': {'module': 'database', 'class': 'CreateDbHomeFromDbSystemDetails'}}, output_type={'module': 'database', 'class': 'DbSystem'})
 @cli_util.wrap_exceptions
-def launch_db_system_launch_db_system_from_db_system_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, availability_domain, subnet_id, shape, ssh_public_keys, hostname, source_db_system_id, db_home, fault_domains, display_name, backup_subnet_id, nsg_ids, backup_network_nsg_ids, time_zone, db_system_options, storage_volume_performance_mode, sparse_diskgroup, domain, cpu_core_count, cluster_name, data_storage_percentage, initial_data_storage_size_in_gb, kms_key_id, kms_key_version_id, node_count, freeform_tags, defined_tags, security_attributes, private_ip, private_ip_v6, cluster_placement_group_id, subscription_id, data_collection_options, compute_model, compute_count, license_model, opc_dry_run):
+def launch_db_system_launch_db_system_from_db_system_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, availability_domain, subnet_id, shape, hostname, source_db_system_id, db_home, fault_domains, display_name, backup_subnet_id, nsg_ids, backup_network_nsg_ids, time_zone, db_system_options, storage_volume_performance_mode, sparse_diskgroup, ssh_public_keys, domain, cpu_core_count, cluster_name, data_storage_percentage, initial_data_storage_size_in_gb, kms_key_id, kms_key_version_id, node_count, freeform_tags, defined_tags, security_attributes, private_ip, private_ip_v6, cluster_placement_group_id, subscription_id, data_collection_options, compute_model, compute_count, license_model, opc_dry_run):
 
     kwargs = {}
     if opc_dry_run is not None:
@@ -25151,7 +25157,6 @@ def launch_db_system_launch_db_system_from_db_system_details(ctx, from_json, wai
     _details['availabilityDomain'] = availability_domain
     _details['subnetId'] = subnet_id
     _details['shape'] = shape
-    _details['sshPublicKeys'] = cli_util.parse_json_parameter("ssh_public_keys", ssh_public_keys)
     _details['hostname'] = hostname
     _details['sourceDbSystemId'] = source_db_system_id
     _details['dbHome'] = cli_util.parse_json_parameter("db_home", db_home)
@@ -25182,6 +25187,9 @@ def launch_db_system_launch_db_system_from_db_system_details(ctx, from_json, wai
 
     if sparse_diskgroup is not None:
         _details['sparseDiskgroup'] = sparse_diskgroup
+
+    if ssh_public_keys is not None:
+        _details['sshPublicKeys'] = cli_util.parse_json_parameter("ssh_public_keys", ssh_public_keys)
 
     if domain is not None:
         _details['domain'] = domain
@@ -25292,7 +25300,6 @@ These subnets are used by the Oracle Clusterware private interconnect on the dat
 @cli_util.option('--shape', required=True, help=u"""The shape of the DB system. The shape determines resources allocated to the DB system. - For virtual machine shapes, the number of CPU cores and memory - For bare metal and Exadata shapes, the number of CPU cores, memory, and storage
 
 To get a list of shapes, use the [ListDbSystemShapes] operation.""")
-@cli_util.option('--ssh-public-keys', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""The public key portion of the key pair to use for SSH access to the DB system. Multiple public keys can be provided. The length of the combined keys cannot exceed 40,000 characters.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--hostname', required=True, help=u"""The hostname for the DB system. The hostname must begin with an alphabetic character, and can contain alphanumeric characters and hyphens (-). The maximum length of the hostname is 16 characters for bare metal and virtual machine DB systems, and 12 characters for Exadata DB systems.
 
 The maximum length of the combined hostname and domain is 63 characters.
@@ -25319,6 +25326,7 @@ Example: `FAULT-DOMAIN-1`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--db-system-options', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--storage-volume-performance-mode', type=custom_types.CliCaseInsensitiveChoice(["BALANCED", "HIGH_PERFORMANCE"]), help=u"""The block storage volume performance level. Valid values are `BALANCED` and `HIGH_PERFORMANCE`. See [Block Volume Performance] for more information.""")
 @cli_util.option('--sparse-diskgroup', type=click.BOOL, help=u"""If true, Sparse Diskgroup is configured for Exadata dbsystem. If False, Sparse diskgroup is not configured.""")
+@cli_util.option('--ssh-public-keys', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The public key portion of the key pair to use for SSH access to the DB system. Multiple public keys can be provided. The length of the combined keys cannot exceed 40,000 characters.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--domain', help=u"""A domain name used for the DB system. If the Oracle-provided Internet and VCN Resolver is enabled for the specified subnet, the domain name for the subnet is used (do not provide one). Otherwise, provide a valid DNS domain name. Hyphens (-) are not permitted.""")
 @cli_util.option('--cpu-core-count', type=click.INT, help=u"""The number of CPU cores to enable for a bare metal or Exadata DB system or AMD VMDB Systems. The valid values depend on the specified shape:
 
@@ -25354,7 +25362,7 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'fault-domains': {'module': 'database', 'class': 'list[string]'}, 'nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'backup-network-nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'db-system-options': {'module': 'database', 'class': 'DbSystemOptions'}, 'ssh-public-keys': {'module': 'database', 'class': 'list[string]'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'data-collection-options': {'module': 'database', 'class': 'DataCollectionOptions'}, 'db-home': {'module': 'database', 'class': 'CreateDbHomeFromDatabaseDetails'}}, output_type={'module': 'database', 'class': 'DbSystem'})
 @cli_util.wrap_exceptions
-def launch_db_system_launch_db_system_from_database_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, availability_domain, subnet_id, shape, ssh_public_keys, hostname, db_home, database_edition, fault_domains, display_name, backup_subnet_id, nsg_ids, backup_network_nsg_ids, time_zone, db_system_options, storage_volume_performance_mode, sparse_diskgroup, domain, cpu_core_count, cluster_name, data_storage_percentage, initial_data_storage_size_in_gb, kms_key_id, kms_key_version_id, node_count, freeform_tags, defined_tags, security_attributes, private_ip, private_ip_v6, cluster_placement_group_id, subscription_id, data_collection_options, compute_model, compute_count, disk_redundancy, license_model, opc_dry_run):
+def launch_db_system_launch_db_system_from_database_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, availability_domain, subnet_id, shape, hostname, db_home, database_edition, fault_domains, display_name, backup_subnet_id, nsg_ids, backup_network_nsg_ids, time_zone, db_system_options, storage_volume_performance_mode, sparse_diskgroup, ssh_public_keys, domain, cpu_core_count, cluster_name, data_storage_percentage, initial_data_storage_size_in_gb, kms_key_id, kms_key_version_id, node_count, freeform_tags, defined_tags, security_attributes, private_ip, private_ip_v6, cluster_placement_group_id, subscription_id, data_collection_options, compute_model, compute_count, disk_redundancy, license_model, opc_dry_run):
 
     kwargs = {}
     if opc_dry_run is not None:
@@ -25365,7 +25373,6 @@ def launch_db_system_launch_db_system_from_database_details(ctx, from_json, wait
     _details['availabilityDomain'] = availability_domain
     _details['subnetId'] = subnet_id
     _details['shape'] = shape
-    _details['sshPublicKeys'] = cli_util.parse_json_parameter("ssh_public_keys", ssh_public_keys)
     _details['hostname'] = hostname
     _details['dbHome'] = cli_util.parse_json_parameter("db_home", db_home)
     _details['databaseEdition'] = database_edition
@@ -25396,6 +25403,9 @@ def launch_db_system_launch_db_system_from_database_details(ctx, from_json, wait
 
     if sparse_diskgroup is not None:
         _details['sparseDiskgroup'] = sparse_diskgroup
+
+    if ssh_public_keys is not None:
+        _details['sshPublicKeys'] = cli_util.parse_json_parameter("ssh_public_keys", ssh_public_keys)
 
     if domain is not None:
         _details['domain'] = domain
@@ -25509,7 +25519,6 @@ These subnets are used by the Oracle Clusterware private interconnect on the dat
 @cli_util.option('--shape', required=True, help=u"""The shape of the DB system. The shape determines resources allocated to the DB system. - For virtual machine shapes, the number of CPU cores and memory - For bare metal and Exadata shapes, the number of CPU cores, memory, and storage
 
 To get a list of shapes, use the [ListDbSystemShapes] operation.""")
-@cli_util.option('--ssh-public-keys', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""The public key portion of the key pair to use for SSH access to the DB system. Multiple public keys can be provided. The length of the combined keys cannot exceed 40,000 characters.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--hostname', required=True, help=u"""The hostname for the DB system. The hostname must begin with an alphabetic character, and can contain alphanumeric characters and hyphens (-). The maximum length of the hostname is 16 characters for bare metal and virtual machine DB systems, and 12 characters for Exadata DB systems.
 
 The maximum length of the combined hostname and domain is 63 characters.
@@ -25536,6 +25545,7 @@ Example: `FAULT-DOMAIN-1`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--db-system-options', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--storage-volume-performance-mode', type=custom_types.CliCaseInsensitiveChoice(["BALANCED", "HIGH_PERFORMANCE"]), help=u"""The block storage volume performance level. Valid values are `BALANCED` and `HIGH_PERFORMANCE`. See [Block Volume Performance] for more information.""")
 @cli_util.option('--sparse-diskgroup', type=click.BOOL, help=u"""If true, Sparse Diskgroup is configured for Exadata dbsystem. If False, Sparse diskgroup is not configured.""")
+@cli_util.option('--ssh-public-keys', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The public key portion of the key pair to use for SSH access to the DB system. Multiple public keys can be provided. The length of the combined keys cannot exceed 40,000 characters.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--domain', help=u"""A domain name used for the DB system. If the Oracle-provided Internet and VCN Resolver is enabled for the specified subnet, the domain name for the subnet is used (do not provide one). Otherwise, provide a valid DNS domain name. Hyphens (-) are not permitted.""")
 @cli_util.option('--cpu-core-count', type=click.INT, help=u"""The number of CPU cores to enable for a bare metal or Exadata DB system or AMD VMDB Systems. The valid values depend on the specified shape:
 
@@ -25571,7 +25581,7 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'fault-domains': {'module': 'database', 'class': 'list[string]'}, 'nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'backup-network-nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'db-system-options': {'module': 'database', 'class': 'DbSystemOptions'}, 'ssh-public-keys': {'module': 'database', 'class': 'list[string]'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'data-collection-options': {'module': 'database', 'class': 'DataCollectionOptions'}, 'db-home': {'module': 'database', 'class': 'CreateDbHomeFromBackupDetails'}}, output_type={'module': 'database', 'class': 'DbSystem'})
 @cli_util.wrap_exceptions
-def launch_db_system_launch_db_system_from_backup_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, availability_domain, subnet_id, shape, ssh_public_keys, hostname, db_home, database_edition, fault_domains, display_name, backup_subnet_id, nsg_ids, backup_network_nsg_ids, time_zone, db_system_options, storage_volume_performance_mode, sparse_diskgroup, domain, cpu_core_count, cluster_name, data_storage_percentage, initial_data_storage_size_in_gb, kms_key_id, kms_key_version_id, node_count, freeform_tags, defined_tags, security_attributes, private_ip, private_ip_v6, cluster_placement_group_id, subscription_id, data_collection_options, compute_model, compute_count, disk_redundancy, license_model, opc_dry_run):
+def launch_db_system_launch_db_system_from_backup_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, availability_domain, subnet_id, shape, hostname, db_home, database_edition, fault_domains, display_name, backup_subnet_id, nsg_ids, backup_network_nsg_ids, time_zone, db_system_options, storage_volume_performance_mode, sparse_diskgroup, ssh_public_keys, domain, cpu_core_count, cluster_name, data_storage_percentage, initial_data_storage_size_in_gb, kms_key_id, kms_key_version_id, node_count, freeform_tags, defined_tags, security_attributes, private_ip, private_ip_v6, cluster_placement_group_id, subscription_id, data_collection_options, compute_model, compute_count, disk_redundancy, license_model, opc_dry_run):
 
     kwargs = {}
     if opc_dry_run is not None:
@@ -25582,7 +25592,6 @@ def launch_db_system_launch_db_system_from_backup_details(ctx, from_json, wait_f
     _details['availabilityDomain'] = availability_domain
     _details['subnetId'] = subnet_id
     _details['shape'] = shape
-    _details['sshPublicKeys'] = cli_util.parse_json_parameter("ssh_public_keys", ssh_public_keys)
     _details['hostname'] = hostname
     _details['dbHome'] = cli_util.parse_json_parameter("db_home", db_home)
     _details['databaseEdition'] = database_edition
@@ -25613,6 +25622,9 @@ def launch_db_system_launch_db_system_from_backup_details(ctx, from_json, wait_f
 
     if sparse_diskgroup is not None:
         _details['sparseDiskgroup'] = sparse_diskgroup
+
+    if ssh_public_keys is not None:
+        _details['sshPublicKeys'] = cli_util.parse_json_parameter("ssh_public_keys", ssh_public_keys)
 
     if domain is not None:
         _details['domain'] = domain
@@ -27026,6 +27038,57 @@ def list_autonomous_vm_clusters(ctx, from_json, all_pages, page_size, compartmen
     else:
         result = client.list_autonomous_vm_clusters(
             compartment_id=compartment_id,
+            **kwargs
+        )
+    cli_util.render_response(result, ctx)
+
+
+@autonomous_database_group.command(name=cli_util.override('db.list_available_maintenance_windows.command_name', 'list-available-maintenance-windows'), help=u"""Retrieves the list of available maintenance window options for the specified Autonomous AI Database. \n[Command Reference](listAvailableMaintenanceWindows)""")
+@cli_util.option('--autonomous-database-id', required=True, help=u"""The database [OCID].""")
+@cli_util.option('--limit', type=click.INT, help=u"""The maximum number of items to return per page.""")
+@cli_util.option('--page', help=u"""The pagination token to continue listing from.""")
+@cli_util.option('--all', 'all_pages', is_flag=True, help="""Fetches all pages of results. If you provide this option, then you cannot provide the --limit option.""")
+@cli_util.option('--page-size', type=click.INT, help="""When fetching results, the number of results to fetch per call. Only valid when used with --all or --limit, and ignored otherwise.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'database', 'class': 'AutonomousDatabaseMaintenanceWindowCollection'})
+@cli_util.wrap_exceptions
+def list_available_maintenance_windows(ctx, from_json, all_pages, page_size, autonomous_database_id, limit, page):
+
+    if all_pages and limit:
+        raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
+
+    if isinstance(autonomous_database_id, six.string_types) and len(autonomous_database_id.strip()) == 0:
+        raise click.UsageError('Parameter --autonomous-database-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if limit is not None:
+        kwargs['limit'] = limit
+    if page is not None:
+        kwargs['page'] = page
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('database', 'database', ctx)
+    if all_pages:
+        if page_size:
+            kwargs['limit'] = page_size
+
+        result = cli_util.list_call_get_all_results(
+            client.list_available_maintenance_windows,
+            autonomous_database_id=autonomous_database_id,
+            **kwargs
+        )
+    elif limit is not None:
+        result = cli_util.list_call_get_up_to_limit(
+            client.list_available_maintenance_windows,
+            limit,
+            page_size,
+            autonomous_database_id=autonomous_database_id,
+            **kwargs
+        )
+    else:
+        result = client.list_available_maintenance_windows(
+            autonomous_database_id=autonomous_database_id,
             **kwargs
         )
     cli_util.render_response(result, ctx)
@@ -36030,6 +36093,8 @@ Service Change: The default value of the isMTLSConnectionRequired attribute will
 @cli_util.option('--autonomous-maintenance-schedule-type', type=custom_types.CliCaseInsensitiveChoice(["EARLY", "REGULAR"]), help=u"""The maintenance schedule type of the Autonomous AI Database Serverless. An EARLY maintenance schedule follows a schedule applying patches prior to the REGULAR schedule. A REGULAR maintenance schedule follows the normal cycle""")
 @cli_util.option('--autonomous-database-maintenance-window', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--time-maintenance-pause-until', type=custom_types.CLI_DATETIME, help=u"""The date until which Autonomous AI Database maintenance is temporarily paused.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
+@cli_util.option('--scheduled-maintenance-window', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--time-scheduled-maintenance-window-update', type=custom_types.CLI_DATETIME, help=u"""The date and time at which operation to change Maintenance Window is scheduled to take place.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
 @cli_util.option('--is-backup-retention-locked', type=click.BOOL, help=u"""True if the Autonomous AI Database is backup retention locked.""")
 @cli_util.option('--time-scheduled-db-version-upgrade', type=custom_types.CLI_DATETIME, help=u"""The date and time the Autonomous AI Database scheduled to upgrade to 26ai.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
 @cli_util.option('--is-disable-db-version-upgrade-schedule', type=click.BOOL, help=u"""True if user wants to disable Autonomous AI Database scheduled upgrade to 26ai.""")
@@ -36064,18 +36129,18 @@ To disconnect a cross region standby, also provide the OCID of the standby datab
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["PROVISIONING", "AVAILABLE", "STOPPING", "STOPPED", "STARTING", "TERMINATING", "TERMINATED", "UNAVAILABLE", "RESTORE_IN_PROGRESS", "RESTORE_FAILED", "BACKUP_IN_PROGRESS", "SCALE_IN_PROGRESS", "AVAILABLE_NEEDS_ATTENTION", "UPDATING", "MAINTENANCE_IN_PROGRESS", "RESTARTING", "RECREATING", "ROLE_CHANGE_IN_PROGRESS", "UPGRADING", "INACCESSIBLE", "STANDBY", "TRANSPORTING"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state PROVISIONING --wait-for-state TRANSPORTING would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'long-term-backup-schedule': {'module': 'database', 'class': 'LongTermBackUpScheduleDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'standby-whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'customer-contacts': {'module': 'database', 'class': 'list[CustomerContact]'}, 'resource-pool-summary': {'module': 'database', 'class': 'ResourcePoolSummary'}, 'autonomous-database-maintenance-window': {'module': 'database', 'class': 'AutonomousDatabaseMaintenanceWindowSummary'}, 'scheduled-operations': {'module': 'database', 'class': 'list[ScheduledOperationDetails]'}, 'db-tools-details': {'module': 'database', 'class': 'list[DatabaseTool]'}, 'vanity-url-details': {'module': 'database', 'class': 'VanityUrlDetails'}, 'encryption-key': {'module': 'database', 'class': 'AutonomousDatabaseEncryptionKeyDetails'}})
+@json_skeleton_utils.get_cli_json_input_option({'long-term-backup-schedule': {'module': 'database', 'class': 'LongTermBackUpScheduleDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'standby-whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'customer-contacts': {'module': 'database', 'class': 'list[CustomerContact]'}, 'resource-pool-summary': {'module': 'database', 'class': 'ResourcePoolSummary'}, 'autonomous-database-maintenance-window': {'module': 'database', 'class': 'AutonomousDatabaseMaintenanceWindowSummary'}, 'scheduled-maintenance-window': {'module': 'database', 'class': 'AutonomousDatabaseMaintenanceWindowSummary'}, 'scheduled-operations': {'module': 'database', 'class': 'list[ScheduledOperationDetails]'}, 'db-tools-details': {'module': 'database', 'class': 'list[DatabaseTool]'}, 'vanity-url-details': {'module': 'database', 'class': 'VanityUrlDetails'}, 'encryption-key': {'module': 'database', 'class': 'AutonomousDatabaseEncryptionKeyDetails'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'long-term-backup-schedule': {'module': 'database', 'class': 'LongTermBackUpScheduleDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'standby-whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'customer-contacts': {'module': 'database', 'class': 'list[CustomerContact]'}, 'resource-pool-summary': {'module': 'database', 'class': 'ResourcePoolSummary'}, 'autonomous-database-maintenance-window': {'module': 'database', 'class': 'AutonomousDatabaseMaintenanceWindowSummary'}, 'scheduled-operations': {'module': 'database', 'class': 'list[ScheduledOperationDetails]'}, 'db-tools-details': {'module': 'database', 'class': 'list[DatabaseTool]'}, 'vanity-url-details': {'module': 'database', 'class': 'VanityUrlDetails'}, 'encryption-key': {'module': 'database', 'class': 'AutonomousDatabaseEncryptionKeyDetails'}}, output_type={'module': 'database', 'class': 'AutonomousDatabase'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'long-term-backup-schedule': {'module': 'database', 'class': 'LongTermBackUpScheduleDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'standby-whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'customer-contacts': {'module': 'database', 'class': 'list[CustomerContact]'}, 'resource-pool-summary': {'module': 'database', 'class': 'ResourcePoolSummary'}, 'autonomous-database-maintenance-window': {'module': 'database', 'class': 'AutonomousDatabaseMaintenanceWindowSummary'}, 'scheduled-maintenance-window': {'module': 'database', 'class': 'AutonomousDatabaseMaintenanceWindowSummary'}, 'scheduled-operations': {'module': 'database', 'class': 'list[ScheduledOperationDetails]'}, 'db-tools-details': {'module': 'database', 'class': 'list[DatabaseTool]'}, 'vanity-url-details': {'module': 'database', 'class': 'VanityUrlDetails'}, 'encryption-key': {'module': 'database', 'class': 'AutonomousDatabaseEncryptionKeyDetails'}}, output_type={'module': 'database', 'class': 'AutonomousDatabase'})
 @cli_util.wrap_exceptions
-def update_autonomous_database(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, autonomous_database_id, backup_retention_period_in_days, compute_model, in_memory_percentage, local_adg_auto_failover_max_data_loss_limit, cpu_core_count, long_term_backup_schedule, is_dev_tier, compute_count, ocpu_count, data_storage_size_in_tbs, data_storage_size_in_gbs, display_name, is_free_tier, availability_domain, time_scheduled_ad_update, is_disable_ad_update_schedule, is_schedule_ad_update_to_earliest, admin_password, db_name, freeform_tags, defined_tags, security_attributes, db_workload, license_model, byol_compute_count_limit, is_access_control_enabled, whitelisted_ips, are_primary_whitelisted_ips_used, standby_whitelisted_ips, is_auto_scaling_enabled, is_refreshable_clone, refreshable_mode, is_local_data_guard_enabled, is_data_guard_enabled, peer_db_id, db_version, open_mode, permission_level, subnet_id, private_endpoint_label, private_endpoint_ip, nsg_ids, auto_refresh_frequency_in_seconds, auto_refresh_point_lag_in_seconds, time_of_auto_refresh_start, customer_contacts, is_mtls_connection_required, resource_pool_leader_id, resource_pool_summary, autonomous_maintenance_schedule_type, autonomous_database_maintenance_window, time_maintenance_pause_until, is_backup_retention_locked, time_scheduled_db_version_upgrade, is_disable_db_version_upgrade_schedule, is_schedule_db_version_upgrade_to_earliest, scheduled_operations, is_auto_scaling_for_storage_enabled, database_edition, db_tools_details, vanity_url_details, secret_id, secret_version_number, encryption_key, is_disconnect_peer, local_adg_resource_pool_leader_id, if_match, opc_dry_run):
+def update_autonomous_database(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, autonomous_database_id, backup_retention_period_in_days, compute_model, in_memory_percentage, local_adg_auto_failover_max_data_loss_limit, cpu_core_count, long_term_backup_schedule, is_dev_tier, compute_count, ocpu_count, data_storage_size_in_tbs, data_storage_size_in_gbs, display_name, is_free_tier, availability_domain, time_scheduled_ad_update, is_disable_ad_update_schedule, is_schedule_ad_update_to_earliest, admin_password, db_name, freeform_tags, defined_tags, security_attributes, db_workload, license_model, byol_compute_count_limit, is_access_control_enabled, whitelisted_ips, are_primary_whitelisted_ips_used, standby_whitelisted_ips, is_auto_scaling_enabled, is_refreshable_clone, refreshable_mode, is_local_data_guard_enabled, is_data_guard_enabled, peer_db_id, db_version, open_mode, permission_level, subnet_id, private_endpoint_label, private_endpoint_ip, nsg_ids, auto_refresh_frequency_in_seconds, auto_refresh_point_lag_in_seconds, time_of_auto_refresh_start, customer_contacts, is_mtls_connection_required, resource_pool_leader_id, resource_pool_summary, autonomous_maintenance_schedule_type, autonomous_database_maintenance_window, time_maintenance_pause_until, scheduled_maintenance_window, time_scheduled_maintenance_window_update, is_backup_retention_locked, time_scheduled_db_version_upgrade, is_disable_db_version_upgrade_schedule, is_schedule_db_version_upgrade_to_earliest, scheduled_operations, is_auto_scaling_for_storage_enabled, database_edition, db_tools_details, vanity_url_details, secret_id, secret_version_number, encryption_key, is_disconnect_peer, local_adg_resource_pool_leader_id, if_match, opc_dry_run):
 
     if isinstance(autonomous_database_id, six.string_types) and len(autonomous_database_id.strip()) == 0:
         raise click.UsageError('Parameter --autonomous-database-id cannot be whitespace or empty string')
     if not force:
-        if long_term_backup_schedule or freeform_tags or defined_tags or security_attributes or whitelisted_ips or standby_whitelisted_ips or nsg_ids or customer_contacts or resource_pool_summary or autonomous_database_maintenance_window or scheduled_operations or db_tools_details or vanity_url_details or encryption_key:
-            if not click.confirm("WARNING: Updates to long-term-backup-schedule and freeform-tags and defined-tags and security-attributes and whitelisted-ips and standby-whitelisted-ips and nsg-ids and customer-contacts and resource-pool-summary and autonomous-database-maintenance-window and scheduled-operations and db-tools-details and vanity-url-details and encryption-key will replace any existing values. Are you sure you want to continue?"):
+        if long_term_backup_schedule or freeform_tags or defined_tags or security_attributes or whitelisted_ips or standby_whitelisted_ips or nsg_ids or customer_contacts or resource_pool_summary or autonomous_database_maintenance_window or scheduled_maintenance_window or scheduled_operations or db_tools_details or vanity_url_details or encryption_key:
+            if not click.confirm("WARNING: Updates to long-term-backup-schedule and freeform-tags and defined-tags and security-attributes and whitelisted-ips and standby-whitelisted-ips and nsg-ids and customer-contacts and resource-pool-summary and autonomous-database-maintenance-window and scheduled-maintenance-window and scheduled-operations and db-tools-details and vanity-url-details and encryption-key will replace any existing values. Are you sure you want to continue?"):
                 ctx.abort()
 
     kwargs = {}
@@ -36242,6 +36307,12 @@ def update_autonomous_database(ctx, from_json, force, wait_for_state, max_wait_s
 
     if time_maintenance_pause_until is not None:
         _details['timeMaintenancePauseUntil'] = time_maintenance_pause_until
+
+    if scheduled_maintenance_window is not None:
+        _details['scheduledMaintenanceWindow'] = cli_util.parse_json_parameter("scheduled_maintenance_window", scheduled_maintenance_window)
+
+    if time_scheduled_maintenance_window_update is not None:
+        _details['timeScheduledMaintenanceWindowUpdate'] = time_scheduled_maintenance_window_update
 
     if is_backup_retention_locked is not None:
         _details['isBackupRetentionLocked'] = is_backup_retention_locked
@@ -36284,2618 +36355,6 @@ def update_autonomous_database(ctx, from_json, force, wait_for_state, max_wait_s
 
     if local_adg_resource_pool_leader_id is not None:
         _details['localAdgResourcePoolLeaderId'] = local_adg_resource_pool_leader_id
-
-    client = cli_util.build_client('database', 'database', ctx)
-    result = client.update_autonomous_database(
-        autonomous_database_id=autonomous_database_id,
-        update_autonomous_database_details=_details,
-        **kwargs
-    )
-    if wait_for_state:
-
-        if hasattr(client, 'get_autonomous_database') and callable(getattr(client, 'get_autonomous_database')):
-            try:
-                wait_period_kwargs = {}
-                if max_wait_seconds is not None:
-                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
-                if wait_interval_seconds is not None:
-                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
-
-                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
-                result = oci.wait_until(client, client.get_autonomous_database(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
-            except oci.exceptions.MaximumWaitTimeExceeded as e:
-                # If we fail, we should show an error, but we should still provide the information to the customer
-                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
-                cli_util.render_response(result, ctx)
-                sys.exit(2)
-            except Exception:
-                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
-                cli_util.render_response(result, ctx)
-                raise
-        else:
-            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
-    cli_util.render_response(result, ctx)
-
-
-@autonomous_database_group.command(name=cli_util.override('db.update_autonomous_database_okv_key_details.command_name', 'update-autonomous-database-okv-key-details'), help=u"""Updates one or more attributes of the specified Autonomous AI Database. See the UpdateAutonomousDatabaseDetails resource for a full list of attributes that can be updated. \n[Command Reference](updateAutonomousDatabase)""")
-@cli_util.option('--autonomous-database-id', required=True, help=u"""The database [OCID].""")
-@cli_util.option('--encryption-key-okv-uri', required=True, help=u"""URI of OKV server""")
-@cli_util.option('--encryption-key-okv-kms-key', required=True, help=u"""UUID of OKV KMS Key""")
-@cli_util.option('--encryption-key-directory-name', required=True, help=u"""OKV wallet directory name""")
-@cli_util.option('--encryption-key-certificate-directory-name', required=True, help=u"""OKV certificate directory name""")
-@cli_util.option('--backup-retention-period-in-days', type=click.INT, help=u"""Retention period, in days, for long-term backups""")
-@cli_util.option('--compute-model', type=custom_types.CliCaseInsensitiveChoice(["ECPU", "OCPU"]), help=u"""The compute model of the Autonomous AI Database. This is required if using the `computeCount` parameter. If using `cpuCoreCount` then it is an error to specify `computeModel` to a non-null value. ECPU compute model is the recommended model and OCPU compute model is legacy.""")
-@cli_util.option('--in-memory-percentage', type=click.INT, help=u"""The percentage of the System Global Area(SGA) assigned to In-Memory tables in Autonomous AI Database. This property is applicable only to Autonomous AI Databases on the Exadata Cloud@Customer platform.""")
-@cli_util.option('--local-adg-auto-failover-max-data-loss-limit', type=click.INT, help=u"""Parameter that allows users to select an acceptable maximum data loss limit in seconds, up to which Automatic Failover will be triggered when necessary for a Local Autonomous Data Guard""")
-@cli_util.option('--cpu-core-count', type=click.INT, help=u"""The number of CPUs to be made available to the Autonomous AI Database.<br> For Autonomous AI Databases on Dedicated Exadata Infrastructure: - The CPU type (OCPUs or ECPUs) is determined by the parent Autonomous Exadata VM Cluster's compute model. - It is suggested to use 'computeCount' parameter if you want to use fractional value to provision less than 1 core.
-
-**Note:** This parameter cannot be used with the `ocpuCount` or `computeCount` parameter.
-
-This cannot be updated in parallel with any of the following: licenseModel, databaseEdition, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--long-term-backup-schedule', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-dev-tier', type=click.BOOL, help=u"""Autonomous AI Database for Developers are fixed-shape Autonomous AI Databases that developers can use to build and test new applications. On Serverless, these are low-cost and billed per instance, on Dedicated and Cloud@Customer there is no additional cost to create Developer databases. Developer databases come with limited resources and is not intended for large-scale testing and production deployments. When you need more compute or storage resources, you may upgrade to a full paid production database.""")
-@cli_util.option('--compute-count', type=click.FLOAT, help=u"""The compute amount (CPUs) available to the database. Minimum and maximum values depend on the compute model and whether the database is an Autonomous AI Database Serverless instance or an Autonomous AI Database on Dedicated Exadata Infrastructure. The 'ECPU' compute model requires a minimum value of one, for databases in the elastic resource pool and minimum value of two, otherwise. Required when using the `computeModel` parameter. When using `cpuCoreCount` parameter, it is an error to specify computeCount to a non-null value. Providing `computeModel` and `computeCount` is the preferred method for both OCPU and ECPU.
-
-This cannot be updated in parallel with any of the following: licenseModel, databaseEdition, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--ocpu-count', type=click.FLOAT, help=u"""The number of OCPU cores to be made available to the Autonomous AI Database.
-
-For Autonomous AI Databases on Dedicated Exadata Infrastructure, you can specify a fractional value for this parameter. Fractional values are not supported for Autonomous AI Database Serverless instances. For Autonomous AI Database Serverless instances, this parameter is not used.
-
-To provision less than 1 core, enter a fractional value in an increment of 0.1. To provision 1 or more cores, you must enter an integer between 1 and the maximum number of cores available to the infrastructure shape. For example, you can provision 0.3 or 0.4 cores, but not 0.35 cores. Likewise, you can provision 2 cores or 3 cores, but not 2.5 cores. The maximum number of cores is determined by the infrastructure shape. See [Characteristics of Infrastructure Shapes] for shape details.
-
-**Note:** This parameter cannot be used with the `cpuCoreCount` parameter.""")
-@cli_util.option('--data-storage-size-in-tbs', type=click.INT, help=u"""The size, in terabytes, of the data volume that will be created and attached to the database. For Autonomous AI Databases on dedicated Exadata infrastructure, the maximum storage value is determined by the infrastructure shape. See [Characteristics of Infrastructure Shapes] for shape details. A full Exadata service is allocated when the Autonomous AI Database size is set to the upper limit (384 TB).
-
-**Note:** This parameter cannot be used with the `dataStorageSizeInGBs` parameter.
-
-This cannot be updated in parallel with any of the following: licenseModel, databaseEdition, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--data-storage-size-in-gbs', type=click.INT, help=u"""Applies to dedicated Exadata infrastructure only.
-
-The size, in gigabytes, of the data volume that will be created and attached to the database. The maximum storage value depends on the system shape. See [Characteristics of Infrastructure Shapes] for shape details.
-
-**Note:** This parameter cannot be used with the `dataStorageSizeInTBs` parameter.""")
-@cli_util.option('--display-name', help=u"""The user-friendly name for the Autonomous AI Database. The name does not have to be unique. The display name can only be updated for Autonomous AI Databases using dedicated Exadata Infrastructure. This parameter may not be updated in parallel with dbVersion.""")
-@cli_util.option('--is-free-tier', type=click.BOOL, help=u"""Indicates if this is an Always Free resource. The default value is false. Note that Always Free Autonomous AI Databases have 1 CPU and 20GB of memory. For Always Free databases, memory and CPU cannot be scaled.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isLocalDataGuardEnabled""")
-@cli_util.option('--availability-domain', help=u"""The Autonomous Database Serverless instance's availability domain.""")
-@cli_util.option('--time-scheduled-ad-update', type=custom_types.CLI_DATETIME, help=u"""The date and time when the Autonomous Database availability domain is to be updated.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--is-disable-ad-update-schedule', type=click.BOOL, help=u"""True, if you want to disable Autonomous Database availability domain scheduled update.""")
-@cli_util.option('--is-schedule-ad-update-to-earliest', type=click.BOOL, help=u"""True, if you want to schedule Autonomous Database availability domain update to the earliest available time.""")
-@cli_util.option('--admin-password', help=u"""The password must be between 12 and 30 characters long, and must contain at least 1 uppercase, 1 lowercase, and 1 numeric character. It cannot contain the double quote symbol (\") or the username \"admin\", regardless of casing. It must be different from the last four passwords and it must not be a password used within the last 24 hours.
-
-This cannot be used in conjunction with with OCI vault secrets (secretId).
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, whitelistedIps, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, or isFreeTier.""")
-@cli_util.option('--db-name', help=u"""New name for this Autonomous AI Database. For Autonomous AI Databases on Dedicated Exadata Infrastructure, the name must begin with an alphabetic character, and can contain a maximum of eight alphanumeric characters. Special characters are not permitted. For Autonomous AI Database Serverless instances, the name must begin with an alphabetic character, and can contain a maximum of 30 alphanumeric characters. Special characters are not permitted. The database name must be unique in the tenancy.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails.""")
-@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
-
-Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--security-attributes', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Security Attributes for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags]. Example: `{\"Oracle-ZPR\": {\"MaxEgressCount\": {\"value\": \"42\", \"mode\": \"audit\"}}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--db-workload', type=custom_types.CliCaseInsensitiveChoice(["OLTP", "DW", "AJD", "APEX", "LH"]), help=u"""The Autonomous AI Database workload type. The following values are valid: - OLTP - indicates an Autonomous AI Transaction Processing database - DW - indicates an Autonomous AI Lakehouse database - AJD - indicates an Autonomous AI JSON Database - APEX - indicates an Autonomous AI Database with the Oracle APEX AI Application Development workload type. - LH - indicates an Oracle Autonomous AI Lakehouse database
-
-**Note** Starting December 2026, DW will not be supported as a valid value for this parameter. When creating an Autonomous AI Database, if this parameter is not specified, the default value is `OLTP`.
-
- This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""")
-@cli_util.option('--license-model', type=custom_types.CliCaseInsensitiveChoice(["LICENSE_INCLUDED", "BRING_YOUR_OWN_LICENSE"]), help=u"""The Oracle license model that applies to the Oracle Autonomous AI Database. Bring your own license (BYOL) allows you to apply your current on-premises Oracle software licenses to equivalent, highly automated Oracle services in the cloud. License Included allows you to subscribe to new Oracle AI Database software licenses and the Oracle AI Database service. Note that when provisioning an [Autonomous AI Database on dedicated Exadata infrastructure], this attribute must be null. It is already set at the Autonomous Exadata Infrastructure level. When provisioning an [Autonomous AI Database Serverless]  database, if a value is not specified, the system defaults the value to `BRING_YOUR_OWN_LICENSE`. Bring your own license (BYOL) also allows you to select the DB edition using the optional parameter.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, dataStorageSizeInTBs, adminPassword, isMTLSConnectionRequired, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--byol-compute-count-limit', type=click.FLOAT, help=u"""The maximum number of CPUs allowed with a Bring Your Own License (BYOL), including those used for auto-scaling, disaster recovery, tools, etc. Any CPU usage above this limit is considered as License Included and billed.""")
-@cli_util.option('--is-access-control-enabled', type=click.BOOL, help=u"""Indicates if the database-level access control is enabled. If disabled, database access is defined by the network security rules. If enabled, database access is restricted to the IP addresses defined by the rules specified with the `whitelistedIps` property. While specifying `whitelistedIps` rules is optional,  if database-level access control is enabled and no rules are specified, the database will become inaccessible. The rules can be added later using the `UpdateAutonomousDatabase` API operation or edit option in console. When creating a database clone, the desired access control setting should be specified. By default, database-level access control will be disabled for the clone.
-
-This property is applicable only to Autonomous AI Databases on the Exadata Cloud@Customer platform. For Autonomous AI Database Serverless instances, `whitelistedIps` is used.""")
-@cli_util.option('--whitelisted-ips', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The client IP access control list (ACL). This feature is available for [Autonomous AI Database Serverless]  and on Exadata Cloud@Customer. Only clients connecting from an IP address included in the ACL may access the Autonomous AI Database instance. If `arePrimaryWhitelistedIpsUsed` is 'TRUE' then Autonomous AI Database uses this primary's IP access control list (ACL) for the disaster recovery peer called `standbywhitelistedips`.
-
-For Autonomous AI Database Serverless, this is an array of CIDR (classless inter-domain routing) notations for a subnet or VCN OCID (virtual cloud network Oracle Cloud ID). Multiple IPs and VCN OCIDs should be separate strings separated by commas, but if it\u2019s other configurations that need multiple pieces of information then its each piece is connected with semicolon (;) as a delimiter. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"ocid1.vcn.oc1.sea.<unique_id>\",\"ocid1.vcn.oc1.sea.<unique_id1>;1.1.1.1\",\"ocid1.vcn.oc1.sea.<unique_id2>;1.1.0.0/16\"]` For Exadata Cloud@Customer, this is an array of IP addresses or CIDR notations. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"1.1.2.25\"]`
-
-For an update operation, if you want to delete all the IPs in the ACL, use an array with a single empty string entry.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--are-primary-whitelisted-ips-used', type=click.BOOL, help=u"""This field will be null if the Autonomous AI Database is not Data Guard enabled or Access Control is disabled. `TRUE` if the Autonomous AI Database has Data Guard and Access Control enabled, and the Autonomous AI Database uses the primary's IP access control list (ACL) for standby. `FALSE` if the Autonomous AI Database has Data Guard and Access Control enabled, and the Autonomous AI Database uses a different IP access control list (ACL) for standby compared to primary.""")
-@cli_util.option('--standby-whitelisted-ips', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The client IP access control list (ACL). This feature is available for [Autonomous AI Database Serverless]  and on Exadata Cloud@Customer. Only clients connecting from an IP address included in the ACL may access the Autonomous AI Database instance. If `arePrimaryWhitelistedIpsUsed` is 'TRUE' then Autonomous AI Database uses this primary's IP access control list (ACL) for the disaster recovery peer called `standbywhitelistedips`.
-
-For Autonomous AI Database Serverless, this is an array of CIDR (classless inter-domain routing) notations for a subnet or VCN OCID (virtual cloud network Oracle Cloud ID). Multiple IPs and VCN OCIDs should be separate strings separated by commas, but if it\u2019s other configurations that need multiple pieces of information then its each piece is connected with semicolon (;) as a delimiter. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"ocid1.vcn.oc1.sea.<unique_id>\",\"ocid1.vcn.oc1.sea.<unique_id1>;1.1.1.1\",\"ocid1.vcn.oc1.sea.<unique_id2>;1.1.0.0/16\"]` For Exadata Cloud@Customer, this is an array of IP addresses or CIDR notations. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"1.1.2.25\"]`
-
-For an update operation, if you want to delete all the IPs in the ACL, use an array with a single empty string entry.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-auto-scaling-enabled', type=click.BOOL, help=u"""Indicates whether auto scaling is enabled for the Autonomous AI Database CPU core count. Setting to `TRUE` enables auto scaling. Setting to `FALSE` disables auto scaling. The default value is `TRUE`. Auto scaling is only available for [Autonomous AI Database Serverless instances].""")
-@cli_util.option('--is-refreshable-clone', type=click.BOOL, help=u"""Indicates if the Autonomous AI Database is a refreshable clone.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""")
-@cli_util.option('--refreshable-mode', type=custom_types.CliCaseInsensitiveChoice(["AUTOMATIC", "MANUAL"]), help=u"""The refresh mode of the clone. AUTOMATIC indicates that the clone is automatically being refreshed with data from the source Autonomous AI Database.""")
-@cli_util.option('--is-local-data-guard-enabled', type=click.BOOL, help=u"""Indicates whether the Autonomous AI Database has a local (in-region) standby database. Not applicable when creating a cross-region Autonomous Data Guard associations, or to Autonomous AI Databases using dedicated Exadata infrastructure or Exadata Cloud@Customer infrastructure.
-
-To create a local standby, set to `TRUE`. To delete a local standby, set to `FALSE`. For more information on using Autonomous Data Guard on an Autonomous AI Database Serverless instance (local and cross-region) , see [About Standby Databases]
-
-To enable cross-region Autonomous Data Guard on an Autonomous AI Database Serverless instance, see [Enable Autonomous Data Guard].
-
-This cannot be updated in parallel with any of the following: isMTLSRequired, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--is-data-guard-enabled', type=click.BOOL, help=u"""** Deprecated. ** Indicates whether the Autonomous AI Database has a local (in-region) standby database. Not applicable when creating a cross-region Autonomous Data Guard associations, or to Autonomous AI Databases using dedicated Exadata infrastructure or Exadata Cloud@Customer infrastructure.
-
-To create a local standby, set to `TRUE`. To delete a local standby, set to `FALSE`. For more information on using Autonomous Data Guard on an Autonomous AI Database Serverless instance (local and cross-region) , see [About Standby Databases]
-
-To enable cross-region Autonomous Data Guard on an Autonomous AI Database Serverless instance, see [Enable Autonomous Data Guard].
-
-To delete a cross-region standby database, provide the `peerDbId` for the standby database in a remote region, and set `isDataGuardEnabled` to `FALSE`.""")
-@cli_util.option('--peer-db-id', help=u"""The database OCID(/Content/General/Concepts/identifiers.htm) of the Disaster Recovery peer (source Primary) database, which is located in a different (remote) region from the current peer database.
-
-To create or delete a local (in-region) standby, see the `isDataGuardEnabled` parameter.
-
-When disconnecting a cross-region standby, specify the standby database OCID in this parameter together with `isDisconnectPeer=true`.""")
-@cli_util.option('--db-version', help=u"""A valid Oracle AI Database version for Autonomous AI Database. When you specify 23ai for dbversion, the system will provision a 23ai database, but the UI will display it as 26ai. When you specify 26ai for dbversion, the system will provision and display a 26ai database as expected. For new databases, it is recommended to use either 19c or 26ai.
-
-**Note** Starting December 2026, 23ai will not be supported as a valid value for this parameter.""")
-@cli_util.option('--open-mode', type=custom_types.CliCaseInsensitiveChoice(["READ_ONLY", "READ_WRITE"]), help=u"""Indicates the Autonomous AI Database mode. The database can be opened in `READ_ONLY` or `READ_WRITE` mode.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--permission-level', type=custom_types.CliCaseInsensitiveChoice(["RESTRICTED", "UNRESTRICTED"]), help=u"""The Autonomous AI Database permission level. Restricted mode allows access only by admin users.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--subnet-id', help=u"""The [OCID] of the subnet the resource is associated with.
-
-**Subnet Restrictions:** - For bare metal DB systems and for single node virtual machine DB systems, do not use a subnet that overlaps with 192.168.16.16/28. - For Exadata and virtual machine 2-node RAC systems, do not use a subnet that overlaps with 192.168.128.0/20. - For Autonomous AI Database, setting this will disable public secure access to the database.
-
-These subnets are used by the Oracle Clusterware private interconnect on the database instance. Specifying an overlapping subnet will cause the private interconnect to malfunction. This restriction applies to both the client subnet and the backup subnet.""")
-@cli_util.option('--private-endpoint-label', help=u"""The resource's private endpoint label. - Setting the endpoint label to a non-empty string creates a private endpoint database. - Resetting the endpoint label to an empty string, after the creation of the private endpoint database, changes the private endpoint database to a public endpoint database. - Setting the endpoint label to a non-empty string value, updates to a new private endpoint database, when the database is disabled and re-enabled.
-
-This setting cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--private-endpoint-ip', help=u"""The private endpoint Ip address for the resource.""")
-@cli_util.option('--nsg-ids', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of [OCIDs] for the network security groups (NSGs) to which this resource belongs. Setting this to an empty list removes all resources from all NSGs. For more information about NSGs, see [Security Rules]. **NsgIds restrictions:** - A network security group (NSG) is optional for Autonomous AI Databases with private access. The nsgIds list can be empty.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--auto-refresh-frequency-in-seconds', type=click.INT, help=u"""The frequency a refreshable clone is refreshed after auto-refresh is enabled. The minimum is 1 hour. The maximum is 7 days. The date and time that auto-refresh is enabled is controlled by the `timeOfAutoRefreshStart` parameter.""")
-@cli_util.option('--auto-refresh-point-lag-in-seconds', type=click.INT, help=u"""The time, in seconds, the data of the refreshable clone lags the primary database at the point of refresh. The minimum is 0 minutes (0 mins means refresh to the latest available timestamp). The maximum is 7 days. The lag time increases after refreshing until the next data refresh happens.""")
-@cli_util.option('--time-of-auto-refresh-start', type=custom_types.CLI_DATETIME, help=u"""The the date and time that auto-refreshing will begin for an Autonomous AI Database refreshable clone. This value controls only the start time for the first refresh operation. Subsequent (ongoing) refresh operations have start times controlled by the value of the `autoRefreshFrequencyInSeconds` parameter.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--customer-contacts', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Customer Contacts. Setting this to an empty list removes all customer contacts of an Oracle
-
-This cannot be updated in parallel with any of the following: isMTLSConnectionRequired, scheduledOperations, or dbToolsDetails.
-
-This option is a JSON list with items of type CustomerContact.  For documentation on CustomerContact please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/database/20160918/datatypes/CustomerContact.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-mtls-connection-required', type=click.BOOL, help=u"""Specifies if the Autonomous AI Database requires mTLS connections.
-
-This may not be updated in parallel with any of the following: licenseModel, databaseEdition, cpuCoreCount, computeCount, dataStorageSizeInTBs, whitelistedIps, openMode, permissionLevel, db-workload, privateEndpointLabel, nsgIds, customerContacts, dbVersion, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.
-
-Service Change: The default value of the isMTLSConnectionRequired attribute will change from true to false on July 1, 2023 in the following APIs: - CreateAutonomousDatabase - GetAutonomousDatabase - UpdateAutonomousDatabase Details: Prior to the July 1, 2023 change, the isMTLSConnectionRequired attribute default value was true. This applies to Autonomous AI Database Serverless. Does this impact me? If you use or maintain custom scripts or Terraform scripts referencing the CreateAutonomousDatabase, GetAutonomousDatabase, or UpdateAutonomousDatabase APIs, you want to check, and possibly modify, the scripts for the changed default value of the attribute. Should you choose not to leave your scripts unchanged, the API calls containing this attribute will continue to work, but the default value will switch from true to false. How do I make this change? Using either OCI SDKs or command line tools, update your custom scripts to explicitly set the isMTLSConnectionRequired attribute to true.""")
-@cli_util.option('--resource-pool-leader-id', help=u"""The unique identifier for leader Autonomous AI Database OCID [OCID].""")
-@cli_util.option('--resource-pool-summary', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--autonomous-maintenance-schedule-type', type=custom_types.CliCaseInsensitiveChoice(["EARLY", "REGULAR"]), help=u"""The maintenance schedule type of the Autonomous AI Database Serverless. An EARLY maintenance schedule follows a schedule applying patches prior to the REGULAR schedule. A REGULAR maintenance schedule follows the normal cycle""")
-@cli_util.option('--autonomous-database-maintenance-window', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--time-maintenance-pause-until', type=custom_types.CLI_DATETIME, help=u"""The date until which Autonomous AI Database maintenance is temporarily paused.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--is-backup-retention-locked', type=click.BOOL, help=u"""True if the Autonomous AI Database is backup retention locked.""")
-@cli_util.option('--time-scheduled-db-version-upgrade', type=custom_types.CLI_DATETIME, help=u"""The date and time the Autonomous AI Database scheduled to upgrade to 26ai.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--is-disable-db-version-upgrade-schedule', type=click.BOOL, help=u"""True if user wants to disable Autonomous AI Database scheduled upgrade to 26ai.""")
-@cli_util.option('--is-schedule-db-version-upgrade-to-earliest', type=click.BOOL, help=u"""True if user wants to schedule Autonomous AI Database upgrade to the earliest available time.""")
-@cli_util.option('--scheduled-operations', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of scheduled operations. Consists of values such as dayOfWeek, scheduledStartTime, scheduledStopTime.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.
-
-This option is a JSON list with items of type ScheduledOperationDetails.  For documentation on ScheduledOperationDetails please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/database/20160918/datatypes/ScheduledOperationDetails.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-auto-scaling-for-storage-enabled', type=click.BOOL, help=u"""Indicates if auto scaling is enabled for the Autonomous AI Database storage. The default value is `FALSE`.""")
-@cli_util.option('--database-edition', help=u"""The Oracle AI Database Edition that applies to the Autonomous AI Databases. This parameter accepts options `STANDARD_EDITION` and `ENTERPRISE_EDITION`.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--db-tools-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of database tools details.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, isLocalDataGuardEnabled, or isFreeTier.
-
-This option is a JSON list with items of type DatabaseTool.  For documentation on DatabaseTool please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/database/20160918/datatypes/DatabaseTool.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--vanity-url-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--secret-id', help=u"""The OCI vault secret [/Content/General/Concepts/identifiers.htm]OCID. This cannot be used in conjunction with adminPassword.""")
-@cli_util.option('--secret-version-number', type=click.INT, help=u"""The version of the vault secret. If no version is specified, the latest version will be used.""")
-@cli_util.option('--is-disconnect-peer', type=click.BOOL, help=u"""If true, this disconnects the Autonomous AI Database from its peer. After the disconnect completes, the Autonomous AI Database works permanently as a standalone database.
-
-**Warning:** A disconnected standby is no longer part of the disaster recovery configuration. Operations and restrictions that apply to a connected standby do not apply in the same way after the database has been disconnected.
-
-To disconnect a cross region standby, also provide the OCID of the standby database in the `peerDbId` parameter.""")
-@cli_util.option('--local-adg-resource-pool-leader-id', help=u"""The [OCID] of a dedicated resource pool leader Autonomous AI Database in the same region, that is required when local Autonomous Data Guard is enabled for a dedicated resource pool member using the parameter `isLocalDataGuardEnabled`. This field applies only to dedicated resource pool members, and the specified leader must be different from the primary\u2019s leader. Local Autonomous Data Guard can be enabled only if more than one dedicated resource pool exists in the region.""")
-@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource.  The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
-@cli_util.option('--opc-dry-run', type=click.BOOL, help=u"""Indicates that the request is a dry run, if set to \"true\". A dry run request does not actually creating or updating a resource and is used only to perform validation on the submitted data.""")
-@cli_util.option('--encryption-key-certificate-id', help=u"""OKV certificate id""")
-@cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
-@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["PROVISIONING", "AVAILABLE", "STOPPING", "STOPPED", "STARTING", "TERMINATING", "TERMINATED", "UNAVAILABLE", "RESTORE_IN_PROGRESS", "RESTORE_FAILED", "BACKUP_IN_PROGRESS", "SCALE_IN_PROGRESS", "AVAILABLE_NEEDS_ATTENTION", "UPDATING", "MAINTENANCE_IN_PROGRESS", "RESTARTING", "RECREATING", "ROLE_CHANGE_IN_PROGRESS", "UPGRADING", "INACCESSIBLE", "STANDBY", "TRANSPORTING"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state PROVISIONING --wait-for-state TRANSPORTING would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
-@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
-@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'long-term-backup-schedule': {'module': 'database', 'class': 'LongTermBackUpScheduleDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'standby-whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'customer-contacts': {'module': 'database', 'class': 'list[CustomerContact]'}, 'resource-pool-summary': {'module': 'database', 'class': 'ResourcePoolSummary'}, 'autonomous-database-maintenance-window': {'module': 'database', 'class': 'AutonomousDatabaseMaintenanceWindowSummary'}, 'scheduled-operations': {'module': 'database', 'class': 'list[ScheduledOperationDetails]'}, 'db-tools-details': {'module': 'database', 'class': 'list[DatabaseTool]'}, 'vanity-url-details': {'module': 'database', 'class': 'VanityUrlDetails'}})
-@cli_util.help_option
-@click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'long-term-backup-schedule': {'module': 'database', 'class': 'LongTermBackUpScheduleDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'standby-whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'customer-contacts': {'module': 'database', 'class': 'list[CustomerContact]'}, 'resource-pool-summary': {'module': 'database', 'class': 'ResourcePoolSummary'}, 'autonomous-database-maintenance-window': {'module': 'database', 'class': 'AutonomousDatabaseMaintenanceWindowSummary'}, 'scheduled-operations': {'module': 'database', 'class': 'list[ScheduledOperationDetails]'}, 'db-tools-details': {'module': 'database', 'class': 'list[DatabaseTool]'}, 'vanity-url-details': {'module': 'database', 'class': 'VanityUrlDetails'}}, output_type={'module': 'database', 'class': 'AutonomousDatabase'})
-@cli_util.wrap_exceptions
-def update_autonomous_database_okv_key_details(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, autonomous_database_id, encryption_key_okv_uri, encryption_key_okv_kms_key, encryption_key_directory_name, encryption_key_certificate_directory_name, backup_retention_period_in_days, compute_model, in_memory_percentage, local_adg_auto_failover_max_data_loss_limit, cpu_core_count, long_term_backup_schedule, is_dev_tier, compute_count, ocpu_count, data_storage_size_in_tbs, data_storage_size_in_gbs, display_name, is_free_tier, availability_domain, time_scheduled_ad_update, is_disable_ad_update_schedule, is_schedule_ad_update_to_earliest, admin_password, db_name, freeform_tags, defined_tags, security_attributes, db_workload, license_model, byol_compute_count_limit, is_access_control_enabled, whitelisted_ips, are_primary_whitelisted_ips_used, standby_whitelisted_ips, is_auto_scaling_enabled, is_refreshable_clone, refreshable_mode, is_local_data_guard_enabled, is_data_guard_enabled, peer_db_id, db_version, open_mode, permission_level, subnet_id, private_endpoint_label, private_endpoint_ip, nsg_ids, auto_refresh_frequency_in_seconds, auto_refresh_point_lag_in_seconds, time_of_auto_refresh_start, customer_contacts, is_mtls_connection_required, resource_pool_leader_id, resource_pool_summary, autonomous_maintenance_schedule_type, autonomous_database_maintenance_window, time_maintenance_pause_until, is_backup_retention_locked, time_scheduled_db_version_upgrade, is_disable_db_version_upgrade_schedule, is_schedule_db_version_upgrade_to_earliest, scheduled_operations, is_auto_scaling_for_storage_enabled, database_edition, db_tools_details, vanity_url_details, secret_id, secret_version_number, is_disconnect_peer, local_adg_resource_pool_leader_id, if_match, opc_dry_run, encryption_key_certificate_id):
-
-    if isinstance(autonomous_database_id, six.string_types) and len(autonomous_database_id.strip()) == 0:
-        raise click.UsageError('Parameter --autonomous-database-id cannot be whitespace or empty string')
-    if not force:
-        if long_term_backup_schedule or freeform_tags or defined_tags or security_attributes or whitelisted_ips or standby_whitelisted_ips or nsg_ids or customer_contacts or resource_pool_summary or autonomous_database_maintenance_window or scheduled_operations or db_tools_details or vanity_url_details:
-            if not click.confirm("WARNING: Updates to long-term-backup-schedule and freeform-tags and defined-tags and security-attributes and whitelisted-ips and standby-whitelisted-ips and nsg-ids and customer-contacts and resource-pool-summary and autonomous-database-maintenance-window and scheduled-operations and db-tools-details and vanity-url-details will replace any existing values. Are you sure you want to continue?"):
-                ctx.abort()
-
-    kwargs = {}
-    if if_match is not None:
-        kwargs['if_match'] = if_match
-    if opc_dry_run is not None:
-        kwargs['opc_dry_run'] = opc_dry_run
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
-
-    _details = {}
-    _details['encryptionKey'] = {}
-    _details['encryptionKey']['okvUri'] = encryption_key_okv_uri
-    _details['encryptionKey']['okvKmsKey'] = encryption_key_okv_kms_key
-    _details['encryptionKey']['directoryName'] = encryption_key_directory_name
-    _details['encryptionKey']['certificateDirectoryName'] = encryption_key_certificate_directory_name
-
-    if backup_retention_period_in_days is not None:
-        _details['backupRetentionPeriodInDays'] = backup_retention_period_in_days
-
-    if compute_model is not None:
-        _details['computeModel'] = compute_model
-
-    if in_memory_percentage is not None:
-        _details['inMemoryPercentage'] = in_memory_percentage
-
-    if local_adg_auto_failover_max_data_loss_limit is not None:
-        _details['localAdgAutoFailoverMaxDataLossLimit'] = local_adg_auto_failover_max_data_loss_limit
-
-    if cpu_core_count is not None:
-        _details['cpuCoreCount'] = cpu_core_count
-
-    if long_term_backup_schedule is not None:
-        _details['longTermBackupSchedule'] = cli_util.parse_json_parameter("long_term_backup_schedule", long_term_backup_schedule)
-
-    if is_dev_tier is not None:
-        _details['isDevTier'] = is_dev_tier
-
-    if compute_count is not None:
-        _details['computeCount'] = compute_count
-
-    if ocpu_count is not None:
-        _details['ocpuCount'] = ocpu_count
-
-    if data_storage_size_in_tbs is not None:
-        _details['dataStorageSizeInTBs'] = data_storage_size_in_tbs
-
-    if data_storage_size_in_gbs is not None:
-        _details['dataStorageSizeInGBs'] = data_storage_size_in_gbs
-
-    if display_name is not None:
-        _details['displayName'] = display_name
-
-    if is_free_tier is not None:
-        _details['isFreeTier'] = is_free_tier
-
-    if availability_domain is not None:
-        _details['availabilityDomain'] = availability_domain
-
-    if time_scheduled_ad_update is not None:
-        _details['timeScheduledAdUpdate'] = time_scheduled_ad_update
-
-    if is_disable_ad_update_schedule is not None:
-        _details['isDisableAdUpdateSchedule'] = is_disable_ad_update_schedule
-
-    if is_schedule_ad_update_to_earliest is not None:
-        _details['isScheduleAdUpdateToEarliest'] = is_schedule_ad_update_to_earliest
-
-    if admin_password is not None:
-        _details['adminPassword'] = admin_password
-
-    if db_name is not None:
-        _details['dbName'] = db_name
-
-    if freeform_tags is not None:
-        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
-
-    if defined_tags is not None:
-        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
-
-    if security_attributes is not None:
-        _details['securityAttributes'] = cli_util.parse_json_parameter("security_attributes", security_attributes)
-
-    if db_workload is not None:
-        _details['dbWorkload'] = db_workload
-
-    if license_model is not None:
-        _details['licenseModel'] = license_model
-
-    if byol_compute_count_limit is not None:
-        _details['byolComputeCountLimit'] = byol_compute_count_limit
-
-    if is_access_control_enabled is not None:
-        _details['isAccessControlEnabled'] = is_access_control_enabled
-
-    if whitelisted_ips is not None:
-        _details['whitelistedIps'] = cli_util.parse_json_parameter("whitelisted_ips", whitelisted_ips)
-
-    if are_primary_whitelisted_ips_used is not None:
-        _details['arePrimaryWhitelistedIpsUsed'] = are_primary_whitelisted_ips_used
-
-    if standby_whitelisted_ips is not None:
-        _details['standbyWhitelistedIps'] = cli_util.parse_json_parameter("standby_whitelisted_ips", standby_whitelisted_ips)
-
-    if is_auto_scaling_enabled is not None:
-        _details['isAutoScalingEnabled'] = is_auto_scaling_enabled
-
-    if is_refreshable_clone is not None:
-        _details['isRefreshableClone'] = is_refreshable_clone
-
-    if refreshable_mode is not None:
-        _details['refreshableMode'] = refreshable_mode
-
-    if is_local_data_guard_enabled is not None:
-        _details['isLocalDataGuardEnabled'] = is_local_data_guard_enabled
-
-    if is_data_guard_enabled is not None:
-        _details['isDataGuardEnabled'] = is_data_guard_enabled
-
-    if peer_db_id is not None:
-        _details['peerDbId'] = peer_db_id
-
-    if db_version is not None:
-        _details['dbVersion'] = db_version
-
-    if open_mode is not None:
-        _details['openMode'] = open_mode
-
-    if permission_level is not None:
-        _details['permissionLevel'] = permission_level
-
-    if subnet_id is not None:
-        _details['subnetId'] = subnet_id
-
-    if private_endpoint_label is not None:
-        _details['privateEndpointLabel'] = private_endpoint_label
-
-    if private_endpoint_ip is not None:
-        _details['privateEndpointIp'] = private_endpoint_ip
-
-    if nsg_ids is not None:
-        _details['nsgIds'] = cli_util.parse_json_parameter("nsg_ids", nsg_ids)
-
-    if auto_refresh_frequency_in_seconds is not None:
-        _details['autoRefreshFrequencyInSeconds'] = auto_refresh_frequency_in_seconds
-
-    if auto_refresh_point_lag_in_seconds is not None:
-        _details['autoRefreshPointLagInSeconds'] = auto_refresh_point_lag_in_seconds
-
-    if time_of_auto_refresh_start is not None:
-        _details['timeOfAutoRefreshStart'] = time_of_auto_refresh_start
-
-    if customer_contacts is not None:
-        _details['customerContacts'] = cli_util.parse_json_parameter("customer_contacts", customer_contacts)
-
-    if is_mtls_connection_required is not None:
-        _details['isMtlsConnectionRequired'] = is_mtls_connection_required
-
-    if resource_pool_leader_id is not None:
-        _details['resourcePoolLeaderId'] = resource_pool_leader_id
-
-    if resource_pool_summary is not None:
-        _details['resourcePoolSummary'] = cli_util.parse_json_parameter("resource_pool_summary", resource_pool_summary)
-
-    if autonomous_maintenance_schedule_type is not None:
-        _details['autonomousMaintenanceScheduleType'] = autonomous_maintenance_schedule_type
-
-    if autonomous_database_maintenance_window is not None:
-        _details['autonomousDatabaseMaintenanceWindow'] = cli_util.parse_json_parameter("autonomous_database_maintenance_window", autonomous_database_maintenance_window)
-
-    if time_maintenance_pause_until is not None:
-        _details['timeMaintenancePauseUntil'] = time_maintenance_pause_until
-
-    if is_backup_retention_locked is not None:
-        _details['isBackupRetentionLocked'] = is_backup_retention_locked
-
-    if time_scheduled_db_version_upgrade is not None:
-        _details['timeScheduledDbVersionUpgrade'] = time_scheduled_db_version_upgrade
-
-    if is_disable_db_version_upgrade_schedule is not None:
-        _details['isDisableDbVersionUpgradeSchedule'] = is_disable_db_version_upgrade_schedule
-
-    if is_schedule_db_version_upgrade_to_earliest is not None:
-        _details['isScheduleDbVersionUpgradeToEarliest'] = is_schedule_db_version_upgrade_to_earliest
-
-    if scheduled_operations is not None:
-        _details['scheduledOperations'] = cli_util.parse_json_parameter("scheduled_operations", scheduled_operations)
-
-    if is_auto_scaling_for_storage_enabled is not None:
-        _details['isAutoScalingForStorageEnabled'] = is_auto_scaling_for_storage_enabled
-
-    if database_edition is not None:
-        _details['databaseEdition'] = database_edition
-
-    if db_tools_details is not None:
-        _details['dbToolsDetails'] = cli_util.parse_json_parameter("db_tools_details", db_tools_details)
-
-    if vanity_url_details is not None:
-        _details['vanityUrlDetails'] = cli_util.parse_json_parameter("vanity_url_details", vanity_url_details)
-
-    if secret_id is not None:
-        _details['secretId'] = secret_id
-
-    if secret_version_number is not None:
-        _details['secretVersionNumber'] = secret_version_number
-
-    if is_disconnect_peer is not None:
-        _details['isDisconnectPeer'] = is_disconnect_peer
-
-    if local_adg_resource_pool_leader_id is not None:
-        _details['localAdgResourcePoolLeaderId'] = local_adg_resource_pool_leader_id
-
-    if encryption_key_certificate_id is not None:
-        _details['encryptionKey']['certificateId'] = encryption_key_certificate_id
-
-    _details['encryptionKey']['provider'] = 'OKV'
-
-    client = cli_util.build_client('database', 'database', ctx)
-    result = client.update_autonomous_database(
-        autonomous_database_id=autonomous_database_id,
-        update_autonomous_database_details=_details,
-        **kwargs
-    )
-    if wait_for_state:
-
-        if hasattr(client, 'get_autonomous_database') and callable(getattr(client, 'get_autonomous_database')):
-            try:
-                wait_period_kwargs = {}
-                if max_wait_seconds is not None:
-                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
-                if wait_interval_seconds is not None:
-                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
-
-                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
-                result = oci.wait_until(client, client.get_autonomous_database(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
-            except oci.exceptions.MaximumWaitTimeExceeded as e:
-                # If we fail, we should show an error, but we should still provide the information to the customer
-                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
-                cli_util.render_response(result, ctx)
-                sys.exit(2)
-            except Exception:
-                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
-                cli_util.render_response(result, ctx)
-                raise
-        else:
-            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
-    cli_util.render_response(result, ctx)
-
-
-@autonomous_database_group.command(name=cli_util.override('db.update_autonomous_database_azure_key_details.command_name', 'update-autonomous-database-azure-key-details'), help=u"""Updates one or more attributes of the specified Autonomous AI Database. See the UpdateAutonomousDatabaseDetails resource for a full list of attributes that can be updated. \n[Command Reference](updateAutonomousDatabase)""")
-@cli_util.option('--autonomous-database-id', required=True, help=u"""The database [OCID].""")
-@cli_util.option('--encryption-key-vault-uri', required=True, help=u"""Azure vault URI""")
-@cli_util.option('--encryption-key-key-name', required=True, help=u"""Azure key name""")
-@cli_util.option('--backup-retention-period-in-days', type=click.INT, help=u"""Retention period, in days, for long-term backups""")
-@cli_util.option('--compute-model', type=custom_types.CliCaseInsensitiveChoice(["ECPU", "OCPU"]), help=u"""The compute model of the Autonomous AI Database. This is required if using the `computeCount` parameter. If using `cpuCoreCount` then it is an error to specify `computeModel` to a non-null value. ECPU compute model is the recommended model and OCPU compute model is legacy.""")
-@cli_util.option('--in-memory-percentage', type=click.INT, help=u"""The percentage of the System Global Area(SGA) assigned to In-Memory tables in Autonomous AI Database. This property is applicable only to Autonomous AI Databases on the Exadata Cloud@Customer platform.""")
-@cli_util.option('--local-adg-auto-failover-max-data-loss-limit', type=click.INT, help=u"""Parameter that allows users to select an acceptable maximum data loss limit in seconds, up to which Automatic Failover will be triggered when necessary for a Local Autonomous Data Guard""")
-@cli_util.option('--cpu-core-count', type=click.INT, help=u"""The number of CPUs to be made available to the Autonomous AI Database.<br> For Autonomous AI Databases on Dedicated Exadata Infrastructure: - The CPU type (OCPUs or ECPUs) is determined by the parent Autonomous Exadata VM Cluster's compute model. - It is suggested to use 'computeCount' parameter if you want to use fractional value to provision less than 1 core.
-
-**Note:** This parameter cannot be used with the `ocpuCount` or `computeCount` parameter.
-
-This cannot be updated in parallel with any of the following: licenseModel, databaseEdition, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--long-term-backup-schedule', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-dev-tier', type=click.BOOL, help=u"""Autonomous AI Database for Developers are fixed-shape Autonomous AI Databases that developers can use to build and test new applications. On Serverless, these are low-cost and billed per instance, on Dedicated and Cloud@Customer there is no additional cost to create Developer databases. Developer databases come with limited resources and is not intended for large-scale testing and production deployments. When you need more compute or storage resources, you may upgrade to a full paid production database.""")
-@cli_util.option('--compute-count', type=click.FLOAT, help=u"""The compute amount (CPUs) available to the database. Minimum and maximum values depend on the compute model and whether the database is an Autonomous AI Database Serverless instance or an Autonomous AI Database on Dedicated Exadata Infrastructure. The 'ECPU' compute model requires a minimum value of one, for databases in the elastic resource pool and minimum value of two, otherwise. Required when using the `computeModel` parameter. When using `cpuCoreCount` parameter, it is an error to specify computeCount to a non-null value. Providing `computeModel` and `computeCount` is the preferred method for both OCPU and ECPU.
-
-This cannot be updated in parallel with any of the following: licenseModel, databaseEdition, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--ocpu-count', type=click.FLOAT, help=u"""The number of OCPU cores to be made available to the Autonomous AI Database.
-
-For Autonomous AI Databases on Dedicated Exadata Infrastructure, you can specify a fractional value for this parameter. Fractional values are not supported for Autonomous AI Database Serverless instances. For Autonomous AI Database Serverless instances, this parameter is not used.
-
-To provision less than 1 core, enter a fractional value in an increment of 0.1. To provision 1 or more cores, you must enter an integer between 1 and the maximum number of cores available to the infrastructure shape. For example, you can provision 0.3 or 0.4 cores, but not 0.35 cores. Likewise, you can provision 2 cores or 3 cores, but not 2.5 cores. The maximum number of cores is determined by the infrastructure shape. See [Characteristics of Infrastructure Shapes] for shape details.
-
-**Note:** This parameter cannot be used with the `cpuCoreCount` parameter.""")
-@cli_util.option('--data-storage-size-in-tbs', type=click.INT, help=u"""The size, in terabytes, of the data volume that will be created and attached to the database. For Autonomous AI Databases on dedicated Exadata infrastructure, the maximum storage value is determined by the infrastructure shape. See [Characteristics of Infrastructure Shapes] for shape details. A full Exadata service is allocated when the Autonomous AI Database size is set to the upper limit (384 TB).
-
-**Note:** This parameter cannot be used with the `dataStorageSizeInGBs` parameter.
-
-This cannot be updated in parallel with any of the following: licenseModel, databaseEdition, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--data-storage-size-in-gbs', type=click.INT, help=u"""Applies to dedicated Exadata infrastructure only.
-
-The size, in gigabytes, of the data volume that will be created and attached to the database. The maximum storage value depends on the system shape. See [Characteristics of Infrastructure Shapes] for shape details.
-
-**Note:** This parameter cannot be used with the `dataStorageSizeInTBs` parameter.""")
-@cli_util.option('--display-name', help=u"""The user-friendly name for the Autonomous AI Database. The name does not have to be unique. The display name can only be updated for Autonomous AI Databases using dedicated Exadata Infrastructure. This parameter may not be updated in parallel with dbVersion.""")
-@cli_util.option('--is-free-tier', type=click.BOOL, help=u"""Indicates if this is an Always Free resource. The default value is false. Note that Always Free Autonomous AI Databases have 1 CPU and 20GB of memory. For Always Free databases, memory and CPU cannot be scaled.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isLocalDataGuardEnabled""")
-@cli_util.option('--availability-domain', help=u"""The Autonomous Database Serverless instance's availability domain.""")
-@cli_util.option('--time-scheduled-ad-update', type=custom_types.CLI_DATETIME, help=u"""The date and time when the Autonomous Database availability domain is to be updated.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--is-disable-ad-update-schedule', type=click.BOOL, help=u"""True, if you want to disable Autonomous Database availability domain scheduled update.""")
-@cli_util.option('--is-schedule-ad-update-to-earliest', type=click.BOOL, help=u"""True, if you want to schedule Autonomous Database availability domain update to the earliest available time.""")
-@cli_util.option('--admin-password', help=u"""The password must be between 12 and 30 characters long, and must contain at least 1 uppercase, 1 lowercase, and 1 numeric character. It cannot contain the double quote symbol (\") or the username \"admin\", regardless of casing. It must be different from the last four passwords and it must not be a password used within the last 24 hours.
-
-This cannot be used in conjunction with with OCI vault secrets (secretId).
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, whitelistedIps, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, or isFreeTier.""")
-@cli_util.option('--db-name', help=u"""New name for this Autonomous AI Database. For Autonomous AI Databases on Dedicated Exadata Infrastructure, the name must begin with an alphabetic character, and can contain a maximum of eight alphanumeric characters. Special characters are not permitted. For Autonomous AI Database Serverless instances, the name must begin with an alphabetic character, and can contain a maximum of 30 alphanumeric characters. Special characters are not permitted. The database name must be unique in the tenancy.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails.""")
-@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
-
-Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--security-attributes', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Security Attributes for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags]. Example: `{\"Oracle-ZPR\": {\"MaxEgressCount\": {\"value\": \"42\", \"mode\": \"audit\"}}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--db-workload', type=custom_types.CliCaseInsensitiveChoice(["OLTP", "DW", "AJD", "APEX", "LH"]), help=u"""The Autonomous AI Database workload type. The following values are valid: - OLTP - indicates an Autonomous AI Transaction Processing database - DW - indicates an Autonomous AI Lakehouse database - AJD - indicates an Autonomous AI JSON Database - APEX - indicates an Autonomous AI Database with the Oracle APEX AI Application Development workload type. - LH - indicates an Oracle Autonomous AI Lakehouse database
-
-**Note** Starting December 2026, DW will not be supported as a valid value for this parameter. When creating an Autonomous AI Database, if this parameter is not specified, the default value is `OLTP`.
-
- This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""")
-@cli_util.option('--license-model', type=custom_types.CliCaseInsensitiveChoice(["LICENSE_INCLUDED", "BRING_YOUR_OWN_LICENSE"]), help=u"""The Oracle license model that applies to the Oracle Autonomous AI Database. Bring your own license (BYOL) allows you to apply your current on-premises Oracle software licenses to equivalent, highly automated Oracle services in the cloud. License Included allows you to subscribe to new Oracle AI Database software licenses and the Oracle AI Database service. Note that when provisioning an [Autonomous AI Database on dedicated Exadata infrastructure], this attribute must be null. It is already set at the Autonomous Exadata Infrastructure level. When provisioning an [Autonomous AI Database Serverless]  database, if a value is not specified, the system defaults the value to `BRING_YOUR_OWN_LICENSE`. Bring your own license (BYOL) also allows you to select the DB edition using the optional parameter.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, dataStorageSizeInTBs, adminPassword, isMTLSConnectionRequired, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--byol-compute-count-limit', type=click.FLOAT, help=u"""The maximum number of CPUs allowed with a Bring Your Own License (BYOL), including those used for auto-scaling, disaster recovery, tools, etc. Any CPU usage above this limit is considered as License Included and billed.""")
-@cli_util.option('--is-access-control-enabled', type=click.BOOL, help=u"""Indicates if the database-level access control is enabled. If disabled, database access is defined by the network security rules. If enabled, database access is restricted to the IP addresses defined by the rules specified with the `whitelistedIps` property. While specifying `whitelistedIps` rules is optional,  if database-level access control is enabled and no rules are specified, the database will become inaccessible. The rules can be added later using the `UpdateAutonomousDatabase` API operation or edit option in console. When creating a database clone, the desired access control setting should be specified. By default, database-level access control will be disabled for the clone.
-
-This property is applicable only to Autonomous AI Databases on the Exadata Cloud@Customer platform. For Autonomous AI Database Serverless instances, `whitelistedIps` is used.""")
-@cli_util.option('--whitelisted-ips', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The client IP access control list (ACL). This feature is available for [Autonomous AI Database Serverless]  and on Exadata Cloud@Customer. Only clients connecting from an IP address included in the ACL may access the Autonomous AI Database instance. If `arePrimaryWhitelistedIpsUsed` is 'TRUE' then Autonomous AI Database uses this primary's IP access control list (ACL) for the disaster recovery peer called `standbywhitelistedips`.
-
-For Autonomous AI Database Serverless, this is an array of CIDR (classless inter-domain routing) notations for a subnet or VCN OCID (virtual cloud network Oracle Cloud ID). Multiple IPs and VCN OCIDs should be separate strings separated by commas, but if it\u2019s other configurations that need multiple pieces of information then its each piece is connected with semicolon (;) as a delimiter. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"ocid1.vcn.oc1.sea.<unique_id>\",\"ocid1.vcn.oc1.sea.<unique_id1>;1.1.1.1\",\"ocid1.vcn.oc1.sea.<unique_id2>;1.1.0.0/16\"]` For Exadata Cloud@Customer, this is an array of IP addresses or CIDR notations. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"1.1.2.25\"]`
-
-For an update operation, if you want to delete all the IPs in the ACL, use an array with a single empty string entry.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--are-primary-whitelisted-ips-used', type=click.BOOL, help=u"""This field will be null if the Autonomous AI Database is not Data Guard enabled or Access Control is disabled. `TRUE` if the Autonomous AI Database has Data Guard and Access Control enabled, and the Autonomous AI Database uses the primary's IP access control list (ACL) for standby. `FALSE` if the Autonomous AI Database has Data Guard and Access Control enabled, and the Autonomous AI Database uses a different IP access control list (ACL) for standby compared to primary.""")
-@cli_util.option('--standby-whitelisted-ips', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The client IP access control list (ACL). This feature is available for [Autonomous AI Database Serverless]  and on Exadata Cloud@Customer. Only clients connecting from an IP address included in the ACL may access the Autonomous AI Database instance. If `arePrimaryWhitelistedIpsUsed` is 'TRUE' then Autonomous AI Database uses this primary's IP access control list (ACL) for the disaster recovery peer called `standbywhitelistedips`.
-
-For Autonomous AI Database Serverless, this is an array of CIDR (classless inter-domain routing) notations for a subnet or VCN OCID (virtual cloud network Oracle Cloud ID). Multiple IPs and VCN OCIDs should be separate strings separated by commas, but if it\u2019s other configurations that need multiple pieces of information then its each piece is connected with semicolon (;) as a delimiter. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"ocid1.vcn.oc1.sea.<unique_id>\",\"ocid1.vcn.oc1.sea.<unique_id1>;1.1.1.1\",\"ocid1.vcn.oc1.sea.<unique_id2>;1.1.0.0/16\"]` For Exadata Cloud@Customer, this is an array of IP addresses or CIDR notations. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"1.1.2.25\"]`
-
-For an update operation, if you want to delete all the IPs in the ACL, use an array with a single empty string entry.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-auto-scaling-enabled', type=click.BOOL, help=u"""Indicates whether auto scaling is enabled for the Autonomous AI Database CPU core count. Setting to `TRUE` enables auto scaling. Setting to `FALSE` disables auto scaling. The default value is `TRUE`. Auto scaling is only available for [Autonomous AI Database Serverless instances].""")
-@cli_util.option('--is-refreshable-clone', type=click.BOOL, help=u"""Indicates if the Autonomous AI Database is a refreshable clone.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""")
-@cli_util.option('--refreshable-mode', type=custom_types.CliCaseInsensitiveChoice(["AUTOMATIC", "MANUAL"]), help=u"""The refresh mode of the clone. AUTOMATIC indicates that the clone is automatically being refreshed with data from the source Autonomous AI Database.""")
-@cli_util.option('--is-local-data-guard-enabled', type=click.BOOL, help=u"""Indicates whether the Autonomous AI Database has a local (in-region) standby database. Not applicable when creating a cross-region Autonomous Data Guard associations, or to Autonomous AI Databases using dedicated Exadata infrastructure or Exadata Cloud@Customer infrastructure.
-
-To create a local standby, set to `TRUE`. To delete a local standby, set to `FALSE`. For more information on using Autonomous Data Guard on an Autonomous AI Database Serverless instance (local and cross-region) , see [About Standby Databases]
-
-To enable cross-region Autonomous Data Guard on an Autonomous AI Database Serverless instance, see [Enable Autonomous Data Guard].
-
-This cannot be updated in parallel with any of the following: isMTLSRequired, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--is-data-guard-enabled', type=click.BOOL, help=u"""** Deprecated. ** Indicates whether the Autonomous AI Database has a local (in-region) standby database. Not applicable when creating a cross-region Autonomous Data Guard associations, or to Autonomous AI Databases using dedicated Exadata infrastructure or Exadata Cloud@Customer infrastructure.
-
-To create a local standby, set to `TRUE`. To delete a local standby, set to `FALSE`. For more information on using Autonomous Data Guard on an Autonomous AI Database Serverless instance (local and cross-region) , see [About Standby Databases]
-
-To enable cross-region Autonomous Data Guard on an Autonomous AI Database Serverless instance, see [Enable Autonomous Data Guard].
-
-To delete a cross-region standby database, provide the `peerDbId` for the standby database in a remote region, and set `isDataGuardEnabled` to `FALSE`.""")
-@cli_util.option('--peer-db-id', help=u"""The database OCID(/Content/General/Concepts/identifiers.htm) of the Disaster Recovery peer (source Primary) database, which is located in a different (remote) region from the current peer database.
-
-To create or delete a local (in-region) standby, see the `isDataGuardEnabled` parameter.
-
-When disconnecting a cross-region standby, specify the standby database OCID in this parameter together with `isDisconnectPeer=true`.""")
-@cli_util.option('--db-version', help=u"""A valid Oracle AI Database version for Autonomous AI Database. When you specify 23ai for dbversion, the system will provision a 23ai database, but the UI will display it as 26ai. When you specify 26ai for dbversion, the system will provision and display a 26ai database as expected. For new databases, it is recommended to use either 19c or 26ai.
-
-**Note** Starting December 2026, 23ai will not be supported as a valid value for this parameter.""")
-@cli_util.option('--open-mode', type=custom_types.CliCaseInsensitiveChoice(["READ_ONLY", "READ_WRITE"]), help=u"""Indicates the Autonomous AI Database mode. The database can be opened in `READ_ONLY` or `READ_WRITE` mode.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--permission-level', type=custom_types.CliCaseInsensitiveChoice(["RESTRICTED", "UNRESTRICTED"]), help=u"""The Autonomous AI Database permission level. Restricted mode allows access only by admin users.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--subnet-id', help=u"""The [OCID] of the subnet the resource is associated with.
-
-**Subnet Restrictions:** - For bare metal DB systems and for single node virtual machine DB systems, do not use a subnet that overlaps with 192.168.16.16/28. - For Exadata and virtual machine 2-node RAC systems, do not use a subnet that overlaps with 192.168.128.0/20. - For Autonomous AI Database, setting this will disable public secure access to the database.
-
-These subnets are used by the Oracle Clusterware private interconnect on the database instance. Specifying an overlapping subnet will cause the private interconnect to malfunction. This restriction applies to both the client subnet and the backup subnet.""")
-@cli_util.option('--private-endpoint-label', help=u"""The resource's private endpoint label. - Setting the endpoint label to a non-empty string creates a private endpoint database. - Resetting the endpoint label to an empty string, after the creation of the private endpoint database, changes the private endpoint database to a public endpoint database. - Setting the endpoint label to a non-empty string value, updates to a new private endpoint database, when the database is disabled and re-enabled.
-
-This setting cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--private-endpoint-ip', help=u"""The private endpoint Ip address for the resource.""")
-@cli_util.option('--nsg-ids', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of [OCIDs] for the network security groups (NSGs) to which this resource belongs. Setting this to an empty list removes all resources from all NSGs. For more information about NSGs, see [Security Rules]. **NsgIds restrictions:** - A network security group (NSG) is optional for Autonomous AI Databases with private access. The nsgIds list can be empty.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--auto-refresh-frequency-in-seconds', type=click.INT, help=u"""The frequency a refreshable clone is refreshed after auto-refresh is enabled. The minimum is 1 hour. The maximum is 7 days. The date and time that auto-refresh is enabled is controlled by the `timeOfAutoRefreshStart` parameter.""")
-@cli_util.option('--auto-refresh-point-lag-in-seconds', type=click.INT, help=u"""The time, in seconds, the data of the refreshable clone lags the primary database at the point of refresh. The minimum is 0 minutes (0 mins means refresh to the latest available timestamp). The maximum is 7 days. The lag time increases after refreshing until the next data refresh happens.""")
-@cli_util.option('--time-of-auto-refresh-start', type=custom_types.CLI_DATETIME, help=u"""The the date and time that auto-refreshing will begin for an Autonomous AI Database refreshable clone. This value controls only the start time for the first refresh operation. Subsequent (ongoing) refresh operations have start times controlled by the value of the `autoRefreshFrequencyInSeconds` parameter.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--customer-contacts', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Customer Contacts. Setting this to an empty list removes all customer contacts of an Oracle
-
-This cannot be updated in parallel with any of the following: isMTLSConnectionRequired, scheduledOperations, or dbToolsDetails.
-
-This option is a JSON list with items of type CustomerContact.  For documentation on CustomerContact please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/database/20160918/datatypes/CustomerContact.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-mtls-connection-required', type=click.BOOL, help=u"""Specifies if the Autonomous AI Database requires mTLS connections.
-
-This may not be updated in parallel with any of the following: licenseModel, databaseEdition, cpuCoreCount, computeCount, dataStorageSizeInTBs, whitelistedIps, openMode, permissionLevel, db-workload, privateEndpointLabel, nsgIds, customerContacts, dbVersion, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.
-
-Service Change: The default value of the isMTLSConnectionRequired attribute will change from true to false on July 1, 2023 in the following APIs: - CreateAutonomousDatabase - GetAutonomousDatabase - UpdateAutonomousDatabase Details: Prior to the July 1, 2023 change, the isMTLSConnectionRequired attribute default value was true. This applies to Autonomous AI Database Serverless. Does this impact me? If you use or maintain custom scripts or Terraform scripts referencing the CreateAutonomousDatabase, GetAutonomousDatabase, or UpdateAutonomousDatabase APIs, you want to check, and possibly modify, the scripts for the changed default value of the attribute. Should you choose not to leave your scripts unchanged, the API calls containing this attribute will continue to work, but the default value will switch from true to false. How do I make this change? Using either OCI SDKs or command line tools, update your custom scripts to explicitly set the isMTLSConnectionRequired attribute to true.""")
-@cli_util.option('--resource-pool-leader-id', help=u"""The unique identifier for leader Autonomous AI Database OCID [OCID].""")
-@cli_util.option('--resource-pool-summary', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--autonomous-maintenance-schedule-type', type=custom_types.CliCaseInsensitiveChoice(["EARLY", "REGULAR"]), help=u"""The maintenance schedule type of the Autonomous AI Database Serverless. An EARLY maintenance schedule follows a schedule applying patches prior to the REGULAR schedule. A REGULAR maintenance schedule follows the normal cycle""")
-@cli_util.option('--autonomous-database-maintenance-window', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--time-maintenance-pause-until', type=custom_types.CLI_DATETIME, help=u"""The date until which Autonomous AI Database maintenance is temporarily paused.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--is-backup-retention-locked', type=click.BOOL, help=u"""True if the Autonomous AI Database is backup retention locked.""")
-@cli_util.option('--time-scheduled-db-version-upgrade', type=custom_types.CLI_DATETIME, help=u"""The date and time the Autonomous AI Database scheduled to upgrade to 26ai.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--is-disable-db-version-upgrade-schedule', type=click.BOOL, help=u"""True if user wants to disable Autonomous AI Database scheduled upgrade to 26ai.""")
-@cli_util.option('--is-schedule-db-version-upgrade-to-earliest', type=click.BOOL, help=u"""True if user wants to schedule Autonomous AI Database upgrade to the earliest available time.""")
-@cli_util.option('--scheduled-operations', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of scheduled operations. Consists of values such as dayOfWeek, scheduledStartTime, scheduledStopTime.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.
-
-This option is a JSON list with items of type ScheduledOperationDetails.  For documentation on ScheduledOperationDetails please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/database/20160918/datatypes/ScheduledOperationDetails.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-auto-scaling-for-storage-enabled', type=click.BOOL, help=u"""Indicates if auto scaling is enabled for the Autonomous AI Database storage. The default value is `FALSE`.""")
-@cli_util.option('--database-edition', help=u"""The Oracle AI Database Edition that applies to the Autonomous AI Databases. This parameter accepts options `STANDARD_EDITION` and `ENTERPRISE_EDITION`.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--db-tools-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of database tools details.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, isLocalDataGuardEnabled, or isFreeTier.
-
-This option is a JSON list with items of type DatabaseTool.  For documentation on DatabaseTool please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/database/20160918/datatypes/DatabaseTool.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--vanity-url-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--secret-id', help=u"""The OCI vault secret [/Content/General/Concepts/identifiers.htm]OCID. This cannot be used in conjunction with adminPassword.""")
-@cli_util.option('--secret-version-number', type=click.INT, help=u"""The version of the vault secret. If no version is specified, the latest version will be used.""")
-@cli_util.option('--is-disconnect-peer', type=click.BOOL, help=u"""If true, this disconnects the Autonomous AI Database from its peer. After the disconnect completes, the Autonomous AI Database works permanently as a standalone database.
-
-**Warning:** A disconnected standby is no longer part of the disaster recovery configuration. Operations and restrictions that apply to a connected standby do not apply in the same way after the database has been disconnected.
-
-To disconnect a cross region standby, also provide the OCID of the standby database in the `peerDbId` parameter.""")
-@cli_util.option('--local-adg-resource-pool-leader-id', help=u"""The [OCID] of a dedicated resource pool leader Autonomous AI Database in the same region, that is required when local Autonomous Data Guard is enabled for a dedicated resource pool member using the parameter `isLocalDataGuardEnabled`. This field applies only to dedicated resource pool members, and the specified leader must be different from the primary\u2019s leader. Local Autonomous Data Guard can be enabled only if more than one dedicated resource pool exists in the region.""")
-@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource.  The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
-@cli_util.option('--opc-dry-run', type=click.BOOL, help=u"""Indicates that the request is a dry run, if set to \"true\". A dry run request does not actually creating or updating a resource and is used only to perform validation on the submitted data.""")
-@cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
-@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["PROVISIONING", "AVAILABLE", "STOPPING", "STOPPED", "STARTING", "TERMINATING", "TERMINATED", "UNAVAILABLE", "RESTORE_IN_PROGRESS", "RESTORE_FAILED", "BACKUP_IN_PROGRESS", "SCALE_IN_PROGRESS", "AVAILABLE_NEEDS_ATTENTION", "UPDATING", "MAINTENANCE_IN_PROGRESS", "RESTARTING", "RECREATING", "ROLE_CHANGE_IN_PROGRESS", "UPGRADING", "INACCESSIBLE", "STANDBY", "TRANSPORTING"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state PROVISIONING --wait-for-state TRANSPORTING would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
-@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
-@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'long-term-backup-schedule': {'module': 'database', 'class': 'LongTermBackUpScheduleDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'standby-whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'customer-contacts': {'module': 'database', 'class': 'list[CustomerContact]'}, 'resource-pool-summary': {'module': 'database', 'class': 'ResourcePoolSummary'}, 'autonomous-database-maintenance-window': {'module': 'database', 'class': 'AutonomousDatabaseMaintenanceWindowSummary'}, 'scheduled-operations': {'module': 'database', 'class': 'list[ScheduledOperationDetails]'}, 'db-tools-details': {'module': 'database', 'class': 'list[DatabaseTool]'}, 'vanity-url-details': {'module': 'database', 'class': 'VanityUrlDetails'}})
-@cli_util.help_option
-@click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'long-term-backup-schedule': {'module': 'database', 'class': 'LongTermBackUpScheduleDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'standby-whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'customer-contacts': {'module': 'database', 'class': 'list[CustomerContact]'}, 'resource-pool-summary': {'module': 'database', 'class': 'ResourcePoolSummary'}, 'autonomous-database-maintenance-window': {'module': 'database', 'class': 'AutonomousDatabaseMaintenanceWindowSummary'}, 'scheduled-operations': {'module': 'database', 'class': 'list[ScheduledOperationDetails]'}, 'db-tools-details': {'module': 'database', 'class': 'list[DatabaseTool]'}, 'vanity-url-details': {'module': 'database', 'class': 'VanityUrlDetails'}}, output_type={'module': 'database', 'class': 'AutonomousDatabase'})
-@cli_util.wrap_exceptions
-def update_autonomous_database_azure_key_details(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, autonomous_database_id, encryption_key_vault_uri, encryption_key_key_name, backup_retention_period_in_days, compute_model, in_memory_percentage, local_adg_auto_failover_max_data_loss_limit, cpu_core_count, long_term_backup_schedule, is_dev_tier, compute_count, ocpu_count, data_storage_size_in_tbs, data_storage_size_in_gbs, display_name, is_free_tier, availability_domain, time_scheduled_ad_update, is_disable_ad_update_schedule, is_schedule_ad_update_to_earliest, admin_password, db_name, freeform_tags, defined_tags, security_attributes, db_workload, license_model, byol_compute_count_limit, is_access_control_enabled, whitelisted_ips, are_primary_whitelisted_ips_used, standby_whitelisted_ips, is_auto_scaling_enabled, is_refreshable_clone, refreshable_mode, is_local_data_guard_enabled, is_data_guard_enabled, peer_db_id, db_version, open_mode, permission_level, subnet_id, private_endpoint_label, private_endpoint_ip, nsg_ids, auto_refresh_frequency_in_seconds, auto_refresh_point_lag_in_seconds, time_of_auto_refresh_start, customer_contacts, is_mtls_connection_required, resource_pool_leader_id, resource_pool_summary, autonomous_maintenance_schedule_type, autonomous_database_maintenance_window, time_maintenance_pause_until, is_backup_retention_locked, time_scheduled_db_version_upgrade, is_disable_db_version_upgrade_schedule, is_schedule_db_version_upgrade_to_earliest, scheduled_operations, is_auto_scaling_for_storage_enabled, database_edition, db_tools_details, vanity_url_details, secret_id, secret_version_number, is_disconnect_peer, local_adg_resource_pool_leader_id, if_match, opc_dry_run):
-
-    if isinstance(autonomous_database_id, six.string_types) and len(autonomous_database_id.strip()) == 0:
-        raise click.UsageError('Parameter --autonomous-database-id cannot be whitespace or empty string')
-    if not force:
-        if long_term_backup_schedule or freeform_tags or defined_tags or security_attributes or whitelisted_ips or standby_whitelisted_ips or nsg_ids or customer_contacts or resource_pool_summary or autonomous_database_maintenance_window or scheduled_operations or db_tools_details or vanity_url_details:
-            if not click.confirm("WARNING: Updates to long-term-backup-schedule and freeform-tags and defined-tags and security-attributes and whitelisted-ips and standby-whitelisted-ips and nsg-ids and customer-contacts and resource-pool-summary and autonomous-database-maintenance-window and scheduled-operations and db-tools-details and vanity-url-details will replace any existing values. Are you sure you want to continue?"):
-                ctx.abort()
-
-    kwargs = {}
-    if if_match is not None:
-        kwargs['if_match'] = if_match
-    if opc_dry_run is not None:
-        kwargs['opc_dry_run'] = opc_dry_run
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
-
-    _details = {}
-    _details['encryptionKey'] = {}
-    _details['encryptionKey']['vaultUri'] = encryption_key_vault_uri
-    _details['encryptionKey']['keyName'] = encryption_key_key_name
-
-    if backup_retention_period_in_days is not None:
-        _details['backupRetentionPeriodInDays'] = backup_retention_period_in_days
-
-    if compute_model is not None:
-        _details['computeModel'] = compute_model
-
-    if in_memory_percentage is not None:
-        _details['inMemoryPercentage'] = in_memory_percentage
-
-    if local_adg_auto_failover_max_data_loss_limit is not None:
-        _details['localAdgAutoFailoverMaxDataLossLimit'] = local_adg_auto_failover_max_data_loss_limit
-
-    if cpu_core_count is not None:
-        _details['cpuCoreCount'] = cpu_core_count
-
-    if long_term_backup_schedule is not None:
-        _details['longTermBackupSchedule'] = cli_util.parse_json_parameter("long_term_backup_schedule", long_term_backup_schedule)
-
-    if is_dev_tier is not None:
-        _details['isDevTier'] = is_dev_tier
-
-    if compute_count is not None:
-        _details['computeCount'] = compute_count
-
-    if ocpu_count is not None:
-        _details['ocpuCount'] = ocpu_count
-
-    if data_storage_size_in_tbs is not None:
-        _details['dataStorageSizeInTBs'] = data_storage_size_in_tbs
-
-    if data_storage_size_in_gbs is not None:
-        _details['dataStorageSizeInGBs'] = data_storage_size_in_gbs
-
-    if display_name is not None:
-        _details['displayName'] = display_name
-
-    if is_free_tier is not None:
-        _details['isFreeTier'] = is_free_tier
-
-    if availability_domain is not None:
-        _details['availabilityDomain'] = availability_domain
-
-    if time_scheduled_ad_update is not None:
-        _details['timeScheduledAdUpdate'] = time_scheduled_ad_update
-
-    if is_disable_ad_update_schedule is not None:
-        _details['isDisableAdUpdateSchedule'] = is_disable_ad_update_schedule
-
-    if is_schedule_ad_update_to_earliest is not None:
-        _details['isScheduleAdUpdateToEarliest'] = is_schedule_ad_update_to_earliest
-
-    if admin_password is not None:
-        _details['adminPassword'] = admin_password
-
-    if db_name is not None:
-        _details['dbName'] = db_name
-
-    if freeform_tags is not None:
-        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
-
-    if defined_tags is not None:
-        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
-
-    if security_attributes is not None:
-        _details['securityAttributes'] = cli_util.parse_json_parameter("security_attributes", security_attributes)
-
-    if db_workload is not None:
-        _details['dbWorkload'] = db_workload
-
-    if license_model is not None:
-        _details['licenseModel'] = license_model
-
-    if byol_compute_count_limit is not None:
-        _details['byolComputeCountLimit'] = byol_compute_count_limit
-
-    if is_access_control_enabled is not None:
-        _details['isAccessControlEnabled'] = is_access_control_enabled
-
-    if whitelisted_ips is not None:
-        _details['whitelistedIps'] = cli_util.parse_json_parameter("whitelisted_ips", whitelisted_ips)
-
-    if are_primary_whitelisted_ips_used is not None:
-        _details['arePrimaryWhitelistedIpsUsed'] = are_primary_whitelisted_ips_used
-
-    if standby_whitelisted_ips is not None:
-        _details['standbyWhitelistedIps'] = cli_util.parse_json_parameter("standby_whitelisted_ips", standby_whitelisted_ips)
-
-    if is_auto_scaling_enabled is not None:
-        _details['isAutoScalingEnabled'] = is_auto_scaling_enabled
-
-    if is_refreshable_clone is not None:
-        _details['isRefreshableClone'] = is_refreshable_clone
-
-    if refreshable_mode is not None:
-        _details['refreshableMode'] = refreshable_mode
-
-    if is_local_data_guard_enabled is not None:
-        _details['isLocalDataGuardEnabled'] = is_local_data_guard_enabled
-
-    if is_data_guard_enabled is not None:
-        _details['isDataGuardEnabled'] = is_data_guard_enabled
-
-    if peer_db_id is not None:
-        _details['peerDbId'] = peer_db_id
-
-    if db_version is not None:
-        _details['dbVersion'] = db_version
-
-    if open_mode is not None:
-        _details['openMode'] = open_mode
-
-    if permission_level is not None:
-        _details['permissionLevel'] = permission_level
-
-    if subnet_id is not None:
-        _details['subnetId'] = subnet_id
-
-    if private_endpoint_label is not None:
-        _details['privateEndpointLabel'] = private_endpoint_label
-
-    if private_endpoint_ip is not None:
-        _details['privateEndpointIp'] = private_endpoint_ip
-
-    if nsg_ids is not None:
-        _details['nsgIds'] = cli_util.parse_json_parameter("nsg_ids", nsg_ids)
-
-    if auto_refresh_frequency_in_seconds is not None:
-        _details['autoRefreshFrequencyInSeconds'] = auto_refresh_frequency_in_seconds
-
-    if auto_refresh_point_lag_in_seconds is not None:
-        _details['autoRefreshPointLagInSeconds'] = auto_refresh_point_lag_in_seconds
-
-    if time_of_auto_refresh_start is not None:
-        _details['timeOfAutoRefreshStart'] = time_of_auto_refresh_start
-
-    if customer_contacts is not None:
-        _details['customerContacts'] = cli_util.parse_json_parameter("customer_contacts", customer_contacts)
-
-    if is_mtls_connection_required is not None:
-        _details['isMtlsConnectionRequired'] = is_mtls_connection_required
-
-    if resource_pool_leader_id is not None:
-        _details['resourcePoolLeaderId'] = resource_pool_leader_id
-
-    if resource_pool_summary is not None:
-        _details['resourcePoolSummary'] = cli_util.parse_json_parameter("resource_pool_summary", resource_pool_summary)
-
-    if autonomous_maintenance_schedule_type is not None:
-        _details['autonomousMaintenanceScheduleType'] = autonomous_maintenance_schedule_type
-
-    if autonomous_database_maintenance_window is not None:
-        _details['autonomousDatabaseMaintenanceWindow'] = cli_util.parse_json_parameter("autonomous_database_maintenance_window", autonomous_database_maintenance_window)
-
-    if time_maintenance_pause_until is not None:
-        _details['timeMaintenancePauseUntil'] = time_maintenance_pause_until
-
-    if is_backup_retention_locked is not None:
-        _details['isBackupRetentionLocked'] = is_backup_retention_locked
-
-    if time_scheduled_db_version_upgrade is not None:
-        _details['timeScheduledDbVersionUpgrade'] = time_scheduled_db_version_upgrade
-
-    if is_disable_db_version_upgrade_schedule is not None:
-        _details['isDisableDbVersionUpgradeSchedule'] = is_disable_db_version_upgrade_schedule
-
-    if is_schedule_db_version_upgrade_to_earliest is not None:
-        _details['isScheduleDbVersionUpgradeToEarliest'] = is_schedule_db_version_upgrade_to_earliest
-
-    if scheduled_operations is not None:
-        _details['scheduledOperations'] = cli_util.parse_json_parameter("scheduled_operations", scheduled_operations)
-
-    if is_auto_scaling_for_storage_enabled is not None:
-        _details['isAutoScalingForStorageEnabled'] = is_auto_scaling_for_storage_enabled
-
-    if database_edition is not None:
-        _details['databaseEdition'] = database_edition
-
-    if db_tools_details is not None:
-        _details['dbToolsDetails'] = cli_util.parse_json_parameter("db_tools_details", db_tools_details)
-
-    if vanity_url_details is not None:
-        _details['vanityUrlDetails'] = cli_util.parse_json_parameter("vanity_url_details", vanity_url_details)
-
-    if secret_id is not None:
-        _details['secretId'] = secret_id
-
-    if secret_version_number is not None:
-        _details['secretVersionNumber'] = secret_version_number
-
-    if is_disconnect_peer is not None:
-        _details['isDisconnectPeer'] = is_disconnect_peer
-
-    if local_adg_resource_pool_leader_id is not None:
-        _details['localAdgResourcePoolLeaderId'] = local_adg_resource_pool_leader_id
-
-    _details['encryptionKey']['provider'] = 'AZURE'
-
-    client = cli_util.build_client('database', 'database', ctx)
-    result = client.update_autonomous_database(
-        autonomous_database_id=autonomous_database_id,
-        update_autonomous_database_details=_details,
-        **kwargs
-    )
-    if wait_for_state:
-
-        if hasattr(client, 'get_autonomous_database') and callable(getattr(client, 'get_autonomous_database')):
-            try:
-                wait_period_kwargs = {}
-                if max_wait_seconds is not None:
-                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
-                if wait_interval_seconds is not None:
-                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
-
-                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
-                result = oci.wait_until(client, client.get_autonomous_database(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
-            except oci.exceptions.MaximumWaitTimeExceeded as e:
-                # If we fail, we should show an error, but we should still provide the information to the customer
-                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
-                cli_util.render_response(result, ctx)
-                sys.exit(2)
-            except Exception:
-                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
-                cli_util.render_response(result, ctx)
-                raise
-        else:
-            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
-    cli_util.render_response(result, ctx)
-
-
-@autonomous_database_group.command(name=cli_util.override('db.update_autonomous_database_aws_key_details.command_name', 'update-autonomous-database-aws-key-details'), help=u"""Updates one or more attributes of the specified Autonomous AI Database. See the UpdateAutonomousDatabaseDetails resource for a full list of attributes that can be updated. \n[Command Reference](updateAutonomousDatabase)""")
-@cli_util.option('--autonomous-database-id', required=True, help=u"""The database [OCID].""")
-@cli_util.option('--encryption-key-service-endpoint-uri', required=True, help=u"""AWS key service endpoint URI""")
-@cli_util.option('--encryption-key-key-arn', required=True, help=u"""AWS key ARN""")
-@cli_util.option('--backup-retention-period-in-days', type=click.INT, help=u"""Retention period, in days, for long-term backups""")
-@cli_util.option('--compute-model', type=custom_types.CliCaseInsensitiveChoice(["ECPU", "OCPU"]), help=u"""The compute model of the Autonomous AI Database. This is required if using the `computeCount` parameter. If using `cpuCoreCount` then it is an error to specify `computeModel` to a non-null value. ECPU compute model is the recommended model and OCPU compute model is legacy.""")
-@cli_util.option('--in-memory-percentage', type=click.INT, help=u"""The percentage of the System Global Area(SGA) assigned to In-Memory tables in Autonomous AI Database. This property is applicable only to Autonomous AI Databases on the Exadata Cloud@Customer platform.""")
-@cli_util.option('--local-adg-auto-failover-max-data-loss-limit', type=click.INT, help=u"""Parameter that allows users to select an acceptable maximum data loss limit in seconds, up to which Automatic Failover will be triggered when necessary for a Local Autonomous Data Guard""")
-@cli_util.option('--cpu-core-count', type=click.INT, help=u"""The number of CPUs to be made available to the Autonomous AI Database.<br> For Autonomous AI Databases on Dedicated Exadata Infrastructure: - The CPU type (OCPUs or ECPUs) is determined by the parent Autonomous Exadata VM Cluster's compute model. - It is suggested to use 'computeCount' parameter if you want to use fractional value to provision less than 1 core.
-
-**Note:** This parameter cannot be used with the `ocpuCount` or `computeCount` parameter.
-
-This cannot be updated in parallel with any of the following: licenseModel, databaseEdition, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--long-term-backup-schedule', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-dev-tier', type=click.BOOL, help=u"""Autonomous AI Database for Developers are fixed-shape Autonomous AI Databases that developers can use to build and test new applications. On Serverless, these are low-cost and billed per instance, on Dedicated and Cloud@Customer there is no additional cost to create Developer databases. Developer databases come with limited resources and is not intended for large-scale testing and production deployments. When you need more compute or storage resources, you may upgrade to a full paid production database.""")
-@cli_util.option('--compute-count', type=click.FLOAT, help=u"""The compute amount (CPUs) available to the database. Minimum and maximum values depend on the compute model and whether the database is an Autonomous AI Database Serverless instance or an Autonomous AI Database on Dedicated Exadata Infrastructure. The 'ECPU' compute model requires a minimum value of one, for databases in the elastic resource pool and minimum value of two, otherwise. Required when using the `computeModel` parameter. When using `cpuCoreCount` parameter, it is an error to specify computeCount to a non-null value. Providing `computeModel` and `computeCount` is the preferred method for both OCPU and ECPU.
-
-This cannot be updated in parallel with any of the following: licenseModel, databaseEdition, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--ocpu-count', type=click.FLOAT, help=u"""The number of OCPU cores to be made available to the Autonomous AI Database.
-
-For Autonomous AI Databases on Dedicated Exadata Infrastructure, you can specify a fractional value for this parameter. Fractional values are not supported for Autonomous AI Database Serverless instances. For Autonomous AI Database Serverless instances, this parameter is not used.
-
-To provision less than 1 core, enter a fractional value in an increment of 0.1. To provision 1 or more cores, you must enter an integer between 1 and the maximum number of cores available to the infrastructure shape. For example, you can provision 0.3 or 0.4 cores, but not 0.35 cores. Likewise, you can provision 2 cores or 3 cores, but not 2.5 cores. The maximum number of cores is determined by the infrastructure shape. See [Characteristics of Infrastructure Shapes] for shape details.
-
-**Note:** This parameter cannot be used with the `cpuCoreCount` parameter.""")
-@cli_util.option('--data-storage-size-in-tbs', type=click.INT, help=u"""The size, in terabytes, of the data volume that will be created and attached to the database. For Autonomous AI Databases on dedicated Exadata infrastructure, the maximum storage value is determined by the infrastructure shape. See [Characteristics of Infrastructure Shapes] for shape details. A full Exadata service is allocated when the Autonomous AI Database size is set to the upper limit (384 TB).
-
-**Note:** This parameter cannot be used with the `dataStorageSizeInGBs` parameter.
-
-This cannot be updated in parallel with any of the following: licenseModel, databaseEdition, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--data-storage-size-in-gbs', type=click.INT, help=u"""Applies to dedicated Exadata infrastructure only.
-
-The size, in gigabytes, of the data volume that will be created and attached to the database. The maximum storage value depends on the system shape. See [Characteristics of Infrastructure Shapes] for shape details.
-
-**Note:** This parameter cannot be used with the `dataStorageSizeInTBs` parameter.""")
-@cli_util.option('--display-name', help=u"""The user-friendly name for the Autonomous AI Database. The name does not have to be unique. The display name can only be updated for Autonomous AI Databases using dedicated Exadata Infrastructure. This parameter may not be updated in parallel with dbVersion.""")
-@cli_util.option('--is-free-tier', type=click.BOOL, help=u"""Indicates if this is an Always Free resource. The default value is false. Note that Always Free Autonomous AI Databases have 1 CPU and 20GB of memory. For Always Free databases, memory and CPU cannot be scaled.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isLocalDataGuardEnabled""")
-@cli_util.option('--availability-domain', help=u"""The Autonomous Database Serverless instance's availability domain.""")
-@cli_util.option('--time-scheduled-ad-update', type=custom_types.CLI_DATETIME, help=u"""The date and time when the Autonomous Database availability domain is to be updated.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--is-disable-ad-update-schedule', type=click.BOOL, help=u"""True, if you want to disable Autonomous Database availability domain scheduled update.""")
-@cli_util.option('--is-schedule-ad-update-to-earliest', type=click.BOOL, help=u"""True, if you want to schedule Autonomous Database availability domain update to the earliest available time.""")
-@cli_util.option('--admin-password', help=u"""The password must be between 12 and 30 characters long, and must contain at least 1 uppercase, 1 lowercase, and 1 numeric character. It cannot contain the double quote symbol (\") or the username \"admin\", regardless of casing. It must be different from the last four passwords and it must not be a password used within the last 24 hours.
-
-This cannot be used in conjunction with with OCI vault secrets (secretId).
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, whitelistedIps, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, or isFreeTier.""")
-@cli_util.option('--db-name', help=u"""New name for this Autonomous AI Database. For Autonomous AI Databases on Dedicated Exadata Infrastructure, the name must begin with an alphabetic character, and can contain a maximum of eight alphanumeric characters. Special characters are not permitted. For Autonomous AI Database Serverless instances, the name must begin with an alphabetic character, and can contain a maximum of 30 alphanumeric characters. Special characters are not permitted. The database name must be unique in the tenancy.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails.""")
-@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
-
-Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--security-attributes', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Security Attributes for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags]. Example: `{\"Oracle-ZPR\": {\"MaxEgressCount\": {\"value\": \"42\", \"mode\": \"audit\"}}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--db-workload', type=custom_types.CliCaseInsensitiveChoice(["OLTP", "DW", "AJD", "APEX", "LH"]), help=u"""The Autonomous AI Database workload type. The following values are valid: - OLTP - indicates an Autonomous AI Transaction Processing database - DW - indicates an Autonomous AI Lakehouse database - AJD - indicates an Autonomous AI JSON Database - APEX - indicates an Autonomous AI Database with the Oracle APEX AI Application Development workload type. - LH - indicates an Oracle Autonomous AI Lakehouse database
-
-**Note** Starting December 2026, DW will not be supported as a valid value for this parameter. When creating an Autonomous AI Database, if this parameter is not specified, the default value is `OLTP`.
-
- This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""")
-@cli_util.option('--license-model', type=custom_types.CliCaseInsensitiveChoice(["LICENSE_INCLUDED", "BRING_YOUR_OWN_LICENSE"]), help=u"""The Oracle license model that applies to the Oracle Autonomous AI Database. Bring your own license (BYOL) allows you to apply your current on-premises Oracle software licenses to equivalent, highly automated Oracle services in the cloud. License Included allows you to subscribe to new Oracle AI Database software licenses and the Oracle AI Database service. Note that when provisioning an [Autonomous AI Database on dedicated Exadata infrastructure], this attribute must be null. It is already set at the Autonomous Exadata Infrastructure level. When provisioning an [Autonomous AI Database Serverless]  database, if a value is not specified, the system defaults the value to `BRING_YOUR_OWN_LICENSE`. Bring your own license (BYOL) also allows you to select the DB edition using the optional parameter.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, dataStorageSizeInTBs, adminPassword, isMTLSConnectionRequired, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--byol-compute-count-limit', type=click.FLOAT, help=u"""The maximum number of CPUs allowed with a Bring Your Own License (BYOL), including those used for auto-scaling, disaster recovery, tools, etc. Any CPU usage above this limit is considered as License Included and billed.""")
-@cli_util.option('--is-access-control-enabled', type=click.BOOL, help=u"""Indicates if the database-level access control is enabled. If disabled, database access is defined by the network security rules. If enabled, database access is restricted to the IP addresses defined by the rules specified with the `whitelistedIps` property. While specifying `whitelistedIps` rules is optional,  if database-level access control is enabled and no rules are specified, the database will become inaccessible. The rules can be added later using the `UpdateAutonomousDatabase` API operation or edit option in console. When creating a database clone, the desired access control setting should be specified. By default, database-level access control will be disabled for the clone.
-
-This property is applicable only to Autonomous AI Databases on the Exadata Cloud@Customer platform. For Autonomous AI Database Serverless instances, `whitelistedIps` is used.""")
-@cli_util.option('--whitelisted-ips', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The client IP access control list (ACL). This feature is available for [Autonomous AI Database Serverless]  and on Exadata Cloud@Customer. Only clients connecting from an IP address included in the ACL may access the Autonomous AI Database instance. If `arePrimaryWhitelistedIpsUsed` is 'TRUE' then Autonomous AI Database uses this primary's IP access control list (ACL) for the disaster recovery peer called `standbywhitelistedips`.
-
-For Autonomous AI Database Serverless, this is an array of CIDR (classless inter-domain routing) notations for a subnet or VCN OCID (virtual cloud network Oracle Cloud ID). Multiple IPs and VCN OCIDs should be separate strings separated by commas, but if it\u2019s other configurations that need multiple pieces of information then its each piece is connected with semicolon (;) as a delimiter. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"ocid1.vcn.oc1.sea.<unique_id>\",\"ocid1.vcn.oc1.sea.<unique_id1>;1.1.1.1\",\"ocid1.vcn.oc1.sea.<unique_id2>;1.1.0.0/16\"]` For Exadata Cloud@Customer, this is an array of IP addresses or CIDR notations. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"1.1.2.25\"]`
-
-For an update operation, if you want to delete all the IPs in the ACL, use an array with a single empty string entry.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--are-primary-whitelisted-ips-used', type=click.BOOL, help=u"""This field will be null if the Autonomous AI Database is not Data Guard enabled or Access Control is disabled. `TRUE` if the Autonomous AI Database has Data Guard and Access Control enabled, and the Autonomous AI Database uses the primary's IP access control list (ACL) for standby. `FALSE` if the Autonomous AI Database has Data Guard and Access Control enabled, and the Autonomous AI Database uses a different IP access control list (ACL) for standby compared to primary.""")
-@cli_util.option('--standby-whitelisted-ips', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The client IP access control list (ACL). This feature is available for [Autonomous AI Database Serverless]  and on Exadata Cloud@Customer. Only clients connecting from an IP address included in the ACL may access the Autonomous AI Database instance. If `arePrimaryWhitelistedIpsUsed` is 'TRUE' then Autonomous AI Database uses this primary's IP access control list (ACL) for the disaster recovery peer called `standbywhitelistedips`.
-
-For Autonomous AI Database Serverless, this is an array of CIDR (classless inter-domain routing) notations for a subnet or VCN OCID (virtual cloud network Oracle Cloud ID). Multiple IPs and VCN OCIDs should be separate strings separated by commas, but if it\u2019s other configurations that need multiple pieces of information then its each piece is connected with semicolon (;) as a delimiter. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"ocid1.vcn.oc1.sea.<unique_id>\",\"ocid1.vcn.oc1.sea.<unique_id1>;1.1.1.1\",\"ocid1.vcn.oc1.sea.<unique_id2>;1.1.0.0/16\"]` For Exadata Cloud@Customer, this is an array of IP addresses or CIDR notations. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"1.1.2.25\"]`
-
-For an update operation, if you want to delete all the IPs in the ACL, use an array with a single empty string entry.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-auto-scaling-enabled', type=click.BOOL, help=u"""Indicates whether auto scaling is enabled for the Autonomous AI Database CPU core count. Setting to `TRUE` enables auto scaling. Setting to `FALSE` disables auto scaling. The default value is `TRUE`. Auto scaling is only available for [Autonomous AI Database Serverless instances].""")
-@cli_util.option('--is-refreshable-clone', type=click.BOOL, help=u"""Indicates if the Autonomous AI Database is a refreshable clone.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""")
-@cli_util.option('--refreshable-mode', type=custom_types.CliCaseInsensitiveChoice(["AUTOMATIC", "MANUAL"]), help=u"""The refresh mode of the clone. AUTOMATIC indicates that the clone is automatically being refreshed with data from the source Autonomous AI Database.""")
-@cli_util.option('--is-local-data-guard-enabled', type=click.BOOL, help=u"""Indicates whether the Autonomous AI Database has a local (in-region) standby database. Not applicable when creating a cross-region Autonomous Data Guard associations, or to Autonomous AI Databases using dedicated Exadata infrastructure or Exadata Cloud@Customer infrastructure.
-
-To create a local standby, set to `TRUE`. To delete a local standby, set to `FALSE`. For more information on using Autonomous Data Guard on an Autonomous AI Database Serverless instance (local and cross-region) , see [About Standby Databases]
-
-To enable cross-region Autonomous Data Guard on an Autonomous AI Database Serverless instance, see [Enable Autonomous Data Guard].
-
-This cannot be updated in parallel with any of the following: isMTLSRequired, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--is-data-guard-enabled', type=click.BOOL, help=u"""** Deprecated. ** Indicates whether the Autonomous AI Database has a local (in-region) standby database. Not applicable when creating a cross-region Autonomous Data Guard associations, or to Autonomous AI Databases using dedicated Exadata infrastructure or Exadata Cloud@Customer infrastructure.
-
-To create a local standby, set to `TRUE`. To delete a local standby, set to `FALSE`. For more information on using Autonomous Data Guard on an Autonomous AI Database Serverless instance (local and cross-region) , see [About Standby Databases]
-
-To enable cross-region Autonomous Data Guard on an Autonomous AI Database Serverless instance, see [Enable Autonomous Data Guard].
-
-To delete a cross-region standby database, provide the `peerDbId` for the standby database in a remote region, and set `isDataGuardEnabled` to `FALSE`.""")
-@cli_util.option('--peer-db-id', help=u"""The database OCID(/Content/General/Concepts/identifiers.htm) of the Disaster Recovery peer (source Primary) database, which is located in a different (remote) region from the current peer database.
-
-To create or delete a local (in-region) standby, see the `isDataGuardEnabled` parameter.
-
-When disconnecting a cross-region standby, specify the standby database OCID in this parameter together with `isDisconnectPeer=true`.""")
-@cli_util.option('--db-version', help=u"""A valid Oracle AI Database version for Autonomous AI Database. When you specify 23ai for dbversion, the system will provision a 23ai database, but the UI will display it as 26ai. When you specify 26ai for dbversion, the system will provision and display a 26ai database as expected. For new databases, it is recommended to use either 19c or 26ai.
-
-**Note** Starting December 2026, 23ai will not be supported as a valid value for this parameter.""")
-@cli_util.option('--open-mode', type=custom_types.CliCaseInsensitiveChoice(["READ_ONLY", "READ_WRITE"]), help=u"""Indicates the Autonomous AI Database mode. The database can be opened in `READ_ONLY` or `READ_WRITE` mode.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--permission-level', type=custom_types.CliCaseInsensitiveChoice(["RESTRICTED", "UNRESTRICTED"]), help=u"""The Autonomous AI Database permission level. Restricted mode allows access only by admin users.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--subnet-id', help=u"""The [OCID] of the subnet the resource is associated with.
-
-**Subnet Restrictions:** - For bare metal DB systems and for single node virtual machine DB systems, do not use a subnet that overlaps with 192.168.16.16/28. - For Exadata and virtual machine 2-node RAC systems, do not use a subnet that overlaps with 192.168.128.0/20. - For Autonomous AI Database, setting this will disable public secure access to the database.
-
-These subnets are used by the Oracle Clusterware private interconnect on the database instance. Specifying an overlapping subnet will cause the private interconnect to malfunction. This restriction applies to both the client subnet and the backup subnet.""")
-@cli_util.option('--private-endpoint-label', help=u"""The resource's private endpoint label. - Setting the endpoint label to a non-empty string creates a private endpoint database. - Resetting the endpoint label to an empty string, after the creation of the private endpoint database, changes the private endpoint database to a public endpoint database. - Setting the endpoint label to a non-empty string value, updates to a new private endpoint database, when the database is disabled and re-enabled.
-
-This setting cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--private-endpoint-ip', help=u"""The private endpoint Ip address for the resource.""")
-@cli_util.option('--nsg-ids', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of [OCIDs] for the network security groups (NSGs) to which this resource belongs. Setting this to an empty list removes all resources from all NSGs. For more information about NSGs, see [Security Rules]. **NsgIds restrictions:** - A network security group (NSG) is optional for Autonomous AI Databases with private access. The nsgIds list can be empty.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--auto-refresh-frequency-in-seconds', type=click.INT, help=u"""The frequency a refreshable clone is refreshed after auto-refresh is enabled. The minimum is 1 hour. The maximum is 7 days. The date and time that auto-refresh is enabled is controlled by the `timeOfAutoRefreshStart` parameter.""")
-@cli_util.option('--auto-refresh-point-lag-in-seconds', type=click.INT, help=u"""The time, in seconds, the data of the refreshable clone lags the primary database at the point of refresh. The minimum is 0 minutes (0 mins means refresh to the latest available timestamp). The maximum is 7 days. The lag time increases after refreshing until the next data refresh happens.""")
-@cli_util.option('--time-of-auto-refresh-start', type=custom_types.CLI_DATETIME, help=u"""The the date and time that auto-refreshing will begin for an Autonomous AI Database refreshable clone. This value controls only the start time for the first refresh operation. Subsequent (ongoing) refresh operations have start times controlled by the value of the `autoRefreshFrequencyInSeconds` parameter.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--customer-contacts', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Customer Contacts. Setting this to an empty list removes all customer contacts of an Oracle
-
-This cannot be updated in parallel with any of the following: isMTLSConnectionRequired, scheduledOperations, or dbToolsDetails.
-
-This option is a JSON list with items of type CustomerContact.  For documentation on CustomerContact please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/database/20160918/datatypes/CustomerContact.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-mtls-connection-required', type=click.BOOL, help=u"""Specifies if the Autonomous AI Database requires mTLS connections.
-
-This may not be updated in parallel with any of the following: licenseModel, databaseEdition, cpuCoreCount, computeCount, dataStorageSizeInTBs, whitelistedIps, openMode, permissionLevel, db-workload, privateEndpointLabel, nsgIds, customerContacts, dbVersion, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.
-
-Service Change: The default value of the isMTLSConnectionRequired attribute will change from true to false on July 1, 2023 in the following APIs: - CreateAutonomousDatabase - GetAutonomousDatabase - UpdateAutonomousDatabase Details: Prior to the July 1, 2023 change, the isMTLSConnectionRequired attribute default value was true. This applies to Autonomous AI Database Serverless. Does this impact me? If you use or maintain custom scripts or Terraform scripts referencing the CreateAutonomousDatabase, GetAutonomousDatabase, or UpdateAutonomousDatabase APIs, you want to check, and possibly modify, the scripts for the changed default value of the attribute. Should you choose not to leave your scripts unchanged, the API calls containing this attribute will continue to work, but the default value will switch from true to false. How do I make this change? Using either OCI SDKs or command line tools, update your custom scripts to explicitly set the isMTLSConnectionRequired attribute to true.""")
-@cli_util.option('--resource-pool-leader-id', help=u"""The unique identifier for leader Autonomous AI Database OCID [OCID].""")
-@cli_util.option('--resource-pool-summary', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--autonomous-maintenance-schedule-type', type=custom_types.CliCaseInsensitiveChoice(["EARLY", "REGULAR"]), help=u"""The maintenance schedule type of the Autonomous AI Database Serverless. An EARLY maintenance schedule follows a schedule applying patches prior to the REGULAR schedule. A REGULAR maintenance schedule follows the normal cycle""")
-@cli_util.option('--autonomous-database-maintenance-window', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--time-maintenance-pause-until', type=custom_types.CLI_DATETIME, help=u"""The date until which Autonomous AI Database maintenance is temporarily paused.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--is-backup-retention-locked', type=click.BOOL, help=u"""True if the Autonomous AI Database is backup retention locked.""")
-@cli_util.option('--time-scheduled-db-version-upgrade', type=custom_types.CLI_DATETIME, help=u"""The date and time the Autonomous AI Database scheduled to upgrade to 26ai.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--is-disable-db-version-upgrade-schedule', type=click.BOOL, help=u"""True if user wants to disable Autonomous AI Database scheduled upgrade to 26ai.""")
-@cli_util.option('--is-schedule-db-version-upgrade-to-earliest', type=click.BOOL, help=u"""True if user wants to schedule Autonomous AI Database upgrade to the earliest available time.""")
-@cli_util.option('--scheduled-operations', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of scheduled operations. Consists of values such as dayOfWeek, scheduledStartTime, scheduledStopTime.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.
-
-This option is a JSON list with items of type ScheduledOperationDetails.  For documentation on ScheduledOperationDetails please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/database/20160918/datatypes/ScheduledOperationDetails.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-auto-scaling-for-storage-enabled', type=click.BOOL, help=u"""Indicates if auto scaling is enabled for the Autonomous AI Database storage. The default value is `FALSE`.""")
-@cli_util.option('--database-edition', help=u"""The Oracle AI Database Edition that applies to the Autonomous AI Databases. This parameter accepts options `STANDARD_EDITION` and `ENTERPRISE_EDITION`.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--db-tools-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of database tools details.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, isLocalDataGuardEnabled, or isFreeTier.
-
-This option is a JSON list with items of type DatabaseTool.  For documentation on DatabaseTool please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/database/20160918/datatypes/DatabaseTool.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--vanity-url-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--secret-id', help=u"""The OCI vault secret [/Content/General/Concepts/identifiers.htm]OCID. This cannot be used in conjunction with adminPassword.""")
-@cli_util.option('--secret-version-number', type=click.INT, help=u"""The version of the vault secret. If no version is specified, the latest version will be used.""")
-@cli_util.option('--is-disconnect-peer', type=click.BOOL, help=u"""If true, this disconnects the Autonomous AI Database from its peer. After the disconnect completes, the Autonomous AI Database works permanently as a standalone database.
-
-**Warning:** A disconnected standby is no longer part of the disaster recovery configuration. Operations and restrictions that apply to a connected standby do not apply in the same way after the database has been disconnected.
-
-To disconnect a cross region standby, also provide the OCID of the standby database in the `peerDbId` parameter.""")
-@cli_util.option('--local-adg-resource-pool-leader-id', help=u"""The [OCID] of a dedicated resource pool leader Autonomous AI Database in the same region, that is required when local Autonomous Data Guard is enabled for a dedicated resource pool member using the parameter `isLocalDataGuardEnabled`. This field applies only to dedicated resource pool members, and the specified leader must be different from the primary\u2019s leader. Local Autonomous Data Guard can be enabled only if more than one dedicated resource pool exists in the region.""")
-@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource.  The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
-@cli_util.option('--opc-dry-run', type=click.BOOL, help=u"""Indicates that the request is a dry run, if set to \"true\". A dry run request does not actually creating or updating a resource and is used only to perform validation on the submitted data.""")
-@cli_util.option('--encryption-key-arn-role', help=u"""AWS ARN role""")
-@cli_util.option('--encryption-key-external-id', help=u"""AWS external ID""")
-@cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
-@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["PROVISIONING", "AVAILABLE", "STOPPING", "STOPPED", "STARTING", "TERMINATING", "TERMINATED", "UNAVAILABLE", "RESTORE_IN_PROGRESS", "RESTORE_FAILED", "BACKUP_IN_PROGRESS", "SCALE_IN_PROGRESS", "AVAILABLE_NEEDS_ATTENTION", "UPDATING", "MAINTENANCE_IN_PROGRESS", "RESTARTING", "RECREATING", "ROLE_CHANGE_IN_PROGRESS", "UPGRADING", "INACCESSIBLE", "STANDBY", "TRANSPORTING"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state PROVISIONING --wait-for-state TRANSPORTING would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
-@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
-@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'long-term-backup-schedule': {'module': 'database', 'class': 'LongTermBackUpScheduleDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'standby-whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'customer-contacts': {'module': 'database', 'class': 'list[CustomerContact]'}, 'resource-pool-summary': {'module': 'database', 'class': 'ResourcePoolSummary'}, 'autonomous-database-maintenance-window': {'module': 'database', 'class': 'AutonomousDatabaseMaintenanceWindowSummary'}, 'scheduled-operations': {'module': 'database', 'class': 'list[ScheduledOperationDetails]'}, 'db-tools-details': {'module': 'database', 'class': 'list[DatabaseTool]'}, 'vanity-url-details': {'module': 'database', 'class': 'VanityUrlDetails'}})
-@cli_util.help_option
-@click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'long-term-backup-schedule': {'module': 'database', 'class': 'LongTermBackUpScheduleDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'standby-whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'customer-contacts': {'module': 'database', 'class': 'list[CustomerContact]'}, 'resource-pool-summary': {'module': 'database', 'class': 'ResourcePoolSummary'}, 'autonomous-database-maintenance-window': {'module': 'database', 'class': 'AutonomousDatabaseMaintenanceWindowSummary'}, 'scheduled-operations': {'module': 'database', 'class': 'list[ScheduledOperationDetails]'}, 'db-tools-details': {'module': 'database', 'class': 'list[DatabaseTool]'}, 'vanity-url-details': {'module': 'database', 'class': 'VanityUrlDetails'}}, output_type={'module': 'database', 'class': 'AutonomousDatabase'})
-@cli_util.wrap_exceptions
-def update_autonomous_database_aws_key_details(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, autonomous_database_id, encryption_key_service_endpoint_uri, encryption_key_key_arn, backup_retention_period_in_days, compute_model, in_memory_percentage, local_adg_auto_failover_max_data_loss_limit, cpu_core_count, long_term_backup_schedule, is_dev_tier, compute_count, ocpu_count, data_storage_size_in_tbs, data_storage_size_in_gbs, display_name, is_free_tier, availability_domain, time_scheduled_ad_update, is_disable_ad_update_schedule, is_schedule_ad_update_to_earliest, admin_password, db_name, freeform_tags, defined_tags, security_attributes, db_workload, license_model, byol_compute_count_limit, is_access_control_enabled, whitelisted_ips, are_primary_whitelisted_ips_used, standby_whitelisted_ips, is_auto_scaling_enabled, is_refreshable_clone, refreshable_mode, is_local_data_guard_enabled, is_data_guard_enabled, peer_db_id, db_version, open_mode, permission_level, subnet_id, private_endpoint_label, private_endpoint_ip, nsg_ids, auto_refresh_frequency_in_seconds, auto_refresh_point_lag_in_seconds, time_of_auto_refresh_start, customer_contacts, is_mtls_connection_required, resource_pool_leader_id, resource_pool_summary, autonomous_maintenance_schedule_type, autonomous_database_maintenance_window, time_maintenance_pause_until, is_backup_retention_locked, time_scheduled_db_version_upgrade, is_disable_db_version_upgrade_schedule, is_schedule_db_version_upgrade_to_earliest, scheduled_operations, is_auto_scaling_for_storage_enabled, database_edition, db_tools_details, vanity_url_details, secret_id, secret_version_number, is_disconnect_peer, local_adg_resource_pool_leader_id, if_match, opc_dry_run, encryption_key_arn_role, encryption_key_external_id):
-
-    if isinstance(autonomous_database_id, six.string_types) and len(autonomous_database_id.strip()) == 0:
-        raise click.UsageError('Parameter --autonomous-database-id cannot be whitespace or empty string')
-    if not force:
-        if long_term_backup_schedule or freeform_tags or defined_tags or security_attributes or whitelisted_ips or standby_whitelisted_ips or nsg_ids or customer_contacts or resource_pool_summary or autonomous_database_maintenance_window or scheduled_operations or db_tools_details or vanity_url_details:
-            if not click.confirm("WARNING: Updates to long-term-backup-schedule and freeform-tags and defined-tags and security-attributes and whitelisted-ips and standby-whitelisted-ips and nsg-ids and customer-contacts and resource-pool-summary and autonomous-database-maintenance-window and scheduled-operations and db-tools-details and vanity-url-details will replace any existing values. Are you sure you want to continue?"):
-                ctx.abort()
-
-    kwargs = {}
-    if if_match is not None:
-        kwargs['if_match'] = if_match
-    if opc_dry_run is not None:
-        kwargs['opc_dry_run'] = opc_dry_run
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
-
-    _details = {}
-    _details['encryptionKey'] = {}
-    _details['encryptionKey']['serviceEndpointUri'] = encryption_key_service_endpoint_uri
-    _details['encryptionKey']['keyArn'] = encryption_key_key_arn
-
-    if backup_retention_period_in_days is not None:
-        _details['backupRetentionPeriodInDays'] = backup_retention_period_in_days
-
-    if compute_model is not None:
-        _details['computeModel'] = compute_model
-
-    if in_memory_percentage is not None:
-        _details['inMemoryPercentage'] = in_memory_percentage
-
-    if local_adg_auto_failover_max_data_loss_limit is not None:
-        _details['localAdgAutoFailoverMaxDataLossLimit'] = local_adg_auto_failover_max_data_loss_limit
-
-    if cpu_core_count is not None:
-        _details['cpuCoreCount'] = cpu_core_count
-
-    if long_term_backup_schedule is not None:
-        _details['longTermBackupSchedule'] = cli_util.parse_json_parameter("long_term_backup_schedule", long_term_backup_schedule)
-
-    if is_dev_tier is not None:
-        _details['isDevTier'] = is_dev_tier
-
-    if compute_count is not None:
-        _details['computeCount'] = compute_count
-
-    if ocpu_count is not None:
-        _details['ocpuCount'] = ocpu_count
-
-    if data_storage_size_in_tbs is not None:
-        _details['dataStorageSizeInTBs'] = data_storage_size_in_tbs
-
-    if data_storage_size_in_gbs is not None:
-        _details['dataStorageSizeInGBs'] = data_storage_size_in_gbs
-
-    if display_name is not None:
-        _details['displayName'] = display_name
-
-    if is_free_tier is not None:
-        _details['isFreeTier'] = is_free_tier
-
-    if availability_domain is not None:
-        _details['availabilityDomain'] = availability_domain
-
-    if time_scheduled_ad_update is not None:
-        _details['timeScheduledAdUpdate'] = time_scheduled_ad_update
-
-    if is_disable_ad_update_schedule is not None:
-        _details['isDisableAdUpdateSchedule'] = is_disable_ad_update_schedule
-
-    if is_schedule_ad_update_to_earliest is not None:
-        _details['isScheduleAdUpdateToEarliest'] = is_schedule_ad_update_to_earliest
-
-    if admin_password is not None:
-        _details['adminPassword'] = admin_password
-
-    if db_name is not None:
-        _details['dbName'] = db_name
-
-    if freeform_tags is not None:
-        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
-
-    if defined_tags is not None:
-        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
-
-    if security_attributes is not None:
-        _details['securityAttributes'] = cli_util.parse_json_parameter("security_attributes", security_attributes)
-
-    if db_workload is not None:
-        _details['dbWorkload'] = db_workload
-
-    if license_model is not None:
-        _details['licenseModel'] = license_model
-
-    if byol_compute_count_limit is not None:
-        _details['byolComputeCountLimit'] = byol_compute_count_limit
-
-    if is_access_control_enabled is not None:
-        _details['isAccessControlEnabled'] = is_access_control_enabled
-
-    if whitelisted_ips is not None:
-        _details['whitelistedIps'] = cli_util.parse_json_parameter("whitelisted_ips", whitelisted_ips)
-
-    if are_primary_whitelisted_ips_used is not None:
-        _details['arePrimaryWhitelistedIpsUsed'] = are_primary_whitelisted_ips_used
-
-    if standby_whitelisted_ips is not None:
-        _details['standbyWhitelistedIps'] = cli_util.parse_json_parameter("standby_whitelisted_ips", standby_whitelisted_ips)
-
-    if is_auto_scaling_enabled is not None:
-        _details['isAutoScalingEnabled'] = is_auto_scaling_enabled
-
-    if is_refreshable_clone is not None:
-        _details['isRefreshableClone'] = is_refreshable_clone
-
-    if refreshable_mode is not None:
-        _details['refreshableMode'] = refreshable_mode
-
-    if is_local_data_guard_enabled is not None:
-        _details['isLocalDataGuardEnabled'] = is_local_data_guard_enabled
-
-    if is_data_guard_enabled is not None:
-        _details['isDataGuardEnabled'] = is_data_guard_enabled
-
-    if peer_db_id is not None:
-        _details['peerDbId'] = peer_db_id
-
-    if db_version is not None:
-        _details['dbVersion'] = db_version
-
-    if open_mode is not None:
-        _details['openMode'] = open_mode
-
-    if permission_level is not None:
-        _details['permissionLevel'] = permission_level
-
-    if subnet_id is not None:
-        _details['subnetId'] = subnet_id
-
-    if private_endpoint_label is not None:
-        _details['privateEndpointLabel'] = private_endpoint_label
-
-    if private_endpoint_ip is not None:
-        _details['privateEndpointIp'] = private_endpoint_ip
-
-    if nsg_ids is not None:
-        _details['nsgIds'] = cli_util.parse_json_parameter("nsg_ids", nsg_ids)
-
-    if auto_refresh_frequency_in_seconds is not None:
-        _details['autoRefreshFrequencyInSeconds'] = auto_refresh_frequency_in_seconds
-
-    if auto_refresh_point_lag_in_seconds is not None:
-        _details['autoRefreshPointLagInSeconds'] = auto_refresh_point_lag_in_seconds
-
-    if time_of_auto_refresh_start is not None:
-        _details['timeOfAutoRefreshStart'] = time_of_auto_refresh_start
-
-    if customer_contacts is not None:
-        _details['customerContacts'] = cli_util.parse_json_parameter("customer_contacts", customer_contacts)
-
-    if is_mtls_connection_required is not None:
-        _details['isMtlsConnectionRequired'] = is_mtls_connection_required
-
-    if resource_pool_leader_id is not None:
-        _details['resourcePoolLeaderId'] = resource_pool_leader_id
-
-    if resource_pool_summary is not None:
-        _details['resourcePoolSummary'] = cli_util.parse_json_parameter("resource_pool_summary", resource_pool_summary)
-
-    if autonomous_maintenance_schedule_type is not None:
-        _details['autonomousMaintenanceScheduleType'] = autonomous_maintenance_schedule_type
-
-    if autonomous_database_maintenance_window is not None:
-        _details['autonomousDatabaseMaintenanceWindow'] = cli_util.parse_json_parameter("autonomous_database_maintenance_window", autonomous_database_maintenance_window)
-
-    if time_maintenance_pause_until is not None:
-        _details['timeMaintenancePauseUntil'] = time_maintenance_pause_until
-
-    if is_backup_retention_locked is not None:
-        _details['isBackupRetentionLocked'] = is_backup_retention_locked
-
-    if time_scheduled_db_version_upgrade is not None:
-        _details['timeScheduledDbVersionUpgrade'] = time_scheduled_db_version_upgrade
-
-    if is_disable_db_version_upgrade_schedule is not None:
-        _details['isDisableDbVersionUpgradeSchedule'] = is_disable_db_version_upgrade_schedule
-
-    if is_schedule_db_version_upgrade_to_earliest is not None:
-        _details['isScheduleDbVersionUpgradeToEarliest'] = is_schedule_db_version_upgrade_to_earliest
-
-    if scheduled_operations is not None:
-        _details['scheduledOperations'] = cli_util.parse_json_parameter("scheduled_operations", scheduled_operations)
-
-    if is_auto_scaling_for_storage_enabled is not None:
-        _details['isAutoScalingForStorageEnabled'] = is_auto_scaling_for_storage_enabled
-
-    if database_edition is not None:
-        _details['databaseEdition'] = database_edition
-
-    if db_tools_details is not None:
-        _details['dbToolsDetails'] = cli_util.parse_json_parameter("db_tools_details", db_tools_details)
-
-    if vanity_url_details is not None:
-        _details['vanityUrlDetails'] = cli_util.parse_json_parameter("vanity_url_details", vanity_url_details)
-
-    if secret_id is not None:
-        _details['secretId'] = secret_id
-
-    if secret_version_number is not None:
-        _details['secretVersionNumber'] = secret_version_number
-
-    if is_disconnect_peer is not None:
-        _details['isDisconnectPeer'] = is_disconnect_peer
-
-    if local_adg_resource_pool_leader_id is not None:
-        _details['localAdgResourcePoolLeaderId'] = local_adg_resource_pool_leader_id
-
-    if encryption_key_arn_role is not None:
-        _details['encryptionKey']['arnRole'] = encryption_key_arn_role
-
-    if encryption_key_external_id is not None:
-        _details['encryptionKey']['externalId'] = encryption_key_external_id
-
-    _details['encryptionKey']['provider'] = 'AWS'
-
-    client = cli_util.build_client('database', 'database', ctx)
-    result = client.update_autonomous_database(
-        autonomous_database_id=autonomous_database_id,
-        update_autonomous_database_details=_details,
-        **kwargs
-    )
-    if wait_for_state:
-
-        if hasattr(client, 'get_autonomous_database') and callable(getattr(client, 'get_autonomous_database')):
-            try:
-                wait_period_kwargs = {}
-                if max_wait_seconds is not None:
-                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
-                if wait_interval_seconds is not None:
-                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
-
-                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
-                result = oci.wait_until(client, client.get_autonomous_database(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
-            except oci.exceptions.MaximumWaitTimeExceeded as e:
-                # If we fail, we should show an error, but we should still provide the information to the customer
-                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
-                cli_util.render_response(result, ctx)
-                sys.exit(2)
-            except Exception:
-                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
-                cli_util.render_response(result, ctx)
-                raise
-        else:
-            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
-    cli_util.render_response(result, ctx)
-
-
-@autonomous_database_group.command(name=cli_util.override('db.update_autonomous_database_oci_key_details.command_name', 'update-autonomous-database-oci-key-details'), help=u"""Updates one or more attributes of the specified Autonomous AI Database. See the UpdateAutonomousDatabaseDetails resource for a full list of attributes that can be updated. \n[Command Reference](updateAutonomousDatabase)""")
-@cli_util.option('--autonomous-database-id', required=True, help=u"""The database [OCID].""")
-@cli_util.option('--encryption-key-kms-key-id', required=True, help=u"""The OCID of the key container that is used as the master encryption key in database transparent data encryption (TDE) operations.""")
-@cli_util.option('--encryption-key-vault-id', required=True, help=u"""The [OCID] of the Oracle Cloud Infrastructure [vault]. This parameter and `secretId` are required for Customer Managed Keys.""")
-@cli_util.option('--backup-retention-period-in-days', type=click.INT, help=u"""Retention period, in days, for long-term backups""")
-@cli_util.option('--compute-model', type=custom_types.CliCaseInsensitiveChoice(["ECPU", "OCPU"]), help=u"""The compute model of the Autonomous AI Database. This is required if using the `computeCount` parameter. If using `cpuCoreCount` then it is an error to specify `computeModel` to a non-null value. ECPU compute model is the recommended model and OCPU compute model is legacy.""")
-@cli_util.option('--in-memory-percentage', type=click.INT, help=u"""The percentage of the System Global Area(SGA) assigned to In-Memory tables in Autonomous AI Database. This property is applicable only to Autonomous AI Databases on the Exadata Cloud@Customer platform.""")
-@cli_util.option('--local-adg-auto-failover-max-data-loss-limit', type=click.INT, help=u"""Parameter that allows users to select an acceptable maximum data loss limit in seconds, up to which Automatic Failover will be triggered when necessary for a Local Autonomous Data Guard""")
-@cli_util.option('--cpu-core-count', type=click.INT, help=u"""The number of CPUs to be made available to the Autonomous AI Database.<br> For Autonomous AI Databases on Dedicated Exadata Infrastructure: - The CPU type (OCPUs or ECPUs) is determined by the parent Autonomous Exadata VM Cluster's compute model. - It is suggested to use 'computeCount' parameter if you want to use fractional value to provision less than 1 core.
-
-**Note:** This parameter cannot be used with the `ocpuCount` or `computeCount` parameter.
-
-This cannot be updated in parallel with any of the following: licenseModel, databaseEdition, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--long-term-backup-schedule', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-dev-tier', type=click.BOOL, help=u"""Autonomous AI Database for Developers are fixed-shape Autonomous AI Databases that developers can use to build and test new applications. On Serverless, these are low-cost and billed per instance, on Dedicated and Cloud@Customer there is no additional cost to create Developer databases. Developer databases come with limited resources and is not intended for large-scale testing and production deployments. When you need more compute or storage resources, you may upgrade to a full paid production database.""")
-@cli_util.option('--compute-count', type=click.FLOAT, help=u"""The compute amount (CPUs) available to the database. Minimum and maximum values depend on the compute model and whether the database is an Autonomous AI Database Serverless instance or an Autonomous AI Database on Dedicated Exadata Infrastructure. The 'ECPU' compute model requires a minimum value of one, for databases in the elastic resource pool and minimum value of two, otherwise. Required when using the `computeModel` parameter. When using `cpuCoreCount` parameter, it is an error to specify computeCount to a non-null value. Providing `computeModel` and `computeCount` is the preferred method for both OCPU and ECPU.
-
-This cannot be updated in parallel with any of the following: licenseModel, databaseEdition, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--ocpu-count', type=click.FLOAT, help=u"""The number of OCPU cores to be made available to the Autonomous AI Database.
-
-For Autonomous AI Databases on Dedicated Exadata Infrastructure, you can specify a fractional value for this parameter. Fractional values are not supported for Autonomous AI Database Serverless instances. For Autonomous AI Database Serverless instances, this parameter is not used.
-
-To provision less than 1 core, enter a fractional value in an increment of 0.1. To provision 1 or more cores, you must enter an integer between 1 and the maximum number of cores available to the infrastructure shape. For example, you can provision 0.3 or 0.4 cores, but not 0.35 cores. Likewise, you can provision 2 cores or 3 cores, but not 2.5 cores. The maximum number of cores is determined by the infrastructure shape. See [Characteristics of Infrastructure Shapes] for shape details.
-
-**Note:** This parameter cannot be used with the `cpuCoreCount` parameter.""")
-@cli_util.option('--data-storage-size-in-tbs', type=click.INT, help=u"""The size, in terabytes, of the data volume that will be created and attached to the database. For Autonomous AI Databases on dedicated Exadata infrastructure, the maximum storage value is determined by the infrastructure shape. See [Characteristics of Infrastructure Shapes] for shape details. A full Exadata service is allocated when the Autonomous AI Database size is set to the upper limit (384 TB).
-
-**Note:** This parameter cannot be used with the `dataStorageSizeInGBs` parameter.
-
-This cannot be updated in parallel with any of the following: licenseModel, databaseEdition, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--data-storage-size-in-gbs', type=click.INT, help=u"""Applies to dedicated Exadata infrastructure only.
-
-The size, in gigabytes, of the data volume that will be created and attached to the database. The maximum storage value depends on the system shape. See [Characteristics of Infrastructure Shapes] for shape details.
-
-**Note:** This parameter cannot be used with the `dataStorageSizeInTBs` parameter.""")
-@cli_util.option('--display-name', help=u"""The user-friendly name for the Autonomous AI Database. The name does not have to be unique. The display name can only be updated for Autonomous AI Databases using dedicated Exadata Infrastructure. This parameter may not be updated in parallel with dbVersion.""")
-@cli_util.option('--is-free-tier', type=click.BOOL, help=u"""Indicates if this is an Always Free resource. The default value is false. Note that Always Free Autonomous AI Databases have 1 CPU and 20GB of memory. For Always Free databases, memory and CPU cannot be scaled.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isLocalDataGuardEnabled""")
-@cli_util.option('--availability-domain', help=u"""The Autonomous Database Serverless instance's availability domain.""")
-@cli_util.option('--time-scheduled-ad-update', type=custom_types.CLI_DATETIME, help=u"""The date and time when the Autonomous Database availability domain is to be updated.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--is-disable-ad-update-schedule', type=click.BOOL, help=u"""True, if you want to disable Autonomous Database availability domain scheduled update.""")
-@cli_util.option('--is-schedule-ad-update-to-earliest', type=click.BOOL, help=u"""True, if you want to schedule Autonomous Database availability domain update to the earliest available time.""")
-@cli_util.option('--admin-password', help=u"""The password must be between 12 and 30 characters long, and must contain at least 1 uppercase, 1 lowercase, and 1 numeric character. It cannot contain the double quote symbol (\") or the username \"admin\", regardless of casing. It must be different from the last four passwords and it must not be a password used within the last 24 hours.
-
-This cannot be used in conjunction with with OCI vault secrets (secretId).
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, whitelistedIps, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, or isFreeTier.""")
-@cli_util.option('--db-name', help=u"""New name for this Autonomous AI Database. For Autonomous AI Databases on Dedicated Exadata Infrastructure, the name must begin with an alphabetic character, and can contain a maximum of eight alphanumeric characters. Special characters are not permitted. For Autonomous AI Database Serverless instances, the name must begin with an alphabetic character, and can contain a maximum of 30 alphanumeric characters. Special characters are not permitted. The database name must be unique in the tenancy.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails.""")
-@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
-
-Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--security-attributes', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Security Attributes for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags]. Example: `{\"Oracle-ZPR\": {\"MaxEgressCount\": {\"value\": \"42\", \"mode\": \"audit\"}}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--db-workload', type=custom_types.CliCaseInsensitiveChoice(["OLTP", "DW", "AJD", "APEX", "LH"]), help=u"""The Autonomous AI Database workload type. The following values are valid: - OLTP - indicates an Autonomous AI Transaction Processing database - DW - indicates an Autonomous AI Lakehouse database - AJD - indicates an Autonomous AI JSON Database - APEX - indicates an Autonomous AI Database with the Oracle APEX AI Application Development workload type. - LH - indicates an Oracle Autonomous AI Lakehouse database
-
-**Note** Starting December 2026, DW will not be supported as a valid value for this parameter. When creating an Autonomous AI Database, if this parameter is not specified, the default value is `OLTP`.
-
- This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""")
-@cli_util.option('--license-model', type=custom_types.CliCaseInsensitiveChoice(["LICENSE_INCLUDED", "BRING_YOUR_OWN_LICENSE"]), help=u"""The Oracle license model that applies to the Oracle Autonomous AI Database. Bring your own license (BYOL) allows you to apply your current on-premises Oracle software licenses to equivalent, highly automated Oracle services in the cloud. License Included allows you to subscribe to new Oracle AI Database software licenses and the Oracle AI Database service. Note that when provisioning an [Autonomous AI Database on dedicated Exadata infrastructure], this attribute must be null. It is already set at the Autonomous Exadata Infrastructure level. When provisioning an [Autonomous AI Database Serverless]  database, if a value is not specified, the system defaults the value to `BRING_YOUR_OWN_LICENSE`. Bring your own license (BYOL) also allows you to select the DB edition using the optional parameter.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, dataStorageSizeInTBs, adminPassword, isMTLSConnectionRequired, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--byol-compute-count-limit', type=click.FLOAT, help=u"""The maximum number of CPUs allowed with a Bring Your Own License (BYOL), including those used for auto-scaling, disaster recovery, tools, etc. Any CPU usage above this limit is considered as License Included and billed.""")
-@cli_util.option('--is-access-control-enabled', type=click.BOOL, help=u"""Indicates if the database-level access control is enabled. If disabled, database access is defined by the network security rules. If enabled, database access is restricted to the IP addresses defined by the rules specified with the `whitelistedIps` property. While specifying `whitelistedIps` rules is optional,  if database-level access control is enabled and no rules are specified, the database will become inaccessible. The rules can be added later using the `UpdateAutonomousDatabase` API operation or edit option in console. When creating a database clone, the desired access control setting should be specified. By default, database-level access control will be disabled for the clone.
-
-This property is applicable only to Autonomous AI Databases on the Exadata Cloud@Customer platform. For Autonomous AI Database Serverless instances, `whitelistedIps` is used.""")
-@cli_util.option('--whitelisted-ips', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The client IP access control list (ACL). This feature is available for [Autonomous AI Database Serverless]  and on Exadata Cloud@Customer. Only clients connecting from an IP address included in the ACL may access the Autonomous AI Database instance. If `arePrimaryWhitelistedIpsUsed` is 'TRUE' then Autonomous AI Database uses this primary's IP access control list (ACL) for the disaster recovery peer called `standbywhitelistedips`.
-
-For Autonomous AI Database Serverless, this is an array of CIDR (classless inter-domain routing) notations for a subnet or VCN OCID (virtual cloud network Oracle Cloud ID). Multiple IPs and VCN OCIDs should be separate strings separated by commas, but if it\u2019s other configurations that need multiple pieces of information then its each piece is connected with semicolon (;) as a delimiter. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"ocid1.vcn.oc1.sea.<unique_id>\",\"ocid1.vcn.oc1.sea.<unique_id1>;1.1.1.1\",\"ocid1.vcn.oc1.sea.<unique_id2>;1.1.0.0/16\"]` For Exadata Cloud@Customer, this is an array of IP addresses or CIDR notations. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"1.1.2.25\"]`
-
-For an update operation, if you want to delete all the IPs in the ACL, use an array with a single empty string entry.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--are-primary-whitelisted-ips-used', type=click.BOOL, help=u"""This field will be null if the Autonomous AI Database is not Data Guard enabled or Access Control is disabled. `TRUE` if the Autonomous AI Database has Data Guard and Access Control enabled, and the Autonomous AI Database uses the primary's IP access control list (ACL) for standby. `FALSE` if the Autonomous AI Database has Data Guard and Access Control enabled, and the Autonomous AI Database uses a different IP access control list (ACL) for standby compared to primary.""")
-@cli_util.option('--standby-whitelisted-ips', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The client IP access control list (ACL). This feature is available for [Autonomous AI Database Serverless]  and on Exadata Cloud@Customer. Only clients connecting from an IP address included in the ACL may access the Autonomous AI Database instance. If `arePrimaryWhitelistedIpsUsed` is 'TRUE' then Autonomous AI Database uses this primary's IP access control list (ACL) for the disaster recovery peer called `standbywhitelistedips`.
-
-For Autonomous AI Database Serverless, this is an array of CIDR (classless inter-domain routing) notations for a subnet or VCN OCID (virtual cloud network Oracle Cloud ID). Multiple IPs and VCN OCIDs should be separate strings separated by commas, but if it\u2019s other configurations that need multiple pieces of information then its each piece is connected with semicolon (;) as a delimiter. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"ocid1.vcn.oc1.sea.<unique_id>\",\"ocid1.vcn.oc1.sea.<unique_id1>;1.1.1.1\",\"ocid1.vcn.oc1.sea.<unique_id2>;1.1.0.0/16\"]` For Exadata Cloud@Customer, this is an array of IP addresses or CIDR notations. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"1.1.2.25\"]`
-
-For an update operation, if you want to delete all the IPs in the ACL, use an array with a single empty string entry.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-auto-scaling-enabled', type=click.BOOL, help=u"""Indicates whether auto scaling is enabled for the Autonomous AI Database CPU core count. Setting to `TRUE` enables auto scaling. Setting to `FALSE` disables auto scaling. The default value is `TRUE`. Auto scaling is only available for [Autonomous AI Database Serverless instances].""")
-@cli_util.option('--is-refreshable-clone', type=click.BOOL, help=u"""Indicates if the Autonomous AI Database is a refreshable clone.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""")
-@cli_util.option('--refreshable-mode', type=custom_types.CliCaseInsensitiveChoice(["AUTOMATIC", "MANUAL"]), help=u"""The refresh mode of the clone. AUTOMATIC indicates that the clone is automatically being refreshed with data from the source Autonomous AI Database.""")
-@cli_util.option('--is-local-data-guard-enabled', type=click.BOOL, help=u"""Indicates whether the Autonomous AI Database has a local (in-region) standby database. Not applicable when creating a cross-region Autonomous Data Guard associations, or to Autonomous AI Databases using dedicated Exadata infrastructure or Exadata Cloud@Customer infrastructure.
-
-To create a local standby, set to `TRUE`. To delete a local standby, set to `FALSE`. For more information on using Autonomous Data Guard on an Autonomous AI Database Serverless instance (local and cross-region) , see [About Standby Databases]
-
-To enable cross-region Autonomous Data Guard on an Autonomous AI Database Serverless instance, see [Enable Autonomous Data Guard].
-
-This cannot be updated in parallel with any of the following: isMTLSRequired, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--is-data-guard-enabled', type=click.BOOL, help=u"""** Deprecated. ** Indicates whether the Autonomous AI Database has a local (in-region) standby database. Not applicable when creating a cross-region Autonomous Data Guard associations, or to Autonomous AI Databases using dedicated Exadata infrastructure or Exadata Cloud@Customer infrastructure.
-
-To create a local standby, set to `TRUE`. To delete a local standby, set to `FALSE`. For more information on using Autonomous Data Guard on an Autonomous AI Database Serverless instance (local and cross-region) , see [About Standby Databases]
-
-To enable cross-region Autonomous Data Guard on an Autonomous AI Database Serverless instance, see [Enable Autonomous Data Guard].
-
-To delete a cross-region standby database, provide the `peerDbId` for the standby database in a remote region, and set `isDataGuardEnabled` to `FALSE`.""")
-@cli_util.option('--peer-db-id', help=u"""The database OCID(/Content/General/Concepts/identifiers.htm) of the Disaster Recovery peer (source Primary) database, which is located in a different (remote) region from the current peer database.
-
-To create or delete a local (in-region) standby, see the `isDataGuardEnabled` parameter.
-
-When disconnecting a cross-region standby, specify the standby database OCID in this parameter together with `isDisconnectPeer=true`.""")
-@cli_util.option('--db-version', help=u"""A valid Oracle AI Database version for Autonomous AI Database. When you specify 23ai for dbversion, the system will provision a 23ai database, but the UI will display it as 26ai. When you specify 26ai for dbversion, the system will provision and display a 26ai database as expected. For new databases, it is recommended to use either 19c or 26ai.
-
-**Note** Starting December 2026, 23ai will not be supported as a valid value for this parameter.""")
-@cli_util.option('--open-mode', type=custom_types.CliCaseInsensitiveChoice(["READ_ONLY", "READ_WRITE"]), help=u"""Indicates the Autonomous AI Database mode. The database can be opened in `READ_ONLY` or `READ_WRITE` mode.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--permission-level', type=custom_types.CliCaseInsensitiveChoice(["RESTRICTED", "UNRESTRICTED"]), help=u"""The Autonomous AI Database permission level. Restricted mode allows access only by admin users.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--subnet-id', help=u"""The [OCID] of the subnet the resource is associated with.
-
-**Subnet Restrictions:** - For bare metal DB systems and for single node virtual machine DB systems, do not use a subnet that overlaps with 192.168.16.16/28. - For Exadata and virtual machine 2-node RAC systems, do not use a subnet that overlaps with 192.168.128.0/20. - For Autonomous AI Database, setting this will disable public secure access to the database.
-
-These subnets are used by the Oracle Clusterware private interconnect on the database instance. Specifying an overlapping subnet will cause the private interconnect to malfunction. This restriction applies to both the client subnet and the backup subnet.""")
-@cli_util.option('--private-endpoint-label', help=u"""The resource's private endpoint label. - Setting the endpoint label to a non-empty string creates a private endpoint database. - Resetting the endpoint label to an empty string, after the creation of the private endpoint database, changes the private endpoint database to a public endpoint database. - Setting the endpoint label to a non-empty string value, updates to a new private endpoint database, when the database is disabled and re-enabled.
-
-This setting cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--private-endpoint-ip', help=u"""The private endpoint Ip address for the resource.""")
-@cli_util.option('--nsg-ids', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of [OCIDs] for the network security groups (NSGs) to which this resource belongs. Setting this to an empty list removes all resources from all NSGs. For more information about NSGs, see [Security Rules]. **NsgIds restrictions:** - A network security group (NSG) is optional for Autonomous AI Databases with private access. The nsgIds list can be empty.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--auto-refresh-frequency-in-seconds', type=click.INT, help=u"""The frequency a refreshable clone is refreshed after auto-refresh is enabled. The minimum is 1 hour. The maximum is 7 days. The date and time that auto-refresh is enabled is controlled by the `timeOfAutoRefreshStart` parameter.""")
-@cli_util.option('--auto-refresh-point-lag-in-seconds', type=click.INT, help=u"""The time, in seconds, the data of the refreshable clone lags the primary database at the point of refresh. The minimum is 0 minutes (0 mins means refresh to the latest available timestamp). The maximum is 7 days. The lag time increases after refreshing until the next data refresh happens.""")
-@cli_util.option('--time-of-auto-refresh-start', type=custom_types.CLI_DATETIME, help=u"""The the date and time that auto-refreshing will begin for an Autonomous AI Database refreshable clone. This value controls only the start time for the first refresh operation. Subsequent (ongoing) refresh operations have start times controlled by the value of the `autoRefreshFrequencyInSeconds` parameter.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--customer-contacts', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Customer Contacts. Setting this to an empty list removes all customer contacts of an Oracle
-
-This cannot be updated in parallel with any of the following: isMTLSConnectionRequired, scheduledOperations, or dbToolsDetails.
-
-This option is a JSON list with items of type CustomerContact.  For documentation on CustomerContact please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/database/20160918/datatypes/CustomerContact.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-mtls-connection-required', type=click.BOOL, help=u"""Specifies if the Autonomous AI Database requires mTLS connections.
-
-This may not be updated in parallel with any of the following: licenseModel, databaseEdition, cpuCoreCount, computeCount, dataStorageSizeInTBs, whitelistedIps, openMode, permissionLevel, db-workload, privateEndpointLabel, nsgIds, customerContacts, dbVersion, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.
-
-Service Change: The default value of the isMTLSConnectionRequired attribute will change from true to false on July 1, 2023 in the following APIs: - CreateAutonomousDatabase - GetAutonomousDatabase - UpdateAutonomousDatabase Details: Prior to the July 1, 2023 change, the isMTLSConnectionRequired attribute default value was true. This applies to Autonomous AI Database Serverless. Does this impact me? If you use or maintain custom scripts or Terraform scripts referencing the CreateAutonomousDatabase, GetAutonomousDatabase, or UpdateAutonomousDatabase APIs, you want to check, and possibly modify, the scripts for the changed default value of the attribute. Should you choose not to leave your scripts unchanged, the API calls containing this attribute will continue to work, but the default value will switch from true to false. How do I make this change? Using either OCI SDKs or command line tools, update your custom scripts to explicitly set the isMTLSConnectionRequired attribute to true.""")
-@cli_util.option('--resource-pool-leader-id', help=u"""The unique identifier for leader Autonomous AI Database OCID [OCID].""")
-@cli_util.option('--resource-pool-summary', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--autonomous-maintenance-schedule-type', type=custom_types.CliCaseInsensitiveChoice(["EARLY", "REGULAR"]), help=u"""The maintenance schedule type of the Autonomous AI Database Serverless. An EARLY maintenance schedule follows a schedule applying patches prior to the REGULAR schedule. A REGULAR maintenance schedule follows the normal cycle""")
-@cli_util.option('--autonomous-database-maintenance-window', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--time-maintenance-pause-until', type=custom_types.CLI_DATETIME, help=u"""The date until which Autonomous AI Database maintenance is temporarily paused.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--is-backup-retention-locked', type=click.BOOL, help=u"""True if the Autonomous AI Database is backup retention locked.""")
-@cli_util.option('--time-scheduled-db-version-upgrade', type=custom_types.CLI_DATETIME, help=u"""The date and time the Autonomous AI Database scheduled to upgrade to 26ai.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--is-disable-db-version-upgrade-schedule', type=click.BOOL, help=u"""True if user wants to disable Autonomous AI Database scheduled upgrade to 26ai.""")
-@cli_util.option('--is-schedule-db-version-upgrade-to-earliest', type=click.BOOL, help=u"""True if user wants to schedule Autonomous AI Database upgrade to the earliest available time.""")
-@cli_util.option('--scheduled-operations', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of scheduled operations. Consists of values such as dayOfWeek, scheduledStartTime, scheduledStopTime.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.
-
-This option is a JSON list with items of type ScheduledOperationDetails.  For documentation on ScheduledOperationDetails please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/database/20160918/datatypes/ScheduledOperationDetails.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-auto-scaling-for-storage-enabled', type=click.BOOL, help=u"""Indicates if auto scaling is enabled for the Autonomous AI Database storage. The default value is `FALSE`.""")
-@cli_util.option('--database-edition', help=u"""The Oracle AI Database Edition that applies to the Autonomous AI Databases. This parameter accepts options `STANDARD_EDITION` and `ENTERPRISE_EDITION`.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--db-tools-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of database tools details.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, isLocalDataGuardEnabled, or isFreeTier.
-
-This option is a JSON list with items of type DatabaseTool.  For documentation on DatabaseTool please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/database/20160918/datatypes/DatabaseTool.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--vanity-url-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--secret-id', help=u"""The OCI vault secret [/Content/General/Concepts/identifiers.htm]OCID. This cannot be used in conjunction with adminPassword.""")
-@cli_util.option('--secret-version-number', type=click.INT, help=u"""The version of the vault secret. If no version is specified, the latest version will be used.""")
-@cli_util.option('--is-disconnect-peer', type=click.BOOL, help=u"""If true, this disconnects the Autonomous AI Database from its peer. After the disconnect completes, the Autonomous AI Database works permanently as a standalone database.
-
-**Warning:** A disconnected standby is no longer part of the disaster recovery configuration. Operations and restrictions that apply to a connected standby do not apply in the same way after the database has been disconnected.
-
-To disconnect a cross region standby, also provide the OCID of the standby database in the `peerDbId` parameter.""")
-@cli_util.option('--local-adg-resource-pool-leader-id', help=u"""The [OCID] of a dedicated resource pool leader Autonomous AI Database in the same region, that is required when local Autonomous Data Guard is enabled for a dedicated resource pool member using the parameter `isLocalDataGuardEnabled`. This field applies only to dedicated resource pool members, and the specified leader must be different from the primary\u2019s leader. Local Autonomous Data Guard can be enabled only if more than one dedicated resource pool exists in the region.""")
-@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource.  The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
-@cli_util.option('--opc-dry-run', type=click.BOOL, help=u"""Indicates that the request is a dry run, if set to \"true\". A dry run request does not actually creating or updating a resource and is used only to perform validation on the submitted data.""")
-@cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
-@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["PROVISIONING", "AVAILABLE", "STOPPING", "STOPPED", "STARTING", "TERMINATING", "TERMINATED", "UNAVAILABLE", "RESTORE_IN_PROGRESS", "RESTORE_FAILED", "BACKUP_IN_PROGRESS", "SCALE_IN_PROGRESS", "AVAILABLE_NEEDS_ATTENTION", "UPDATING", "MAINTENANCE_IN_PROGRESS", "RESTARTING", "RECREATING", "ROLE_CHANGE_IN_PROGRESS", "UPGRADING", "INACCESSIBLE", "STANDBY", "TRANSPORTING"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state PROVISIONING --wait-for-state TRANSPORTING would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
-@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
-@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'long-term-backup-schedule': {'module': 'database', 'class': 'LongTermBackUpScheduleDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'standby-whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'customer-contacts': {'module': 'database', 'class': 'list[CustomerContact]'}, 'resource-pool-summary': {'module': 'database', 'class': 'ResourcePoolSummary'}, 'autonomous-database-maintenance-window': {'module': 'database', 'class': 'AutonomousDatabaseMaintenanceWindowSummary'}, 'scheduled-operations': {'module': 'database', 'class': 'list[ScheduledOperationDetails]'}, 'db-tools-details': {'module': 'database', 'class': 'list[DatabaseTool]'}, 'vanity-url-details': {'module': 'database', 'class': 'VanityUrlDetails'}})
-@cli_util.help_option
-@click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'long-term-backup-schedule': {'module': 'database', 'class': 'LongTermBackUpScheduleDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'standby-whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'customer-contacts': {'module': 'database', 'class': 'list[CustomerContact]'}, 'resource-pool-summary': {'module': 'database', 'class': 'ResourcePoolSummary'}, 'autonomous-database-maintenance-window': {'module': 'database', 'class': 'AutonomousDatabaseMaintenanceWindowSummary'}, 'scheduled-operations': {'module': 'database', 'class': 'list[ScheduledOperationDetails]'}, 'db-tools-details': {'module': 'database', 'class': 'list[DatabaseTool]'}, 'vanity-url-details': {'module': 'database', 'class': 'VanityUrlDetails'}}, output_type={'module': 'database', 'class': 'AutonomousDatabase'})
-@cli_util.wrap_exceptions
-def update_autonomous_database_oci_key_details(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, autonomous_database_id, encryption_key_kms_key_id, encryption_key_vault_id, backup_retention_period_in_days, compute_model, in_memory_percentage, local_adg_auto_failover_max_data_loss_limit, cpu_core_count, long_term_backup_schedule, is_dev_tier, compute_count, ocpu_count, data_storage_size_in_tbs, data_storage_size_in_gbs, display_name, is_free_tier, availability_domain, time_scheduled_ad_update, is_disable_ad_update_schedule, is_schedule_ad_update_to_earliest, admin_password, db_name, freeform_tags, defined_tags, security_attributes, db_workload, license_model, byol_compute_count_limit, is_access_control_enabled, whitelisted_ips, are_primary_whitelisted_ips_used, standby_whitelisted_ips, is_auto_scaling_enabled, is_refreshable_clone, refreshable_mode, is_local_data_guard_enabled, is_data_guard_enabled, peer_db_id, db_version, open_mode, permission_level, subnet_id, private_endpoint_label, private_endpoint_ip, nsg_ids, auto_refresh_frequency_in_seconds, auto_refresh_point_lag_in_seconds, time_of_auto_refresh_start, customer_contacts, is_mtls_connection_required, resource_pool_leader_id, resource_pool_summary, autonomous_maintenance_schedule_type, autonomous_database_maintenance_window, time_maintenance_pause_until, is_backup_retention_locked, time_scheduled_db_version_upgrade, is_disable_db_version_upgrade_schedule, is_schedule_db_version_upgrade_to_earliest, scheduled_operations, is_auto_scaling_for_storage_enabled, database_edition, db_tools_details, vanity_url_details, secret_id, secret_version_number, is_disconnect_peer, local_adg_resource_pool_leader_id, if_match, opc_dry_run):
-
-    if isinstance(autonomous_database_id, six.string_types) and len(autonomous_database_id.strip()) == 0:
-        raise click.UsageError('Parameter --autonomous-database-id cannot be whitespace or empty string')
-    if not force:
-        if long_term_backup_schedule or freeform_tags or defined_tags or security_attributes or whitelisted_ips or standby_whitelisted_ips or nsg_ids or customer_contacts or resource_pool_summary or autonomous_database_maintenance_window or scheduled_operations or db_tools_details or vanity_url_details:
-            if not click.confirm("WARNING: Updates to long-term-backup-schedule and freeform-tags and defined-tags and security-attributes and whitelisted-ips and standby-whitelisted-ips and nsg-ids and customer-contacts and resource-pool-summary and autonomous-database-maintenance-window and scheduled-operations and db-tools-details and vanity-url-details will replace any existing values. Are you sure you want to continue?"):
-                ctx.abort()
-
-    kwargs = {}
-    if if_match is not None:
-        kwargs['if_match'] = if_match
-    if opc_dry_run is not None:
-        kwargs['opc_dry_run'] = opc_dry_run
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
-
-    _details = {}
-    _details['encryptionKey'] = {}
-    _details['encryptionKey']['kmsKeyId'] = encryption_key_kms_key_id
-    _details['encryptionKey']['vaultId'] = encryption_key_vault_id
-
-    if backup_retention_period_in_days is not None:
-        _details['backupRetentionPeriodInDays'] = backup_retention_period_in_days
-
-    if compute_model is not None:
-        _details['computeModel'] = compute_model
-
-    if in_memory_percentage is not None:
-        _details['inMemoryPercentage'] = in_memory_percentage
-
-    if local_adg_auto_failover_max_data_loss_limit is not None:
-        _details['localAdgAutoFailoverMaxDataLossLimit'] = local_adg_auto_failover_max_data_loss_limit
-
-    if cpu_core_count is not None:
-        _details['cpuCoreCount'] = cpu_core_count
-
-    if long_term_backup_schedule is not None:
-        _details['longTermBackupSchedule'] = cli_util.parse_json_parameter("long_term_backup_schedule", long_term_backup_schedule)
-
-    if is_dev_tier is not None:
-        _details['isDevTier'] = is_dev_tier
-
-    if compute_count is not None:
-        _details['computeCount'] = compute_count
-
-    if ocpu_count is not None:
-        _details['ocpuCount'] = ocpu_count
-
-    if data_storage_size_in_tbs is not None:
-        _details['dataStorageSizeInTBs'] = data_storage_size_in_tbs
-
-    if data_storage_size_in_gbs is not None:
-        _details['dataStorageSizeInGBs'] = data_storage_size_in_gbs
-
-    if display_name is not None:
-        _details['displayName'] = display_name
-
-    if is_free_tier is not None:
-        _details['isFreeTier'] = is_free_tier
-
-    if availability_domain is not None:
-        _details['availabilityDomain'] = availability_domain
-
-    if time_scheduled_ad_update is not None:
-        _details['timeScheduledAdUpdate'] = time_scheduled_ad_update
-
-    if is_disable_ad_update_schedule is not None:
-        _details['isDisableAdUpdateSchedule'] = is_disable_ad_update_schedule
-
-    if is_schedule_ad_update_to_earliest is not None:
-        _details['isScheduleAdUpdateToEarliest'] = is_schedule_ad_update_to_earliest
-
-    if admin_password is not None:
-        _details['adminPassword'] = admin_password
-
-    if db_name is not None:
-        _details['dbName'] = db_name
-
-    if freeform_tags is not None:
-        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
-
-    if defined_tags is not None:
-        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
-
-    if security_attributes is not None:
-        _details['securityAttributes'] = cli_util.parse_json_parameter("security_attributes", security_attributes)
-
-    if db_workload is not None:
-        _details['dbWorkload'] = db_workload
-
-    if license_model is not None:
-        _details['licenseModel'] = license_model
-
-    if byol_compute_count_limit is not None:
-        _details['byolComputeCountLimit'] = byol_compute_count_limit
-
-    if is_access_control_enabled is not None:
-        _details['isAccessControlEnabled'] = is_access_control_enabled
-
-    if whitelisted_ips is not None:
-        _details['whitelistedIps'] = cli_util.parse_json_parameter("whitelisted_ips", whitelisted_ips)
-
-    if are_primary_whitelisted_ips_used is not None:
-        _details['arePrimaryWhitelistedIpsUsed'] = are_primary_whitelisted_ips_used
-
-    if standby_whitelisted_ips is not None:
-        _details['standbyWhitelistedIps'] = cli_util.parse_json_parameter("standby_whitelisted_ips", standby_whitelisted_ips)
-
-    if is_auto_scaling_enabled is not None:
-        _details['isAutoScalingEnabled'] = is_auto_scaling_enabled
-
-    if is_refreshable_clone is not None:
-        _details['isRefreshableClone'] = is_refreshable_clone
-
-    if refreshable_mode is not None:
-        _details['refreshableMode'] = refreshable_mode
-
-    if is_local_data_guard_enabled is not None:
-        _details['isLocalDataGuardEnabled'] = is_local_data_guard_enabled
-
-    if is_data_guard_enabled is not None:
-        _details['isDataGuardEnabled'] = is_data_guard_enabled
-
-    if peer_db_id is not None:
-        _details['peerDbId'] = peer_db_id
-
-    if db_version is not None:
-        _details['dbVersion'] = db_version
-
-    if open_mode is not None:
-        _details['openMode'] = open_mode
-
-    if permission_level is not None:
-        _details['permissionLevel'] = permission_level
-
-    if subnet_id is not None:
-        _details['subnetId'] = subnet_id
-
-    if private_endpoint_label is not None:
-        _details['privateEndpointLabel'] = private_endpoint_label
-
-    if private_endpoint_ip is not None:
-        _details['privateEndpointIp'] = private_endpoint_ip
-
-    if nsg_ids is not None:
-        _details['nsgIds'] = cli_util.parse_json_parameter("nsg_ids", nsg_ids)
-
-    if auto_refresh_frequency_in_seconds is not None:
-        _details['autoRefreshFrequencyInSeconds'] = auto_refresh_frequency_in_seconds
-
-    if auto_refresh_point_lag_in_seconds is not None:
-        _details['autoRefreshPointLagInSeconds'] = auto_refresh_point_lag_in_seconds
-
-    if time_of_auto_refresh_start is not None:
-        _details['timeOfAutoRefreshStart'] = time_of_auto_refresh_start
-
-    if customer_contacts is not None:
-        _details['customerContacts'] = cli_util.parse_json_parameter("customer_contacts", customer_contacts)
-
-    if is_mtls_connection_required is not None:
-        _details['isMtlsConnectionRequired'] = is_mtls_connection_required
-
-    if resource_pool_leader_id is not None:
-        _details['resourcePoolLeaderId'] = resource_pool_leader_id
-
-    if resource_pool_summary is not None:
-        _details['resourcePoolSummary'] = cli_util.parse_json_parameter("resource_pool_summary", resource_pool_summary)
-
-    if autonomous_maintenance_schedule_type is not None:
-        _details['autonomousMaintenanceScheduleType'] = autonomous_maintenance_schedule_type
-
-    if autonomous_database_maintenance_window is not None:
-        _details['autonomousDatabaseMaintenanceWindow'] = cli_util.parse_json_parameter("autonomous_database_maintenance_window", autonomous_database_maintenance_window)
-
-    if time_maintenance_pause_until is not None:
-        _details['timeMaintenancePauseUntil'] = time_maintenance_pause_until
-
-    if is_backup_retention_locked is not None:
-        _details['isBackupRetentionLocked'] = is_backup_retention_locked
-
-    if time_scheduled_db_version_upgrade is not None:
-        _details['timeScheduledDbVersionUpgrade'] = time_scheduled_db_version_upgrade
-
-    if is_disable_db_version_upgrade_schedule is not None:
-        _details['isDisableDbVersionUpgradeSchedule'] = is_disable_db_version_upgrade_schedule
-
-    if is_schedule_db_version_upgrade_to_earliest is not None:
-        _details['isScheduleDbVersionUpgradeToEarliest'] = is_schedule_db_version_upgrade_to_earliest
-
-    if scheduled_operations is not None:
-        _details['scheduledOperations'] = cli_util.parse_json_parameter("scheduled_operations", scheduled_operations)
-
-    if is_auto_scaling_for_storage_enabled is not None:
-        _details['isAutoScalingForStorageEnabled'] = is_auto_scaling_for_storage_enabled
-
-    if database_edition is not None:
-        _details['databaseEdition'] = database_edition
-
-    if db_tools_details is not None:
-        _details['dbToolsDetails'] = cli_util.parse_json_parameter("db_tools_details", db_tools_details)
-
-    if vanity_url_details is not None:
-        _details['vanityUrlDetails'] = cli_util.parse_json_parameter("vanity_url_details", vanity_url_details)
-
-    if secret_id is not None:
-        _details['secretId'] = secret_id
-
-    if secret_version_number is not None:
-        _details['secretVersionNumber'] = secret_version_number
-
-    if is_disconnect_peer is not None:
-        _details['isDisconnectPeer'] = is_disconnect_peer
-
-    if local_adg_resource_pool_leader_id is not None:
-        _details['localAdgResourcePoolLeaderId'] = local_adg_resource_pool_leader_id
-
-    _details['encryptionKey']['provider'] = 'OCI'
-
-    client = cli_util.build_client('database', 'database', ctx)
-    result = client.update_autonomous_database(
-        autonomous_database_id=autonomous_database_id,
-        update_autonomous_database_details=_details,
-        **kwargs
-    )
-    if wait_for_state:
-
-        if hasattr(client, 'get_autonomous_database') and callable(getattr(client, 'get_autonomous_database')):
-            try:
-                wait_period_kwargs = {}
-                if max_wait_seconds is not None:
-                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
-                if wait_interval_seconds is not None:
-                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
-
-                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
-                result = oci.wait_until(client, client.get_autonomous_database(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
-            except oci.exceptions.MaximumWaitTimeExceeded as e:
-                # If we fail, we should show an error, but we should still provide the information to the customer
-                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
-                cli_util.render_response(result, ctx)
-                sys.exit(2)
-            except Exception:
-                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
-                cli_util.render_response(result, ctx)
-                raise
-        else:
-            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
-    cli_util.render_response(result, ctx)
-
-
-@autonomous_database_group.command(name=cli_util.override('db.update_autonomous_database_gcp_key_details.command_name', 'update-autonomous-database-gcp-key-details'), help=u"""Updates one or more attributes of the specified Autonomous AI Database. See the UpdateAutonomousDatabaseDetails resource for a full list of attributes that can be updated. \n[Command Reference](updateAutonomousDatabase)""")
-@cli_util.option('--autonomous-database-id', required=True, help=u"""The database [OCID].""")
-@cli_util.option('--encryption-key-key-name', required=True, help=u"""GCP key name""")
-@cli_util.option('--encryption-key-project', required=True, help=u"""GCP project name""")
-@cli_util.option('--encryption-key-location', required=True, help=u"""GCP key ring location""")
-@cli_util.option('--encryption-key-key-ring', required=True, help=u"""GCP key ring""")
-@cli_util.option('--backup-retention-period-in-days', type=click.INT, help=u"""Retention period, in days, for long-term backups""")
-@cli_util.option('--compute-model', type=custom_types.CliCaseInsensitiveChoice(["ECPU", "OCPU"]), help=u"""The compute model of the Autonomous AI Database. This is required if using the `computeCount` parameter. If using `cpuCoreCount` then it is an error to specify `computeModel` to a non-null value. ECPU compute model is the recommended model and OCPU compute model is legacy.""")
-@cli_util.option('--in-memory-percentage', type=click.INT, help=u"""The percentage of the System Global Area(SGA) assigned to In-Memory tables in Autonomous AI Database. This property is applicable only to Autonomous AI Databases on the Exadata Cloud@Customer platform.""")
-@cli_util.option('--local-adg-auto-failover-max-data-loss-limit', type=click.INT, help=u"""Parameter that allows users to select an acceptable maximum data loss limit in seconds, up to which Automatic Failover will be triggered when necessary for a Local Autonomous Data Guard""")
-@cli_util.option('--cpu-core-count', type=click.INT, help=u"""The number of CPUs to be made available to the Autonomous AI Database.<br> For Autonomous AI Databases on Dedicated Exadata Infrastructure: - The CPU type (OCPUs or ECPUs) is determined by the parent Autonomous Exadata VM Cluster's compute model. - It is suggested to use 'computeCount' parameter if you want to use fractional value to provision less than 1 core.
-
-**Note:** This parameter cannot be used with the `ocpuCount` or `computeCount` parameter.
-
-This cannot be updated in parallel with any of the following: licenseModel, databaseEdition, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--long-term-backup-schedule', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-dev-tier', type=click.BOOL, help=u"""Autonomous AI Database for Developers are fixed-shape Autonomous AI Databases that developers can use to build and test new applications. On Serverless, these are low-cost and billed per instance, on Dedicated and Cloud@Customer there is no additional cost to create Developer databases. Developer databases come with limited resources and is not intended for large-scale testing and production deployments. When you need more compute or storage resources, you may upgrade to a full paid production database.""")
-@cli_util.option('--compute-count', type=click.FLOAT, help=u"""The compute amount (CPUs) available to the database. Minimum and maximum values depend on the compute model and whether the database is an Autonomous AI Database Serverless instance or an Autonomous AI Database on Dedicated Exadata Infrastructure. The 'ECPU' compute model requires a minimum value of one, for databases in the elastic resource pool and minimum value of two, otherwise. Required when using the `computeModel` parameter. When using `cpuCoreCount` parameter, it is an error to specify computeCount to a non-null value. Providing `computeModel` and `computeCount` is the preferred method for both OCPU and ECPU.
-
-This cannot be updated in parallel with any of the following: licenseModel, databaseEdition, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--ocpu-count', type=click.FLOAT, help=u"""The number of OCPU cores to be made available to the Autonomous AI Database.
-
-For Autonomous AI Databases on Dedicated Exadata Infrastructure, you can specify a fractional value for this parameter. Fractional values are not supported for Autonomous AI Database Serverless instances. For Autonomous AI Database Serverless instances, this parameter is not used.
-
-To provision less than 1 core, enter a fractional value in an increment of 0.1. To provision 1 or more cores, you must enter an integer between 1 and the maximum number of cores available to the infrastructure shape. For example, you can provision 0.3 or 0.4 cores, but not 0.35 cores. Likewise, you can provision 2 cores or 3 cores, but not 2.5 cores. The maximum number of cores is determined by the infrastructure shape. See [Characteristics of Infrastructure Shapes] for shape details.
-
-**Note:** This parameter cannot be used with the `cpuCoreCount` parameter.""")
-@cli_util.option('--data-storage-size-in-tbs', type=click.INT, help=u"""The size, in terabytes, of the data volume that will be created and attached to the database. For Autonomous AI Databases on dedicated Exadata infrastructure, the maximum storage value is determined by the infrastructure shape. See [Characteristics of Infrastructure Shapes] for shape details. A full Exadata service is allocated when the Autonomous AI Database size is set to the upper limit (384 TB).
-
-**Note:** This parameter cannot be used with the `dataStorageSizeInGBs` parameter.
-
-This cannot be updated in parallel with any of the following: licenseModel, databaseEdition, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--data-storage-size-in-gbs', type=click.INT, help=u"""Applies to dedicated Exadata infrastructure only.
-
-The size, in gigabytes, of the data volume that will be created and attached to the database. The maximum storage value depends on the system shape. See [Characteristics of Infrastructure Shapes] for shape details.
-
-**Note:** This parameter cannot be used with the `dataStorageSizeInTBs` parameter.""")
-@cli_util.option('--display-name', help=u"""The user-friendly name for the Autonomous AI Database. The name does not have to be unique. The display name can only be updated for Autonomous AI Databases using dedicated Exadata Infrastructure. This parameter may not be updated in parallel with dbVersion.""")
-@cli_util.option('--is-free-tier', type=click.BOOL, help=u"""Indicates if this is an Always Free resource. The default value is false. Note that Always Free Autonomous AI Databases have 1 CPU and 20GB of memory. For Always Free databases, memory and CPU cannot be scaled.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isLocalDataGuardEnabled""")
-@cli_util.option('--availability-domain', help=u"""The Autonomous Database Serverless instance's availability domain.""")
-@cli_util.option('--time-scheduled-ad-update', type=custom_types.CLI_DATETIME, help=u"""The date and time when the Autonomous Database availability domain is to be updated.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--is-disable-ad-update-schedule', type=click.BOOL, help=u"""True, if you want to disable Autonomous Database availability domain scheduled update.""")
-@cli_util.option('--is-schedule-ad-update-to-earliest', type=click.BOOL, help=u"""True, if you want to schedule Autonomous Database availability domain update to the earliest available time.""")
-@cli_util.option('--admin-password', help=u"""The password must be between 12 and 30 characters long, and must contain at least 1 uppercase, 1 lowercase, and 1 numeric character. It cannot contain the double quote symbol (\") or the username \"admin\", regardless of casing. It must be different from the last four passwords and it must not be a password used within the last 24 hours.
-
-This cannot be used in conjunction with with OCI vault secrets (secretId).
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, whitelistedIps, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, or isFreeTier.""")
-@cli_util.option('--db-name', help=u"""New name for this Autonomous AI Database. For Autonomous AI Databases on Dedicated Exadata Infrastructure, the name must begin with an alphabetic character, and can contain a maximum of eight alphanumeric characters. Special characters are not permitted. For Autonomous AI Database Serverless instances, the name must begin with an alphabetic character, and can contain a maximum of 30 alphanumeric characters. Special characters are not permitted. The database name must be unique in the tenancy.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails.""")
-@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
-
-Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--security-attributes', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Security Attributes for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags]. Example: `{\"Oracle-ZPR\": {\"MaxEgressCount\": {\"value\": \"42\", \"mode\": \"audit\"}}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--db-workload', type=custom_types.CliCaseInsensitiveChoice(["OLTP", "DW", "AJD", "APEX", "LH"]), help=u"""The Autonomous AI Database workload type. The following values are valid: - OLTP - indicates an Autonomous AI Transaction Processing database - DW - indicates an Autonomous AI Lakehouse database - AJD - indicates an Autonomous AI JSON Database - APEX - indicates an Autonomous AI Database with the Oracle APEX AI Application Development workload type. - LH - indicates an Oracle Autonomous AI Lakehouse database
-
-**Note** Starting December 2026, DW will not be supported as a valid value for this parameter. When creating an Autonomous AI Database, if this parameter is not specified, the default value is `OLTP`.
-
- This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""")
-@cli_util.option('--license-model', type=custom_types.CliCaseInsensitiveChoice(["LICENSE_INCLUDED", "BRING_YOUR_OWN_LICENSE"]), help=u"""The Oracle license model that applies to the Oracle Autonomous AI Database. Bring your own license (BYOL) allows you to apply your current on-premises Oracle software licenses to equivalent, highly automated Oracle services in the cloud. License Included allows you to subscribe to new Oracle AI Database software licenses and the Oracle AI Database service. Note that when provisioning an [Autonomous AI Database on dedicated Exadata infrastructure], this attribute must be null. It is already set at the Autonomous Exadata Infrastructure level. When provisioning an [Autonomous AI Database Serverless]  database, if a value is not specified, the system defaults the value to `BRING_YOUR_OWN_LICENSE`. Bring your own license (BYOL) also allows you to select the DB edition using the optional parameter.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, dataStorageSizeInTBs, adminPassword, isMTLSConnectionRequired, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--byol-compute-count-limit', type=click.FLOAT, help=u"""The maximum number of CPUs allowed with a Bring Your Own License (BYOL), including those used for auto-scaling, disaster recovery, tools, etc. Any CPU usage above this limit is considered as License Included and billed.""")
-@cli_util.option('--is-access-control-enabled', type=click.BOOL, help=u"""Indicates if the database-level access control is enabled. If disabled, database access is defined by the network security rules. If enabled, database access is restricted to the IP addresses defined by the rules specified with the `whitelistedIps` property. While specifying `whitelistedIps` rules is optional,  if database-level access control is enabled and no rules are specified, the database will become inaccessible. The rules can be added later using the `UpdateAutonomousDatabase` API operation or edit option in console. When creating a database clone, the desired access control setting should be specified. By default, database-level access control will be disabled for the clone.
-
-This property is applicable only to Autonomous AI Databases on the Exadata Cloud@Customer platform. For Autonomous AI Database Serverless instances, `whitelistedIps` is used.""")
-@cli_util.option('--whitelisted-ips', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The client IP access control list (ACL). This feature is available for [Autonomous AI Database Serverless]  and on Exadata Cloud@Customer. Only clients connecting from an IP address included in the ACL may access the Autonomous AI Database instance. If `arePrimaryWhitelistedIpsUsed` is 'TRUE' then Autonomous AI Database uses this primary's IP access control list (ACL) for the disaster recovery peer called `standbywhitelistedips`.
-
-For Autonomous AI Database Serverless, this is an array of CIDR (classless inter-domain routing) notations for a subnet or VCN OCID (virtual cloud network Oracle Cloud ID). Multiple IPs and VCN OCIDs should be separate strings separated by commas, but if it\u2019s other configurations that need multiple pieces of information then its each piece is connected with semicolon (;) as a delimiter. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"ocid1.vcn.oc1.sea.<unique_id>\",\"ocid1.vcn.oc1.sea.<unique_id1>;1.1.1.1\",\"ocid1.vcn.oc1.sea.<unique_id2>;1.1.0.0/16\"]` For Exadata Cloud@Customer, this is an array of IP addresses or CIDR notations. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"1.1.2.25\"]`
-
-For an update operation, if you want to delete all the IPs in the ACL, use an array with a single empty string entry.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--are-primary-whitelisted-ips-used', type=click.BOOL, help=u"""This field will be null if the Autonomous AI Database is not Data Guard enabled or Access Control is disabled. `TRUE` if the Autonomous AI Database has Data Guard and Access Control enabled, and the Autonomous AI Database uses the primary's IP access control list (ACL) for standby. `FALSE` if the Autonomous AI Database has Data Guard and Access Control enabled, and the Autonomous AI Database uses a different IP access control list (ACL) for standby compared to primary.""")
-@cli_util.option('--standby-whitelisted-ips', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The client IP access control list (ACL). This feature is available for [Autonomous AI Database Serverless]  and on Exadata Cloud@Customer. Only clients connecting from an IP address included in the ACL may access the Autonomous AI Database instance. If `arePrimaryWhitelistedIpsUsed` is 'TRUE' then Autonomous AI Database uses this primary's IP access control list (ACL) for the disaster recovery peer called `standbywhitelistedips`.
-
-For Autonomous AI Database Serverless, this is an array of CIDR (classless inter-domain routing) notations for a subnet or VCN OCID (virtual cloud network Oracle Cloud ID). Multiple IPs and VCN OCIDs should be separate strings separated by commas, but if it\u2019s other configurations that need multiple pieces of information then its each piece is connected with semicolon (;) as a delimiter. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"ocid1.vcn.oc1.sea.<unique_id>\",\"ocid1.vcn.oc1.sea.<unique_id1>;1.1.1.1\",\"ocid1.vcn.oc1.sea.<unique_id2>;1.1.0.0/16\"]` For Exadata Cloud@Customer, this is an array of IP addresses or CIDR notations. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"1.1.2.25\"]`
-
-For an update operation, if you want to delete all the IPs in the ACL, use an array with a single empty string entry.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-auto-scaling-enabled', type=click.BOOL, help=u"""Indicates whether auto scaling is enabled for the Autonomous AI Database CPU core count. Setting to `TRUE` enables auto scaling. Setting to `FALSE` disables auto scaling. The default value is `TRUE`. Auto scaling is only available for [Autonomous AI Database Serverless instances].""")
-@cli_util.option('--is-refreshable-clone', type=click.BOOL, help=u"""Indicates if the Autonomous AI Database is a refreshable clone.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""")
-@cli_util.option('--refreshable-mode', type=custom_types.CliCaseInsensitiveChoice(["AUTOMATIC", "MANUAL"]), help=u"""The refresh mode of the clone. AUTOMATIC indicates that the clone is automatically being refreshed with data from the source Autonomous AI Database.""")
-@cli_util.option('--is-local-data-guard-enabled', type=click.BOOL, help=u"""Indicates whether the Autonomous AI Database has a local (in-region) standby database. Not applicable when creating a cross-region Autonomous Data Guard associations, or to Autonomous AI Databases using dedicated Exadata infrastructure or Exadata Cloud@Customer infrastructure.
-
-To create a local standby, set to `TRUE`. To delete a local standby, set to `FALSE`. For more information on using Autonomous Data Guard on an Autonomous AI Database Serverless instance (local and cross-region) , see [About Standby Databases]
-
-To enable cross-region Autonomous Data Guard on an Autonomous AI Database Serverless instance, see [Enable Autonomous Data Guard].
-
-This cannot be updated in parallel with any of the following: isMTLSRequired, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--is-data-guard-enabled', type=click.BOOL, help=u"""** Deprecated. ** Indicates whether the Autonomous AI Database has a local (in-region) standby database. Not applicable when creating a cross-region Autonomous Data Guard associations, or to Autonomous AI Databases using dedicated Exadata infrastructure or Exadata Cloud@Customer infrastructure.
-
-To create a local standby, set to `TRUE`. To delete a local standby, set to `FALSE`. For more information on using Autonomous Data Guard on an Autonomous AI Database Serverless instance (local and cross-region) , see [About Standby Databases]
-
-To enable cross-region Autonomous Data Guard on an Autonomous AI Database Serverless instance, see [Enable Autonomous Data Guard].
-
-To delete a cross-region standby database, provide the `peerDbId` for the standby database in a remote region, and set `isDataGuardEnabled` to `FALSE`.""")
-@cli_util.option('--peer-db-id', help=u"""The database OCID(/Content/General/Concepts/identifiers.htm) of the Disaster Recovery peer (source Primary) database, which is located in a different (remote) region from the current peer database.
-
-To create or delete a local (in-region) standby, see the `isDataGuardEnabled` parameter.
-
-When disconnecting a cross-region standby, specify the standby database OCID in this parameter together with `isDisconnectPeer=true`.""")
-@cli_util.option('--db-version', help=u"""A valid Oracle AI Database version for Autonomous AI Database. When you specify 23ai for dbversion, the system will provision a 23ai database, but the UI will display it as 26ai. When you specify 26ai for dbversion, the system will provision and display a 26ai database as expected. For new databases, it is recommended to use either 19c or 26ai.
-
-**Note** Starting December 2026, 23ai will not be supported as a valid value for this parameter.""")
-@cli_util.option('--open-mode', type=custom_types.CliCaseInsensitiveChoice(["READ_ONLY", "READ_WRITE"]), help=u"""Indicates the Autonomous AI Database mode. The database can be opened in `READ_ONLY` or `READ_WRITE` mode.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--permission-level', type=custom_types.CliCaseInsensitiveChoice(["RESTRICTED", "UNRESTRICTED"]), help=u"""The Autonomous AI Database permission level. Restricted mode allows access only by admin users.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--subnet-id', help=u"""The [OCID] of the subnet the resource is associated with.
-
-**Subnet Restrictions:** - For bare metal DB systems and for single node virtual machine DB systems, do not use a subnet that overlaps with 192.168.16.16/28. - For Exadata and virtual machine 2-node RAC systems, do not use a subnet that overlaps with 192.168.128.0/20. - For Autonomous AI Database, setting this will disable public secure access to the database.
-
-These subnets are used by the Oracle Clusterware private interconnect on the database instance. Specifying an overlapping subnet will cause the private interconnect to malfunction. This restriction applies to both the client subnet and the backup subnet.""")
-@cli_util.option('--private-endpoint-label', help=u"""The resource's private endpoint label. - Setting the endpoint label to a non-empty string creates a private endpoint database. - Resetting the endpoint label to an empty string, after the creation of the private endpoint database, changes the private endpoint database to a public endpoint database. - Setting the endpoint label to a non-empty string value, updates to a new private endpoint database, when the database is disabled and re-enabled.
-
-This setting cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--private-endpoint-ip', help=u"""The private endpoint Ip address for the resource.""")
-@cli_util.option('--nsg-ids', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of [OCIDs] for the network security groups (NSGs) to which this resource belongs. Setting this to an empty list removes all resources from all NSGs. For more information about NSGs, see [Security Rules]. **NsgIds restrictions:** - A network security group (NSG) is optional for Autonomous AI Databases with private access. The nsgIds list can be empty.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--auto-refresh-frequency-in-seconds', type=click.INT, help=u"""The frequency a refreshable clone is refreshed after auto-refresh is enabled. The minimum is 1 hour. The maximum is 7 days. The date and time that auto-refresh is enabled is controlled by the `timeOfAutoRefreshStart` parameter.""")
-@cli_util.option('--auto-refresh-point-lag-in-seconds', type=click.INT, help=u"""The time, in seconds, the data of the refreshable clone lags the primary database at the point of refresh. The minimum is 0 minutes (0 mins means refresh to the latest available timestamp). The maximum is 7 days. The lag time increases after refreshing until the next data refresh happens.""")
-@cli_util.option('--time-of-auto-refresh-start', type=custom_types.CLI_DATETIME, help=u"""The the date and time that auto-refreshing will begin for an Autonomous AI Database refreshable clone. This value controls only the start time for the first refresh operation. Subsequent (ongoing) refresh operations have start times controlled by the value of the `autoRefreshFrequencyInSeconds` parameter.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--customer-contacts', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Customer Contacts. Setting this to an empty list removes all customer contacts of an Oracle
-
-This cannot be updated in parallel with any of the following: isMTLSConnectionRequired, scheduledOperations, or dbToolsDetails.
-
-This option is a JSON list with items of type CustomerContact.  For documentation on CustomerContact please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/database/20160918/datatypes/CustomerContact.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-mtls-connection-required', type=click.BOOL, help=u"""Specifies if the Autonomous AI Database requires mTLS connections.
-
-This may not be updated in parallel with any of the following: licenseModel, databaseEdition, cpuCoreCount, computeCount, dataStorageSizeInTBs, whitelistedIps, openMode, permissionLevel, db-workload, privateEndpointLabel, nsgIds, customerContacts, dbVersion, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.
-
-Service Change: The default value of the isMTLSConnectionRequired attribute will change from true to false on July 1, 2023 in the following APIs: - CreateAutonomousDatabase - GetAutonomousDatabase - UpdateAutonomousDatabase Details: Prior to the July 1, 2023 change, the isMTLSConnectionRequired attribute default value was true. This applies to Autonomous AI Database Serverless. Does this impact me? If you use or maintain custom scripts or Terraform scripts referencing the CreateAutonomousDatabase, GetAutonomousDatabase, or UpdateAutonomousDatabase APIs, you want to check, and possibly modify, the scripts for the changed default value of the attribute. Should you choose not to leave your scripts unchanged, the API calls containing this attribute will continue to work, but the default value will switch from true to false. How do I make this change? Using either OCI SDKs or command line tools, update your custom scripts to explicitly set the isMTLSConnectionRequired attribute to true.""")
-@cli_util.option('--resource-pool-leader-id', help=u"""The unique identifier for leader Autonomous AI Database OCID [OCID].""")
-@cli_util.option('--resource-pool-summary', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--autonomous-maintenance-schedule-type', type=custom_types.CliCaseInsensitiveChoice(["EARLY", "REGULAR"]), help=u"""The maintenance schedule type of the Autonomous AI Database Serverless. An EARLY maintenance schedule follows a schedule applying patches prior to the REGULAR schedule. A REGULAR maintenance schedule follows the normal cycle""")
-@cli_util.option('--autonomous-database-maintenance-window', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--time-maintenance-pause-until', type=custom_types.CLI_DATETIME, help=u"""The date until which Autonomous AI Database maintenance is temporarily paused.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--is-backup-retention-locked', type=click.BOOL, help=u"""True if the Autonomous AI Database is backup retention locked.""")
-@cli_util.option('--time-scheduled-db-version-upgrade', type=custom_types.CLI_DATETIME, help=u"""The date and time the Autonomous AI Database scheduled to upgrade to 26ai.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--is-disable-db-version-upgrade-schedule', type=click.BOOL, help=u"""True if user wants to disable Autonomous AI Database scheduled upgrade to 26ai.""")
-@cli_util.option('--is-schedule-db-version-upgrade-to-earliest', type=click.BOOL, help=u"""True if user wants to schedule Autonomous AI Database upgrade to the earliest available time.""")
-@cli_util.option('--scheduled-operations', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of scheduled operations. Consists of values such as dayOfWeek, scheduledStartTime, scheduledStopTime.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.
-
-This option is a JSON list with items of type ScheduledOperationDetails.  For documentation on ScheduledOperationDetails please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/database/20160918/datatypes/ScheduledOperationDetails.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-auto-scaling-for-storage-enabled', type=click.BOOL, help=u"""Indicates if auto scaling is enabled for the Autonomous AI Database storage. The default value is `FALSE`.""")
-@cli_util.option('--database-edition', help=u"""The Oracle AI Database Edition that applies to the Autonomous AI Databases. This parameter accepts options `STANDARD_EDITION` and `ENTERPRISE_EDITION`.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--db-tools-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of database tools details.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, isLocalDataGuardEnabled, or isFreeTier.
-
-This option is a JSON list with items of type DatabaseTool.  For documentation on DatabaseTool please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/database/20160918/datatypes/DatabaseTool.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--vanity-url-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--secret-id', help=u"""The OCI vault secret [/Content/General/Concepts/identifiers.htm]OCID. This cannot be used in conjunction with adminPassword.""")
-@cli_util.option('--secret-version-number', type=click.INT, help=u"""The version of the vault secret. If no version is specified, the latest version will be used.""")
-@cli_util.option('--is-disconnect-peer', type=click.BOOL, help=u"""If true, this disconnects the Autonomous AI Database from its peer. After the disconnect completes, the Autonomous AI Database works permanently as a standalone database.
-
-**Warning:** A disconnected standby is no longer part of the disaster recovery configuration. Operations and restrictions that apply to a connected standby do not apply in the same way after the database has been disconnected.
-
-To disconnect a cross region standby, also provide the OCID of the standby database in the `peerDbId` parameter.""")
-@cli_util.option('--local-adg-resource-pool-leader-id', help=u"""The [OCID] of a dedicated resource pool leader Autonomous AI Database in the same region, that is required when local Autonomous Data Guard is enabled for a dedicated resource pool member using the parameter `isLocalDataGuardEnabled`. This field applies only to dedicated resource pool members, and the specified leader must be different from the primary\u2019s leader. Local Autonomous Data Guard can be enabled only if more than one dedicated resource pool exists in the region.""")
-@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource.  The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
-@cli_util.option('--opc-dry-run', type=click.BOOL, help=u"""Indicates that the request is a dry run, if set to \"true\". A dry run request does not actually creating or updating a resource and is used only to perform validation on the submitted data.""")
-@cli_util.option('--encryption-key-kms-rest-endpoint', help=u"""GCP kms REST API endpoint""")
-@cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
-@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["PROVISIONING", "AVAILABLE", "STOPPING", "STOPPED", "STARTING", "TERMINATING", "TERMINATED", "UNAVAILABLE", "RESTORE_IN_PROGRESS", "RESTORE_FAILED", "BACKUP_IN_PROGRESS", "SCALE_IN_PROGRESS", "AVAILABLE_NEEDS_ATTENTION", "UPDATING", "MAINTENANCE_IN_PROGRESS", "RESTARTING", "RECREATING", "ROLE_CHANGE_IN_PROGRESS", "UPGRADING", "INACCESSIBLE", "STANDBY", "TRANSPORTING"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state PROVISIONING --wait-for-state TRANSPORTING would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
-@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
-@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'long-term-backup-schedule': {'module': 'database', 'class': 'LongTermBackUpScheduleDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'standby-whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'customer-contacts': {'module': 'database', 'class': 'list[CustomerContact]'}, 'resource-pool-summary': {'module': 'database', 'class': 'ResourcePoolSummary'}, 'autonomous-database-maintenance-window': {'module': 'database', 'class': 'AutonomousDatabaseMaintenanceWindowSummary'}, 'scheduled-operations': {'module': 'database', 'class': 'list[ScheduledOperationDetails]'}, 'db-tools-details': {'module': 'database', 'class': 'list[DatabaseTool]'}, 'vanity-url-details': {'module': 'database', 'class': 'VanityUrlDetails'}})
-@cli_util.help_option
-@click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'long-term-backup-schedule': {'module': 'database', 'class': 'LongTermBackUpScheduleDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'standby-whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'customer-contacts': {'module': 'database', 'class': 'list[CustomerContact]'}, 'resource-pool-summary': {'module': 'database', 'class': 'ResourcePoolSummary'}, 'autonomous-database-maintenance-window': {'module': 'database', 'class': 'AutonomousDatabaseMaintenanceWindowSummary'}, 'scheduled-operations': {'module': 'database', 'class': 'list[ScheduledOperationDetails]'}, 'db-tools-details': {'module': 'database', 'class': 'list[DatabaseTool]'}, 'vanity-url-details': {'module': 'database', 'class': 'VanityUrlDetails'}}, output_type={'module': 'database', 'class': 'AutonomousDatabase'})
-@cli_util.wrap_exceptions
-def update_autonomous_database_gcp_key_details(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, autonomous_database_id, encryption_key_key_name, encryption_key_project, encryption_key_location, encryption_key_key_ring, backup_retention_period_in_days, compute_model, in_memory_percentage, local_adg_auto_failover_max_data_loss_limit, cpu_core_count, long_term_backup_schedule, is_dev_tier, compute_count, ocpu_count, data_storage_size_in_tbs, data_storage_size_in_gbs, display_name, is_free_tier, availability_domain, time_scheduled_ad_update, is_disable_ad_update_schedule, is_schedule_ad_update_to_earliest, admin_password, db_name, freeform_tags, defined_tags, security_attributes, db_workload, license_model, byol_compute_count_limit, is_access_control_enabled, whitelisted_ips, are_primary_whitelisted_ips_used, standby_whitelisted_ips, is_auto_scaling_enabled, is_refreshable_clone, refreshable_mode, is_local_data_guard_enabled, is_data_guard_enabled, peer_db_id, db_version, open_mode, permission_level, subnet_id, private_endpoint_label, private_endpoint_ip, nsg_ids, auto_refresh_frequency_in_seconds, auto_refresh_point_lag_in_seconds, time_of_auto_refresh_start, customer_contacts, is_mtls_connection_required, resource_pool_leader_id, resource_pool_summary, autonomous_maintenance_schedule_type, autonomous_database_maintenance_window, time_maintenance_pause_until, is_backup_retention_locked, time_scheduled_db_version_upgrade, is_disable_db_version_upgrade_schedule, is_schedule_db_version_upgrade_to_earliest, scheduled_operations, is_auto_scaling_for_storage_enabled, database_edition, db_tools_details, vanity_url_details, secret_id, secret_version_number, is_disconnect_peer, local_adg_resource_pool_leader_id, if_match, opc_dry_run, encryption_key_kms_rest_endpoint):
-
-    if isinstance(autonomous_database_id, six.string_types) and len(autonomous_database_id.strip()) == 0:
-        raise click.UsageError('Parameter --autonomous-database-id cannot be whitespace or empty string')
-    if not force:
-        if long_term_backup_schedule or freeform_tags or defined_tags or security_attributes or whitelisted_ips or standby_whitelisted_ips or nsg_ids or customer_contacts or resource_pool_summary or autonomous_database_maintenance_window or scheduled_operations or db_tools_details or vanity_url_details:
-            if not click.confirm("WARNING: Updates to long-term-backup-schedule and freeform-tags and defined-tags and security-attributes and whitelisted-ips and standby-whitelisted-ips and nsg-ids and customer-contacts and resource-pool-summary and autonomous-database-maintenance-window and scheduled-operations and db-tools-details and vanity-url-details will replace any existing values. Are you sure you want to continue?"):
-                ctx.abort()
-
-    kwargs = {}
-    if if_match is not None:
-        kwargs['if_match'] = if_match
-    if opc_dry_run is not None:
-        kwargs['opc_dry_run'] = opc_dry_run
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
-
-    _details = {}
-    _details['encryptionKey'] = {}
-    _details['encryptionKey']['keyName'] = encryption_key_key_name
-    _details['encryptionKey']['project'] = encryption_key_project
-    _details['encryptionKey']['location'] = encryption_key_location
-    _details['encryptionKey']['keyRing'] = encryption_key_key_ring
-
-    if backup_retention_period_in_days is not None:
-        _details['backupRetentionPeriodInDays'] = backup_retention_period_in_days
-
-    if compute_model is not None:
-        _details['computeModel'] = compute_model
-
-    if in_memory_percentage is not None:
-        _details['inMemoryPercentage'] = in_memory_percentage
-
-    if local_adg_auto_failover_max_data_loss_limit is not None:
-        _details['localAdgAutoFailoverMaxDataLossLimit'] = local_adg_auto_failover_max_data_loss_limit
-
-    if cpu_core_count is not None:
-        _details['cpuCoreCount'] = cpu_core_count
-
-    if long_term_backup_schedule is not None:
-        _details['longTermBackupSchedule'] = cli_util.parse_json_parameter("long_term_backup_schedule", long_term_backup_schedule)
-
-    if is_dev_tier is not None:
-        _details['isDevTier'] = is_dev_tier
-
-    if compute_count is not None:
-        _details['computeCount'] = compute_count
-
-    if ocpu_count is not None:
-        _details['ocpuCount'] = ocpu_count
-
-    if data_storage_size_in_tbs is not None:
-        _details['dataStorageSizeInTBs'] = data_storage_size_in_tbs
-
-    if data_storage_size_in_gbs is not None:
-        _details['dataStorageSizeInGBs'] = data_storage_size_in_gbs
-
-    if display_name is not None:
-        _details['displayName'] = display_name
-
-    if is_free_tier is not None:
-        _details['isFreeTier'] = is_free_tier
-
-    if availability_domain is not None:
-        _details['availabilityDomain'] = availability_domain
-
-    if time_scheduled_ad_update is not None:
-        _details['timeScheduledAdUpdate'] = time_scheduled_ad_update
-
-    if is_disable_ad_update_schedule is not None:
-        _details['isDisableAdUpdateSchedule'] = is_disable_ad_update_schedule
-
-    if is_schedule_ad_update_to_earliest is not None:
-        _details['isScheduleAdUpdateToEarliest'] = is_schedule_ad_update_to_earliest
-
-    if admin_password is not None:
-        _details['adminPassword'] = admin_password
-
-    if db_name is not None:
-        _details['dbName'] = db_name
-
-    if freeform_tags is not None:
-        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
-
-    if defined_tags is not None:
-        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
-
-    if security_attributes is not None:
-        _details['securityAttributes'] = cli_util.parse_json_parameter("security_attributes", security_attributes)
-
-    if db_workload is not None:
-        _details['dbWorkload'] = db_workload
-
-    if license_model is not None:
-        _details['licenseModel'] = license_model
-
-    if byol_compute_count_limit is not None:
-        _details['byolComputeCountLimit'] = byol_compute_count_limit
-
-    if is_access_control_enabled is not None:
-        _details['isAccessControlEnabled'] = is_access_control_enabled
-
-    if whitelisted_ips is not None:
-        _details['whitelistedIps'] = cli_util.parse_json_parameter("whitelisted_ips", whitelisted_ips)
-
-    if are_primary_whitelisted_ips_used is not None:
-        _details['arePrimaryWhitelistedIpsUsed'] = are_primary_whitelisted_ips_used
-
-    if standby_whitelisted_ips is not None:
-        _details['standbyWhitelistedIps'] = cli_util.parse_json_parameter("standby_whitelisted_ips", standby_whitelisted_ips)
-
-    if is_auto_scaling_enabled is not None:
-        _details['isAutoScalingEnabled'] = is_auto_scaling_enabled
-
-    if is_refreshable_clone is not None:
-        _details['isRefreshableClone'] = is_refreshable_clone
-
-    if refreshable_mode is not None:
-        _details['refreshableMode'] = refreshable_mode
-
-    if is_local_data_guard_enabled is not None:
-        _details['isLocalDataGuardEnabled'] = is_local_data_guard_enabled
-
-    if is_data_guard_enabled is not None:
-        _details['isDataGuardEnabled'] = is_data_guard_enabled
-
-    if peer_db_id is not None:
-        _details['peerDbId'] = peer_db_id
-
-    if db_version is not None:
-        _details['dbVersion'] = db_version
-
-    if open_mode is not None:
-        _details['openMode'] = open_mode
-
-    if permission_level is not None:
-        _details['permissionLevel'] = permission_level
-
-    if subnet_id is not None:
-        _details['subnetId'] = subnet_id
-
-    if private_endpoint_label is not None:
-        _details['privateEndpointLabel'] = private_endpoint_label
-
-    if private_endpoint_ip is not None:
-        _details['privateEndpointIp'] = private_endpoint_ip
-
-    if nsg_ids is not None:
-        _details['nsgIds'] = cli_util.parse_json_parameter("nsg_ids", nsg_ids)
-
-    if auto_refresh_frequency_in_seconds is not None:
-        _details['autoRefreshFrequencyInSeconds'] = auto_refresh_frequency_in_seconds
-
-    if auto_refresh_point_lag_in_seconds is not None:
-        _details['autoRefreshPointLagInSeconds'] = auto_refresh_point_lag_in_seconds
-
-    if time_of_auto_refresh_start is not None:
-        _details['timeOfAutoRefreshStart'] = time_of_auto_refresh_start
-
-    if customer_contacts is not None:
-        _details['customerContacts'] = cli_util.parse_json_parameter("customer_contacts", customer_contacts)
-
-    if is_mtls_connection_required is not None:
-        _details['isMtlsConnectionRequired'] = is_mtls_connection_required
-
-    if resource_pool_leader_id is not None:
-        _details['resourcePoolLeaderId'] = resource_pool_leader_id
-
-    if resource_pool_summary is not None:
-        _details['resourcePoolSummary'] = cli_util.parse_json_parameter("resource_pool_summary", resource_pool_summary)
-
-    if autonomous_maintenance_schedule_type is not None:
-        _details['autonomousMaintenanceScheduleType'] = autonomous_maintenance_schedule_type
-
-    if autonomous_database_maintenance_window is not None:
-        _details['autonomousDatabaseMaintenanceWindow'] = cli_util.parse_json_parameter("autonomous_database_maintenance_window", autonomous_database_maintenance_window)
-
-    if time_maintenance_pause_until is not None:
-        _details['timeMaintenancePauseUntil'] = time_maintenance_pause_until
-
-    if is_backup_retention_locked is not None:
-        _details['isBackupRetentionLocked'] = is_backup_retention_locked
-
-    if time_scheduled_db_version_upgrade is not None:
-        _details['timeScheduledDbVersionUpgrade'] = time_scheduled_db_version_upgrade
-
-    if is_disable_db_version_upgrade_schedule is not None:
-        _details['isDisableDbVersionUpgradeSchedule'] = is_disable_db_version_upgrade_schedule
-
-    if is_schedule_db_version_upgrade_to_earliest is not None:
-        _details['isScheduleDbVersionUpgradeToEarliest'] = is_schedule_db_version_upgrade_to_earliest
-
-    if scheduled_operations is not None:
-        _details['scheduledOperations'] = cli_util.parse_json_parameter("scheduled_operations", scheduled_operations)
-
-    if is_auto_scaling_for_storage_enabled is not None:
-        _details['isAutoScalingForStorageEnabled'] = is_auto_scaling_for_storage_enabled
-
-    if database_edition is not None:
-        _details['databaseEdition'] = database_edition
-
-    if db_tools_details is not None:
-        _details['dbToolsDetails'] = cli_util.parse_json_parameter("db_tools_details", db_tools_details)
-
-    if vanity_url_details is not None:
-        _details['vanityUrlDetails'] = cli_util.parse_json_parameter("vanity_url_details", vanity_url_details)
-
-    if secret_id is not None:
-        _details['secretId'] = secret_id
-
-    if secret_version_number is not None:
-        _details['secretVersionNumber'] = secret_version_number
-
-    if is_disconnect_peer is not None:
-        _details['isDisconnectPeer'] = is_disconnect_peer
-
-    if local_adg_resource_pool_leader_id is not None:
-        _details['localAdgResourcePoolLeaderId'] = local_adg_resource_pool_leader_id
-
-    if encryption_key_kms_rest_endpoint is not None:
-        _details['encryptionKey']['kmsRestEndpoint'] = encryption_key_kms_rest_endpoint
-
-    _details['encryptionKey']['provider'] = 'GCP'
-
-    client = cli_util.build_client('database', 'database', ctx)
-    result = client.update_autonomous_database(
-        autonomous_database_id=autonomous_database_id,
-        update_autonomous_database_details=_details,
-        **kwargs
-    )
-    if wait_for_state:
-
-        if hasattr(client, 'get_autonomous_database') and callable(getattr(client, 'get_autonomous_database')):
-            try:
-                wait_period_kwargs = {}
-                if max_wait_seconds is not None:
-                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
-                if wait_interval_seconds is not None:
-                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
-
-                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
-                result = oci.wait_until(client, client.get_autonomous_database(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
-            except oci.exceptions.MaximumWaitTimeExceeded as e:
-                # If we fail, we should show an error, but we should still provide the information to the customer
-                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
-                cli_util.render_response(result, ctx)
-                sys.exit(2)
-            except Exception:
-                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
-                cli_util.render_response(result, ctx)
-                raise
-        else:
-            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
-    cli_util.render_response(result, ctx)
-
-
-@autonomous_database_group.command(name=cli_util.override('db.update_autonomous_database_oracle_managed_key_details.command_name', 'update-autonomous-database-oracle-managed-key-details'), help=u"""Updates one or more attributes of the specified Autonomous AI Database. See the UpdateAutonomousDatabaseDetails resource for a full list of attributes that can be updated. \n[Command Reference](updateAutonomousDatabase)""")
-@cli_util.option('--autonomous-database-id', required=True, help=u"""The database [OCID].""")
-@cli_util.option('--backup-retention-period-in-days', type=click.INT, help=u"""Retention period, in days, for long-term backups""")
-@cli_util.option('--compute-model', type=custom_types.CliCaseInsensitiveChoice(["ECPU", "OCPU"]), help=u"""The compute model of the Autonomous AI Database. This is required if using the `computeCount` parameter. If using `cpuCoreCount` then it is an error to specify `computeModel` to a non-null value. ECPU compute model is the recommended model and OCPU compute model is legacy.""")
-@cli_util.option('--in-memory-percentage', type=click.INT, help=u"""The percentage of the System Global Area(SGA) assigned to In-Memory tables in Autonomous AI Database. This property is applicable only to Autonomous AI Databases on the Exadata Cloud@Customer platform.""")
-@cli_util.option('--local-adg-auto-failover-max-data-loss-limit', type=click.INT, help=u"""Parameter that allows users to select an acceptable maximum data loss limit in seconds, up to which Automatic Failover will be triggered when necessary for a Local Autonomous Data Guard""")
-@cli_util.option('--cpu-core-count', type=click.INT, help=u"""The number of CPUs to be made available to the Autonomous AI Database.<br> For Autonomous AI Databases on Dedicated Exadata Infrastructure: - The CPU type (OCPUs or ECPUs) is determined by the parent Autonomous Exadata VM Cluster's compute model. - It is suggested to use 'computeCount' parameter if you want to use fractional value to provision less than 1 core.
-
-**Note:** This parameter cannot be used with the `ocpuCount` or `computeCount` parameter.
-
-This cannot be updated in parallel with any of the following: licenseModel, databaseEdition, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--long-term-backup-schedule', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-dev-tier', type=click.BOOL, help=u"""Autonomous AI Database for Developers are fixed-shape Autonomous AI Databases that developers can use to build and test new applications. On Serverless, these are low-cost and billed per instance, on Dedicated and Cloud@Customer there is no additional cost to create Developer databases. Developer databases come with limited resources and is not intended for large-scale testing and production deployments. When you need more compute or storage resources, you may upgrade to a full paid production database.""")
-@cli_util.option('--compute-count', type=click.FLOAT, help=u"""The compute amount (CPUs) available to the database. Minimum and maximum values depend on the compute model and whether the database is an Autonomous AI Database Serverless instance or an Autonomous AI Database on Dedicated Exadata Infrastructure. The 'ECPU' compute model requires a minimum value of one, for databases in the elastic resource pool and minimum value of two, otherwise. Required when using the `computeModel` parameter. When using `cpuCoreCount` parameter, it is an error to specify computeCount to a non-null value. Providing `computeModel` and `computeCount` is the preferred method for both OCPU and ECPU.
-
-This cannot be updated in parallel with any of the following: licenseModel, databaseEdition, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--ocpu-count', type=click.FLOAT, help=u"""The number of OCPU cores to be made available to the Autonomous AI Database.
-
-For Autonomous AI Databases on Dedicated Exadata Infrastructure, you can specify a fractional value for this parameter. Fractional values are not supported for Autonomous AI Database Serverless instances. For Autonomous AI Database Serverless instances, this parameter is not used.
-
-To provision less than 1 core, enter a fractional value in an increment of 0.1. To provision 1 or more cores, you must enter an integer between 1 and the maximum number of cores available to the infrastructure shape. For example, you can provision 0.3 or 0.4 cores, but not 0.35 cores. Likewise, you can provision 2 cores or 3 cores, but not 2.5 cores. The maximum number of cores is determined by the infrastructure shape. See [Characteristics of Infrastructure Shapes] for shape details.
-
-**Note:** This parameter cannot be used with the `cpuCoreCount` parameter.""")
-@cli_util.option('--data-storage-size-in-tbs', type=click.INT, help=u"""The size, in terabytes, of the data volume that will be created and attached to the database. For Autonomous AI Databases on dedicated Exadata infrastructure, the maximum storage value is determined by the infrastructure shape. See [Characteristics of Infrastructure Shapes] for shape details. A full Exadata service is allocated when the Autonomous AI Database size is set to the upper limit (384 TB).
-
-**Note:** This parameter cannot be used with the `dataStorageSizeInGBs` parameter.
-
-This cannot be updated in parallel with any of the following: licenseModel, databaseEdition, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--data-storage-size-in-gbs', type=click.INT, help=u"""Applies to dedicated Exadata infrastructure only.
-
-The size, in gigabytes, of the data volume that will be created and attached to the database. The maximum storage value depends on the system shape. See [Characteristics of Infrastructure Shapes] for shape details.
-
-**Note:** This parameter cannot be used with the `dataStorageSizeInTBs` parameter.""")
-@cli_util.option('--display-name', help=u"""The user-friendly name for the Autonomous AI Database. The name does not have to be unique. The display name can only be updated for Autonomous AI Databases using dedicated Exadata Infrastructure. This parameter may not be updated in parallel with dbVersion.""")
-@cli_util.option('--is-free-tier', type=click.BOOL, help=u"""Indicates if this is an Always Free resource. The default value is false. Note that Always Free Autonomous AI Databases have 1 CPU and 20GB of memory. For Always Free databases, memory and CPU cannot be scaled.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isLocalDataGuardEnabled""")
-@cli_util.option('--availability-domain', help=u"""The Autonomous Database Serverless instance's availability domain.""")
-@cli_util.option('--time-scheduled-ad-update', type=custom_types.CLI_DATETIME, help=u"""The date and time when the Autonomous Database availability domain is to be updated.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--is-disable-ad-update-schedule', type=click.BOOL, help=u"""True, if you want to disable Autonomous Database availability domain scheduled update.""")
-@cli_util.option('--is-schedule-ad-update-to-earliest', type=click.BOOL, help=u"""True, if you want to schedule Autonomous Database availability domain update to the earliest available time.""")
-@cli_util.option('--admin-password', help=u"""The password must be between 12 and 30 characters long, and must contain at least 1 uppercase, 1 lowercase, and 1 numeric character. It cannot contain the double quote symbol (\") or the username \"admin\", regardless of casing. It must be different from the last four passwords and it must not be a password used within the last 24 hours.
-
-This cannot be used in conjunction with with OCI vault secrets (secretId).
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, whitelistedIps, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, or isFreeTier.""")
-@cli_util.option('--db-name', help=u"""New name for this Autonomous AI Database. For Autonomous AI Databases on Dedicated Exadata Infrastructure, the name must begin with an alphabetic character, and can contain a maximum of eight alphanumeric characters. Special characters are not permitted. For Autonomous AI Database Serverless instances, the name must begin with an alphabetic character, and can contain a maximum of 30 alphanumeric characters. Special characters are not permitted. The database name must be unique in the tenancy.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails.""")
-@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
-
-Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--security-attributes', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Security Attributes for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags]. Example: `{\"Oracle-ZPR\": {\"MaxEgressCount\": {\"value\": \"42\", \"mode\": \"audit\"}}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--db-workload', type=custom_types.CliCaseInsensitiveChoice(["OLTP", "DW", "AJD", "APEX", "LH"]), help=u"""The Autonomous AI Database workload type. The following values are valid: - OLTP - indicates an Autonomous AI Transaction Processing database - DW - indicates an Autonomous AI Lakehouse database - AJD - indicates an Autonomous AI JSON Database - APEX - indicates an Autonomous AI Database with the Oracle APEX AI Application Development workload type. - LH - indicates an Oracle Autonomous AI Lakehouse database
-
-**Note** Starting December 2026, DW will not be supported as a valid value for this parameter. When creating an Autonomous AI Database, if this parameter is not specified, the default value is `OLTP`.
-
- This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""")
-@cli_util.option('--license-model', type=custom_types.CliCaseInsensitiveChoice(["LICENSE_INCLUDED", "BRING_YOUR_OWN_LICENSE"]), help=u"""The Oracle license model that applies to the Oracle Autonomous AI Database. Bring your own license (BYOL) allows you to apply your current on-premises Oracle software licenses to equivalent, highly automated Oracle services in the cloud. License Included allows you to subscribe to new Oracle AI Database software licenses and the Oracle AI Database service. Note that when provisioning an [Autonomous AI Database on dedicated Exadata infrastructure], this attribute must be null. It is already set at the Autonomous Exadata Infrastructure level. When provisioning an [Autonomous AI Database Serverless]  database, if a value is not specified, the system defaults the value to `BRING_YOUR_OWN_LICENSE`. Bring your own license (BYOL) also allows you to select the DB edition using the optional parameter.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, dataStorageSizeInTBs, adminPassword, isMTLSConnectionRequired, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--byol-compute-count-limit', type=click.FLOAT, help=u"""The maximum number of CPUs allowed with a Bring Your Own License (BYOL), including those used for auto-scaling, disaster recovery, tools, etc. Any CPU usage above this limit is considered as License Included and billed.""")
-@cli_util.option('--is-access-control-enabled', type=click.BOOL, help=u"""Indicates if the database-level access control is enabled. If disabled, database access is defined by the network security rules. If enabled, database access is restricted to the IP addresses defined by the rules specified with the `whitelistedIps` property. While specifying `whitelistedIps` rules is optional,  if database-level access control is enabled and no rules are specified, the database will become inaccessible. The rules can be added later using the `UpdateAutonomousDatabase` API operation or edit option in console. When creating a database clone, the desired access control setting should be specified. By default, database-level access control will be disabled for the clone.
-
-This property is applicable only to Autonomous AI Databases on the Exadata Cloud@Customer platform. For Autonomous AI Database Serverless instances, `whitelistedIps` is used.""")
-@cli_util.option('--whitelisted-ips', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The client IP access control list (ACL). This feature is available for [Autonomous AI Database Serverless]  and on Exadata Cloud@Customer. Only clients connecting from an IP address included in the ACL may access the Autonomous AI Database instance. If `arePrimaryWhitelistedIpsUsed` is 'TRUE' then Autonomous AI Database uses this primary's IP access control list (ACL) for the disaster recovery peer called `standbywhitelistedips`.
-
-For Autonomous AI Database Serverless, this is an array of CIDR (classless inter-domain routing) notations for a subnet or VCN OCID (virtual cloud network Oracle Cloud ID). Multiple IPs and VCN OCIDs should be separate strings separated by commas, but if it\u2019s other configurations that need multiple pieces of information then its each piece is connected with semicolon (;) as a delimiter. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"ocid1.vcn.oc1.sea.<unique_id>\",\"ocid1.vcn.oc1.sea.<unique_id1>;1.1.1.1\",\"ocid1.vcn.oc1.sea.<unique_id2>;1.1.0.0/16\"]` For Exadata Cloud@Customer, this is an array of IP addresses or CIDR notations. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"1.1.2.25\"]`
-
-For an update operation, if you want to delete all the IPs in the ACL, use an array with a single empty string entry.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--are-primary-whitelisted-ips-used', type=click.BOOL, help=u"""This field will be null if the Autonomous AI Database is not Data Guard enabled or Access Control is disabled. `TRUE` if the Autonomous AI Database has Data Guard and Access Control enabled, and the Autonomous AI Database uses the primary's IP access control list (ACL) for standby. `FALSE` if the Autonomous AI Database has Data Guard and Access Control enabled, and the Autonomous AI Database uses a different IP access control list (ACL) for standby compared to primary.""")
-@cli_util.option('--standby-whitelisted-ips', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The client IP access control list (ACL). This feature is available for [Autonomous AI Database Serverless]  and on Exadata Cloud@Customer. Only clients connecting from an IP address included in the ACL may access the Autonomous AI Database instance. If `arePrimaryWhitelistedIpsUsed` is 'TRUE' then Autonomous AI Database uses this primary's IP access control list (ACL) for the disaster recovery peer called `standbywhitelistedips`.
-
-For Autonomous AI Database Serverless, this is an array of CIDR (classless inter-domain routing) notations for a subnet or VCN OCID (virtual cloud network Oracle Cloud ID). Multiple IPs and VCN OCIDs should be separate strings separated by commas, but if it\u2019s other configurations that need multiple pieces of information then its each piece is connected with semicolon (;) as a delimiter. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"ocid1.vcn.oc1.sea.<unique_id>\",\"ocid1.vcn.oc1.sea.<unique_id1>;1.1.1.1\",\"ocid1.vcn.oc1.sea.<unique_id2>;1.1.0.0/16\"]` For Exadata Cloud@Customer, this is an array of IP addresses or CIDR notations. Example: `[\"1.1.1.1\",\"1.1.1.0/24\",\"1.1.2.25\"]`
-
-For an update operation, if you want to delete all the IPs in the ACL, use an array with a single empty string entry.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-auto-scaling-enabled', type=click.BOOL, help=u"""Indicates whether auto scaling is enabled for the Autonomous AI Database CPU core count. Setting to `TRUE` enables auto scaling. Setting to `FALSE` disables auto scaling. The default value is `TRUE`. Auto scaling is only available for [Autonomous AI Database Serverless instances].""")
-@cli_util.option('--is-refreshable-clone', type=click.BOOL, help=u"""Indicates if the Autonomous AI Database is a refreshable clone.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, dbName, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.""")
-@cli_util.option('--refreshable-mode', type=custom_types.CliCaseInsensitiveChoice(["AUTOMATIC", "MANUAL"]), help=u"""The refresh mode of the clone. AUTOMATIC indicates that the clone is automatically being refreshed with data from the source Autonomous AI Database.""")
-@cli_util.option('--is-local-data-guard-enabled', type=click.BOOL, help=u"""Indicates whether the Autonomous AI Database has a local (in-region) standby database. Not applicable when creating a cross-region Autonomous Data Guard associations, or to Autonomous AI Databases using dedicated Exadata infrastructure or Exadata Cloud@Customer infrastructure.
-
-To create a local standby, set to `TRUE`. To delete a local standby, set to `FALSE`. For more information on using Autonomous Data Guard on an Autonomous AI Database Serverless instance (local and cross-region) , see [About Standby Databases]
-
-To enable cross-region Autonomous Data Guard on an Autonomous AI Database Serverless instance, see [Enable Autonomous Data Guard].
-
-This cannot be updated in parallel with any of the following: isMTLSRequired, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--is-data-guard-enabled', type=click.BOOL, help=u"""** Deprecated. ** Indicates whether the Autonomous AI Database has a local (in-region) standby database. Not applicable when creating a cross-region Autonomous Data Guard associations, or to Autonomous AI Databases using dedicated Exadata infrastructure or Exadata Cloud@Customer infrastructure.
-
-To create a local standby, set to `TRUE`. To delete a local standby, set to `FALSE`. For more information on using Autonomous Data Guard on an Autonomous AI Database Serverless instance (local and cross-region) , see [About Standby Databases]
-
-To enable cross-region Autonomous Data Guard on an Autonomous AI Database Serverless instance, see [Enable Autonomous Data Guard].
-
-To delete a cross-region standby database, provide the `peerDbId` for the standby database in a remote region, and set `isDataGuardEnabled` to `FALSE`.""")
-@cli_util.option('--peer-db-id', help=u"""The database OCID(/Content/General/Concepts/identifiers.htm) of the Disaster Recovery peer (source Primary) database, which is located in a different (remote) region from the current peer database.
-
-To create or delete a local (in-region) standby, see the `isDataGuardEnabled` parameter.
-
-When disconnecting a cross-region standby, specify the standby database OCID in this parameter together with `isDisconnectPeer=true`.""")
-@cli_util.option('--db-version', help=u"""A valid Oracle AI Database version for Autonomous AI Database. When you specify 23ai for dbversion, the system will provision a 23ai database, but the UI will display it as 26ai. When you specify 26ai for dbversion, the system will provision and display a 26ai database as expected. For new databases, it is recommended to use either 19c or 26ai.
-
-**Note** Starting December 2026, 23ai will not be supported as a valid value for this parameter.""")
-@cli_util.option('--open-mode', type=custom_types.CliCaseInsensitiveChoice(["READ_ONLY", "READ_WRITE"]), help=u"""Indicates the Autonomous AI Database mode. The database can be opened in `READ_ONLY` or `READ_WRITE` mode.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--permission-level', type=custom_types.CliCaseInsensitiveChoice(["RESTRICTED", "UNRESTRICTED"]), help=u"""The Autonomous AI Database permission level. Restricted mode allows access only by admin users.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--subnet-id', help=u"""The [OCID] of the subnet the resource is associated with.
-
-**Subnet Restrictions:** - For bare metal DB systems and for single node virtual machine DB systems, do not use a subnet that overlaps with 192.168.16.16/28. - For Exadata and virtual machine 2-node RAC systems, do not use a subnet that overlaps with 192.168.128.0/20. - For Autonomous AI Database, setting this will disable public secure access to the database.
-
-These subnets are used by the Oracle Clusterware private interconnect on the database instance. Specifying an overlapping subnet will cause the private interconnect to malfunction. This restriction applies to both the client subnet and the backup subnet.""")
-@cli_util.option('--private-endpoint-label', help=u"""The resource's private endpoint label. - Setting the endpoint label to a non-empty string creates a private endpoint database. - Resetting the endpoint label to an empty string, after the creation of the private endpoint database, changes the private endpoint database to a public endpoint database. - Setting the endpoint label to a non-empty string value, updates to a new private endpoint database, when the database is disabled and re-enabled.
-
-This setting cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, dbWorkload, dbVersion, isRefreshable, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--private-endpoint-ip', help=u"""The private endpoint Ip address for the resource.""")
-@cli_util.option('--nsg-ids', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of [OCIDs] for the network security groups (NSGs) to which this resource belongs. Setting this to an empty list removes all resources from all NSGs. For more information about NSGs, see [Security Rules]. **NsgIds restrictions:** - A network security group (NSG) is optional for Autonomous AI Databases with private access. The nsgIds list can be empty.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--auto-refresh-frequency-in-seconds', type=click.INT, help=u"""The frequency a refreshable clone is refreshed after auto-refresh is enabled. The minimum is 1 hour. The maximum is 7 days. The date and time that auto-refresh is enabled is controlled by the `timeOfAutoRefreshStart` parameter.""")
-@cli_util.option('--auto-refresh-point-lag-in-seconds', type=click.INT, help=u"""The time, in seconds, the data of the refreshable clone lags the primary database at the point of refresh. The minimum is 0 minutes (0 mins means refresh to the latest available timestamp). The maximum is 7 days. The lag time increases after refreshing until the next data refresh happens.""")
-@cli_util.option('--time-of-auto-refresh-start', type=custom_types.CLI_DATETIME, help=u"""The the date and time that auto-refreshing will begin for an Autonomous AI Database refreshable clone. This value controls only the start time for the first refresh operation. Subsequent (ongoing) refresh operations have start times controlled by the value of the `autoRefreshFrequencyInSeconds` parameter.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--customer-contacts', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Customer Contacts. Setting this to an empty list removes all customer contacts of an Oracle
-
-This cannot be updated in parallel with any of the following: isMTLSConnectionRequired, scheduledOperations, or dbToolsDetails.
-
-This option is a JSON list with items of type CustomerContact.  For documentation on CustomerContact please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/database/20160918/datatypes/CustomerContact.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-mtls-connection-required', type=click.BOOL, help=u"""Specifies if the Autonomous AI Database requires mTLS connections.
-
-This may not be updated in parallel with any of the following: licenseModel, databaseEdition, cpuCoreCount, computeCount, dataStorageSizeInTBs, whitelistedIps, openMode, permissionLevel, db-workload, privateEndpointLabel, nsgIds, customerContacts, dbVersion, scheduledOperations, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.
-
-Service Change: The default value of the isMTLSConnectionRequired attribute will change from true to false on July 1, 2023 in the following APIs: - CreateAutonomousDatabase - GetAutonomousDatabase - UpdateAutonomousDatabase Details: Prior to the July 1, 2023 change, the isMTLSConnectionRequired attribute default value was true. This applies to Autonomous AI Database Serverless. Does this impact me? If you use or maintain custom scripts or Terraform scripts referencing the CreateAutonomousDatabase, GetAutonomousDatabase, or UpdateAutonomousDatabase APIs, you want to check, and possibly modify, the scripts for the changed default value of the attribute. Should you choose not to leave your scripts unchanged, the API calls containing this attribute will continue to work, but the default value will switch from true to false. How do I make this change? Using either OCI SDKs or command line tools, update your custom scripts to explicitly set the isMTLSConnectionRequired attribute to true.""")
-@cli_util.option('--resource-pool-leader-id', help=u"""The unique identifier for leader Autonomous AI Database OCID [OCID].""")
-@cli_util.option('--resource-pool-summary', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--autonomous-maintenance-schedule-type', type=custom_types.CliCaseInsensitiveChoice(["EARLY", "REGULAR"]), help=u"""The maintenance schedule type of the Autonomous AI Database Serverless. An EARLY maintenance schedule follows a schedule applying patches prior to the REGULAR schedule. A REGULAR maintenance schedule follows the normal cycle""")
-@cli_util.option('--autonomous-database-maintenance-window', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--time-maintenance-pause-until', type=custom_types.CLI_DATETIME, help=u"""The date until which Autonomous AI Database maintenance is temporarily paused.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--is-backup-retention-locked', type=click.BOOL, help=u"""True if the Autonomous AI Database is backup retention locked.""")
-@cli_util.option('--time-scheduled-db-version-upgrade', type=custom_types.CLI_DATETIME, help=u"""The date and time the Autonomous AI Database scheduled to upgrade to 26ai.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
-@cli_util.option('--is-disable-db-version-upgrade-schedule', type=click.BOOL, help=u"""True if user wants to disable Autonomous AI Database scheduled upgrade to 26ai.""")
-@cli_util.option('--is-schedule-db-version-upgrade-to-earliest', type=click.BOOL, help=u"""True if user wants to schedule Autonomous AI Database upgrade to the earliest available time.""")
-@cli_util.option('--scheduled-operations', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of scheduled operations. Consists of values such as dayOfWeek, scheduledStartTime, scheduledStopTime.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier.
-
-This option is a JSON list with items of type ScheduledOperationDetails.  For documentation on ScheduledOperationDetails please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/database/20160918/datatypes/ScheduledOperationDetails.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-auto-scaling-for-storage-enabled', type=click.BOOL, help=u"""Indicates if auto scaling is enabled for the Autonomous AI Database storage. The default value is `FALSE`.""")
-@cli_util.option('--database-edition', help=u"""The Oracle AI Database Edition that applies to the Autonomous AI Databases. This parameter accepts options `STANDARD_EDITION` and `ENTERPRISE_EDITION`.
-
-This cannot be updated in parallel with any of the following: cpuCoreCount, computeCount, computeModel, adminPassword, whitelistedIps, isMTLSConnectionRequired, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, dbName, scheduledOperations, dbToolsDetails, or isFreeTier.""")
-@cli_util.option('--db-tools-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of database tools details.
-
-This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, scheduledOperations, isLocalDataGuardEnabled, or isFreeTier.
-
-This option is a JSON list with items of type DatabaseTool.  For documentation on DatabaseTool please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/database/20160918/datatypes/DatabaseTool.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--vanity-url-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--secret-id', help=u"""The OCI vault secret [/Content/General/Concepts/identifiers.htm]OCID. This cannot be used in conjunction with adminPassword.""")
-@cli_util.option('--secret-version-number', type=click.INT, help=u"""The version of the vault secret. If no version is specified, the latest version will be used.""")
-@cli_util.option('--is-disconnect-peer', type=click.BOOL, help=u"""If true, this disconnects the Autonomous AI Database from its peer. After the disconnect completes, the Autonomous AI Database works permanently as a standalone database.
-
-**Warning:** A disconnected standby is no longer part of the disaster recovery configuration. Operations and restrictions that apply to a connected standby do not apply in the same way after the database has been disconnected.
-
-To disconnect a cross region standby, also provide the OCID of the standby database in the `peerDbId` parameter.""")
-@cli_util.option('--local-adg-resource-pool-leader-id', help=u"""The [OCID] of a dedicated resource pool leader Autonomous AI Database in the same region, that is required when local Autonomous Data Guard is enabled for a dedicated resource pool member using the parameter `isLocalDataGuardEnabled`. This field applies only to dedicated resource pool members, and the specified leader must be different from the primary\u2019s leader. Local Autonomous Data Guard can be enabled only if more than one dedicated resource pool exists in the region.""")
-@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource.  The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
-@cli_util.option('--opc-dry-run', type=click.BOOL, help=u"""Indicates that the request is a dry run, if set to \"true\". A dry run request does not actually creating or updating a resource and is used only to perform validation on the submitted data.""")
-@cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
-@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["PROVISIONING", "AVAILABLE", "STOPPING", "STOPPED", "STARTING", "TERMINATING", "TERMINATED", "UNAVAILABLE", "RESTORE_IN_PROGRESS", "RESTORE_FAILED", "BACKUP_IN_PROGRESS", "SCALE_IN_PROGRESS", "AVAILABLE_NEEDS_ATTENTION", "UPDATING", "MAINTENANCE_IN_PROGRESS", "RESTARTING", "RECREATING", "ROLE_CHANGE_IN_PROGRESS", "UPGRADING", "INACCESSIBLE", "STANDBY", "TRANSPORTING"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state PROVISIONING --wait-for-state TRANSPORTING would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
-@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
-@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'long-term-backup-schedule': {'module': 'database', 'class': 'LongTermBackUpScheduleDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'standby-whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'customer-contacts': {'module': 'database', 'class': 'list[CustomerContact]'}, 'resource-pool-summary': {'module': 'database', 'class': 'ResourcePoolSummary'}, 'autonomous-database-maintenance-window': {'module': 'database', 'class': 'AutonomousDatabaseMaintenanceWindowSummary'}, 'scheduled-operations': {'module': 'database', 'class': 'list[ScheduledOperationDetails]'}, 'db-tools-details': {'module': 'database', 'class': 'list[DatabaseTool]'}, 'vanity-url-details': {'module': 'database', 'class': 'VanityUrlDetails'}})
-@cli_util.help_option
-@click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'long-term-backup-schedule': {'module': 'database', 'class': 'LongTermBackUpScheduleDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'standby-whitelisted-ips': {'module': 'database', 'class': 'list[string]'}, 'nsg-ids': {'module': 'database', 'class': 'list[string]'}, 'customer-contacts': {'module': 'database', 'class': 'list[CustomerContact]'}, 'resource-pool-summary': {'module': 'database', 'class': 'ResourcePoolSummary'}, 'autonomous-database-maintenance-window': {'module': 'database', 'class': 'AutonomousDatabaseMaintenanceWindowSummary'}, 'scheduled-operations': {'module': 'database', 'class': 'list[ScheduledOperationDetails]'}, 'db-tools-details': {'module': 'database', 'class': 'list[DatabaseTool]'}, 'vanity-url-details': {'module': 'database', 'class': 'VanityUrlDetails'}}, output_type={'module': 'database', 'class': 'AutonomousDatabase'})
-@cli_util.wrap_exceptions
-def update_autonomous_database_oracle_managed_key_details(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, autonomous_database_id, backup_retention_period_in_days, compute_model, in_memory_percentage, local_adg_auto_failover_max_data_loss_limit, cpu_core_count, long_term_backup_schedule, is_dev_tier, compute_count, ocpu_count, data_storage_size_in_tbs, data_storage_size_in_gbs, display_name, is_free_tier, availability_domain, time_scheduled_ad_update, is_disable_ad_update_schedule, is_schedule_ad_update_to_earliest, admin_password, db_name, freeform_tags, defined_tags, security_attributes, db_workload, license_model, byol_compute_count_limit, is_access_control_enabled, whitelisted_ips, are_primary_whitelisted_ips_used, standby_whitelisted_ips, is_auto_scaling_enabled, is_refreshable_clone, refreshable_mode, is_local_data_guard_enabled, is_data_guard_enabled, peer_db_id, db_version, open_mode, permission_level, subnet_id, private_endpoint_label, private_endpoint_ip, nsg_ids, auto_refresh_frequency_in_seconds, auto_refresh_point_lag_in_seconds, time_of_auto_refresh_start, customer_contacts, is_mtls_connection_required, resource_pool_leader_id, resource_pool_summary, autonomous_maintenance_schedule_type, autonomous_database_maintenance_window, time_maintenance_pause_until, is_backup_retention_locked, time_scheduled_db_version_upgrade, is_disable_db_version_upgrade_schedule, is_schedule_db_version_upgrade_to_earliest, scheduled_operations, is_auto_scaling_for_storage_enabled, database_edition, db_tools_details, vanity_url_details, secret_id, secret_version_number, is_disconnect_peer, local_adg_resource_pool_leader_id, if_match, opc_dry_run):
-
-    if isinstance(autonomous_database_id, six.string_types) and len(autonomous_database_id.strip()) == 0:
-        raise click.UsageError('Parameter --autonomous-database-id cannot be whitespace or empty string')
-    if not force:
-        if long_term_backup_schedule or freeform_tags or defined_tags or security_attributes or whitelisted_ips or standby_whitelisted_ips or nsg_ids or customer_contacts or resource_pool_summary or autonomous_database_maintenance_window or scheduled_operations or db_tools_details or vanity_url_details:
-            if not click.confirm("WARNING: Updates to long-term-backup-schedule and freeform-tags and defined-tags and security-attributes and whitelisted-ips and standby-whitelisted-ips and nsg-ids and customer-contacts and resource-pool-summary and autonomous-database-maintenance-window and scheduled-operations and db-tools-details and vanity-url-details will replace any existing values. Are you sure you want to continue?"):
-                ctx.abort()
-
-    kwargs = {}
-    if if_match is not None:
-        kwargs['if_match'] = if_match
-    if opc_dry_run is not None:
-        kwargs['opc_dry_run'] = opc_dry_run
-    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
-
-    _details = {}
-    _details['encryptionKey'] = {}
-
-    if backup_retention_period_in_days is not None:
-        _details['backupRetentionPeriodInDays'] = backup_retention_period_in_days
-
-    if compute_model is not None:
-        _details['computeModel'] = compute_model
-
-    if in_memory_percentage is not None:
-        _details['inMemoryPercentage'] = in_memory_percentage
-
-    if local_adg_auto_failover_max_data_loss_limit is not None:
-        _details['localAdgAutoFailoverMaxDataLossLimit'] = local_adg_auto_failover_max_data_loss_limit
-
-    if cpu_core_count is not None:
-        _details['cpuCoreCount'] = cpu_core_count
-
-    if long_term_backup_schedule is not None:
-        _details['longTermBackupSchedule'] = cli_util.parse_json_parameter("long_term_backup_schedule", long_term_backup_schedule)
-
-    if is_dev_tier is not None:
-        _details['isDevTier'] = is_dev_tier
-
-    if compute_count is not None:
-        _details['computeCount'] = compute_count
-
-    if ocpu_count is not None:
-        _details['ocpuCount'] = ocpu_count
-
-    if data_storage_size_in_tbs is not None:
-        _details['dataStorageSizeInTBs'] = data_storage_size_in_tbs
-
-    if data_storage_size_in_gbs is not None:
-        _details['dataStorageSizeInGBs'] = data_storage_size_in_gbs
-
-    if display_name is not None:
-        _details['displayName'] = display_name
-
-    if is_free_tier is not None:
-        _details['isFreeTier'] = is_free_tier
-
-    if availability_domain is not None:
-        _details['availabilityDomain'] = availability_domain
-
-    if time_scheduled_ad_update is not None:
-        _details['timeScheduledAdUpdate'] = time_scheduled_ad_update
-
-    if is_disable_ad_update_schedule is not None:
-        _details['isDisableAdUpdateSchedule'] = is_disable_ad_update_schedule
-
-    if is_schedule_ad_update_to_earliest is not None:
-        _details['isScheduleAdUpdateToEarliest'] = is_schedule_ad_update_to_earliest
-
-    if admin_password is not None:
-        _details['adminPassword'] = admin_password
-
-    if db_name is not None:
-        _details['dbName'] = db_name
-
-    if freeform_tags is not None:
-        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
-
-    if defined_tags is not None:
-        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
-
-    if security_attributes is not None:
-        _details['securityAttributes'] = cli_util.parse_json_parameter("security_attributes", security_attributes)
-
-    if db_workload is not None:
-        _details['dbWorkload'] = db_workload
-
-    if license_model is not None:
-        _details['licenseModel'] = license_model
-
-    if byol_compute_count_limit is not None:
-        _details['byolComputeCountLimit'] = byol_compute_count_limit
-
-    if is_access_control_enabled is not None:
-        _details['isAccessControlEnabled'] = is_access_control_enabled
-
-    if whitelisted_ips is not None:
-        _details['whitelistedIps'] = cli_util.parse_json_parameter("whitelisted_ips", whitelisted_ips)
-
-    if are_primary_whitelisted_ips_used is not None:
-        _details['arePrimaryWhitelistedIpsUsed'] = are_primary_whitelisted_ips_used
-
-    if standby_whitelisted_ips is not None:
-        _details['standbyWhitelistedIps'] = cli_util.parse_json_parameter("standby_whitelisted_ips", standby_whitelisted_ips)
-
-    if is_auto_scaling_enabled is not None:
-        _details['isAutoScalingEnabled'] = is_auto_scaling_enabled
-
-    if is_refreshable_clone is not None:
-        _details['isRefreshableClone'] = is_refreshable_clone
-
-    if refreshable_mode is not None:
-        _details['refreshableMode'] = refreshable_mode
-
-    if is_local_data_guard_enabled is not None:
-        _details['isLocalDataGuardEnabled'] = is_local_data_guard_enabled
-
-    if is_data_guard_enabled is not None:
-        _details['isDataGuardEnabled'] = is_data_guard_enabled
-
-    if peer_db_id is not None:
-        _details['peerDbId'] = peer_db_id
-
-    if db_version is not None:
-        _details['dbVersion'] = db_version
-
-    if open_mode is not None:
-        _details['openMode'] = open_mode
-
-    if permission_level is not None:
-        _details['permissionLevel'] = permission_level
-
-    if subnet_id is not None:
-        _details['subnetId'] = subnet_id
-
-    if private_endpoint_label is not None:
-        _details['privateEndpointLabel'] = private_endpoint_label
-
-    if private_endpoint_ip is not None:
-        _details['privateEndpointIp'] = private_endpoint_ip
-
-    if nsg_ids is not None:
-        _details['nsgIds'] = cli_util.parse_json_parameter("nsg_ids", nsg_ids)
-
-    if auto_refresh_frequency_in_seconds is not None:
-        _details['autoRefreshFrequencyInSeconds'] = auto_refresh_frequency_in_seconds
-
-    if auto_refresh_point_lag_in_seconds is not None:
-        _details['autoRefreshPointLagInSeconds'] = auto_refresh_point_lag_in_seconds
-
-    if time_of_auto_refresh_start is not None:
-        _details['timeOfAutoRefreshStart'] = time_of_auto_refresh_start
-
-    if customer_contacts is not None:
-        _details['customerContacts'] = cli_util.parse_json_parameter("customer_contacts", customer_contacts)
-
-    if is_mtls_connection_required is not None:
-        _details['isMtlsConnectionRequired'] = is_mtls_connection_required
-
-    if resource_pool_leader_id is not None:
-        _details['resourcePoolLeaderId'] = resource_pool_leader_id
-
-    if resource_pool_summary is not None:
-        _details['resourcePoolSummary'] = cli_util.parse_json_parameter("resource_pool_summary", resource_pool_summary)
-
-    if autonomous_maintenance_schedule_type is not None:
-        _details['autonomousMaintenanceScheduleType'] = autonomous_maintenance_schedule_type
-
-    if autonomous_database_maintenance_window is not None:
-        _details['autonomousDatabaseMaintenanceWindow'] = cli_util.parse_json_parameter("autonomous_database_maintenance_window", autonomous_database_maintenance_window)
-
-    if time_maintenance_pause_until is not None:
-        _details['timeMaintenancePauseUntil'] = time_maintenance_pause_until
-
-    if is_backup_retention_locked is not None:
-        _details['isBackupRetentionLocked'] = is_backup_retention_locked
-
-    if time_scheduled_db_version_upgrade is not None:
-        _details['timeScheduledDbVersionUpgrade'] = time_scheduled_db_version_upgrade
-
-    if is_disable_db_version_upgrade_schedule is not None:
-        _details['isDisableDbVersionUpgradeSchedule'] = is_disable_db_version_upgrade_schedule
-
-    if is_schedule_db_version_upgrade_to_earliest is not None:
-        _details['isScheduleDbVersionUpgradeToEarliest'] = is_schedule_db_version_upgrade_to_earliest
-
-    if scheduled_operations is not None:
-        _details['scheduledOperations'] = cli_util.parse_json_parameter("scheduled_operations", scheduled_operations)
-
-    if is_auto_scaling_for_storage_enabled is not None:
-        _details['isAutoScalingForStorageEnabled'] = is_auto_scaling_for_storage_enabled
-
-    if database_edition is not None:
-        _details['databaseEdition'] = database_edition
-
-    if db_tools_details is not None:
-        _details['dbToolsDetails'] = cli_util.parse_json_parameter("db_tools_details", db_tools_details)
-
-    if vanity_url_details is not None:
-        _details['vanityUrlDetails'] = cli_util.parse_json_parameter("vanity_url_details", vanity_url_details)
-
-    if secret_id is not None:
-        _details['secretId'] = secret_id
-
-    if secret_version_number is not None:
-        _details['secretVersionNumber'] = secret_version_number
-
-    if is_disconnect_peer is not None:
-        _details['isDisconnectPeer'] = is_disconnect_peer
-
-    if local_adg_resource_pool_leader_id is not None:
-        _details['localAdgResourcePoolLeaderId'] = local_adg_resource_pool_leader_id
-
-    _details['encryptionKey']['provider'] = 'ORACLE_MANAGED'
 
     client = cli_util.build_client('database', 'database', ctx)
     result = client.update_autonomous_database(

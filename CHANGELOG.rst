@@ -6,6 +6,65 @@ All notable changes to this project will be documented in this file.
 
 The format is based on `Keep a Changelog <http://keepachangelog.com/>`__.
 
+3.92.0 - 2026-09-01
+-------------------
+Added
+~~~~~
+* Cluster Health service
+
+  * Support for diagnosis store management and diagnosis request/query commands
+
+    * ``oci cluster-health diagnosis-store``
+    * ``oci cluster-health diagnosis-results request-diagnosis``
+    * ``oci cluster-health diagnosis-summary-collection query-diagnosis-summary``
+    * ``oci cluster-health recommendation-report query-diagnosis-by-health-check-key``
+    * ``oci cluster-health work-request``
+
+* Database service
+
+  * Support for listing available maintenance windows for Autonomous AI Databases
+
+    * ``oci db autonomous-database list-available-maintenance-windows``
+
+  * Support for new optional parameters ``--scheduled-maintenance-window`` and ``--time-scheduled-maintenance-window-update``
+
+    * ``oci db autonomous-database update --scheduled-maintenance-window --time-scheduled-maintenance-window-update``
+
+  * Support for new optional parameter ``--compartment-id``
+
+    * ``oci db system list-db-system-compute-performances --compartment-id``
+
+* Internet of Things service
+
+  * Support for new optional parameter ``--connectivity-type``
+
+    * ``oci iot digital-twin-instance update --connectivity-type``
+
+  * Support for managing flow runtimes for building and running Node-RED flows
+
+    * ``oci iot flow-runtime``
+
+Changed
+~~~~~~~
+* Database service
+
+  * ``--ssh-public-keys`` is now an optional parameter
+
+    * ``oci db system launch``
+    * ``oci db system launch-db-system-launch-standby-db-system-details``
+    * ``oci db system launch-from-database``
+    * ``oci db system launch-from-db-system``
+    * ``oci db system launch-from-backup``
+
+  * [BREAKING] Removal of deprecated commands for updating ADB key details
+
+    * ``oci db autonomous-database update-autonomous-database-aws-key-details``
+    * ``oci db autonomous-database update-autonomous-database-azure-key-details``
+    * ``oci db autonomous-database update-autonomous-database-gcp-key-details``
+    * ``oci db autonomous-database update-autonomous-database-oci-key-details``
+    * ``oci db autonomous-database update-autonomous-database-okv-key-details``
+    * ``oci db autonomous-database update-autonomous-database-oracle-managed-key-details``
+
 3.91.0 - 2026-08-25
 -------------------
 Added
