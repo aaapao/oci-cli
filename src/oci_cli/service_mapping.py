@@ -168,6 +168,11 @@ service_mapping = {
         "Oracle Cloud Migrations",
         "Others"
     ],
+    "cluster-health": [
+        "cluster_health",
+        "ITV Control Plane - Diagnosis Store",
+        "Others"
+    ],
     "compute": [
         "core",
         "Compute Service",
@@ -589,7 +594,7 @@ service_mapping = {
         "Databases"
     ],
     "occ": [
-        "oci_control_center",
+        "occ",
         "OCI Control Center",
         "Others"
     ],

@@ -284,6 +284,7 @@ SDK_client_map = {
     "db.list_autonomous_virtual_machines": "oci.database.DatabaseClient.list_autonomous_virtual_machines",
     "db.list_autonomous_vm_cluster_acd_resource_usage": "oci.database.DatabaseClient.list_autonomous_vm_cluster_acd_resource_usage",
     "db.list_autonomous_vm_clusters": "oci.database.DatabaseClient.list_autonomous_vm_clusters",
+    "db.list_available_maintenance_windows": "oci.database.DatabaseClient.list_available_maintenance_windows",
     "db.list_backup_destination": "oci.database.DatabaseClient.list_backup_destination",
     "db.list_backups": "oci.database.DatabaseClient.list_backups",
     "db.list_basecc_vm_cluster_update_history_entries": "oci.database.DatabaseClient.list_basecc_vm_cluster_update_history_entries",
