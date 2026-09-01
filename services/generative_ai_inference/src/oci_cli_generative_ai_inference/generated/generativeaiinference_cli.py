@@ -22,7 +22,9 @@ Use the Generative AI service inference API to access your custom model endpoint
 
 To use a Generative AI custom model for inference, you must first create an endpoint for that model. Use the [Generative AI service management API] to [create a custom model] by fine-tuning an out-of-the-box model, or a previous version of a custom model, using your own data. Fine-tune the custom model on a [fine-tuning dedicated AI cluster]. Then, create a [hosting dedicated AI cluster] with an [endpoint] to host your custom model. For resource management in the Generative AI service, use the [Generative AI service management API].
 
-To learn more about the service, see the [Generative AI documentation]."""), short_help=cli_util.override('generative_ai_inference.generative_ai_inference_root_group.short_help', """Generative AI Service Inference API"""))
+To learn more about the service, see the [Generative AI documentation].
+
+**Important:** The IP addresses behind each DNS endpoint might change over time. Always use the DNS hostname listed under the following **API Endpoints** section and avoid using hard-coded fixed IP addresses."""), short_help=cli_util.override('generative_ai_inference.generative_ai_inference_root_group.short_help', """Generative AI Service Inference API"""))
 @cli_util.help_option_group
 def generative_ai_inference_root_group():
     pass
@@ -34,7 +36,7 @@ def generate_text_result_group():
     pass
 
 
-@click.command(cli_util.override('generative_ai_inference.apply_guardrails_result_group.command_name', 'apply-guardrails-result'), cls=CommandGroupWithAlias, help="""The result of applying guardrails to the input text.""")
+@click.command(cli_util.override('generative_ai_inference.apply_guardrails_result_group.command_name', 'apply-guardrails-result'), cls=CommandGroupWithAlias, help="""The result of applying guardrails to the input content.""")
 @cli_util.help_option_group
 def apply_guardrails_result_group():
     pass
@@ -43,6 +45,12 @@ def apply_guardrails_result_group():
 @click.command(cli_util.override('generative_ai_inference.embed_text_result_group.command_name', 'embed-text-result'), cls=CommandGroupWithAlias, help="""The generated embedded result to return.""")
 @cli_util.help_option_group
 def embed_text_result_group():
+    pass
+
+
+@click.command(cli_util.override('generative_ai_inference.guardrail_version_collection_group.command_name', 'guardrail-version-collection'), cls=CommandGroupWithAlias, help="""The response containing a list of guardrail system versions.""")
+@cli_util.help_option_group
+def guardrail_version_collection_group():
     pass
 
 
@@ -67,29 +75,42 @@ def chat_result_group():
 generative_ai_inference_root_group.add_command(generate_text_result_group)
 generative_ai_inference_root_group.add_command(apply_guardrails_result_group)
 generative_ai_inference_root_group.add_command(embed_text_result_group)
+generative_ai_inference_root_group.add_command(guardrail_version_collection_group)
 generative_ai_inference_root_group.add_command(summarize_text_result_group)
 generative_ai_inference_root_group.add_command(rerank_text_result_group)
 generative_ai_inference_root_group.add_command(chat_result_group)
 
 
-@apply_guardrails_result_group.command(name=cli_util.override('generative_ai_inference.apply_guardrails.command_name', 'apply-guardrails'), help=u"""Applies guardrails to the input text, including content moderation, PII detection, and prompt injection protection. \n[Command Reference](applyGuardrails)""")
-@cli_util.option('--input', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@apply_guardrails_result_group.command(name=cli_util.override('generative_ai_inference.apply_guardrails.command_name', 'apply-guardrails'), help=u"""Applies guardrails to the input content, including content moderation, PII detection, and prompt injection protection. Case 1: Use `input` when the customer wants simple single-text moderation. Existing customers can continue to use this field without changing their current integration. Case 2: Use `multimodalInput` when the customer wants moderation over text, image, or a combination of both. `multimodalInput` supports a single text item, an array of text items only, an array of images only, or a mixed ordered combination of text and image items. Clients may provide `input`, `multimodalInput`, or both. At least one of these fields must be provided. If both `input` and `multimodalInput` are provided, the service will process `input` and discard `multimodalInput`. \n[Command Reference](applyGuardrails)""")
 @cli_util.option('--guardrail-configs', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--compartment-id', required=True, help=u"""The OCID of the compartment to apply guardrails.""")
-@json_skeleton_utils.get_cli_json_input_option({'input': {'module': 'generative_ai_inference', 'class': 'GuardrailsInput'}, 'guardrail-configs': {'module': 'generative_ai_inference', 'class': 'GuardrailConfigs'}})
+@cli_util.option('--input', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--multimodal-input', type=custom_types.CLI_COMPLEX_TYPE, help=u"""An ordered list of text and image inputs for multimodal guardrail evaluation. This field supports a single text item, an array of text items only, an array of images only, or a mixed ordered combination of text and image items. If both `input` and `multimodalInput` are provided, this field is ignored.
+
+This option is a JSON list with items of type GuardrailsInput.  For documentation on GuardrailsInput please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/generativeaiinference/20231130/datatypes/GuardrailsInput.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--guardrail-version-config', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@json_skeleton_utils.get_cli_json_input_option({'input': {'module': 'generative_ai_inference', 'class': 'GuardrailsInput'}, 'multimodal-input': {'module': 'generative_ai_inference', 'class': 'list[GuardrailsInput]'}, 'guardrail-configs': {'module': 'generative_ai_inference', 'class': 'GuardrailConfigs'}, 'guardrail-version-config': {'module': 'generative_ai_inference', 'class': 'GuardrailVersionConfig'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'input': {'module': 'generative_ai_inference', 'class': 'GuardrailsInput'}, 'guardrail-configs': {'module': 'generative_ai_inference', 'class': 'GuardrailConfigs'}}, output_type={'module': 'generative_ai_inference', 'class': 'ApplyGuardrailsResult'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'input': {'module': 'generative_ai_inference', 'class': 'GuardrailsInput'}, 'multimodal-input': {'module': 'generative_ai_inference', 'class': 'list[GuardrailsInput]'}, 'guardrail-configs': {'module': 'generative_ai_inference', 'class': 'GuardrailConfigs'}, 'guardrail-version-config': {'module': 'generative_ai_inference', 'class': 'GuardrailVersionConfig'}}, output_type={'module': 'generative_ai_inference', 'class': 'ApplyGuardrailsResult'})
 @cli_util.wrap_exceptions
-def apply_guardrails(ctx, from_json, input, guardrail_configs, compartment_id):
+def apply_guardrails(ctx, from_json, guardrail_configs, compartment_id, input, multimodal_input, guardrail_version_config):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
     _details = {}
-    _details['input'] = cli_util.parse_json_parameter("input", input)
     _details['guardrailConfigs'] = cli_util.parse_json_parameter("guardrail_configs", guardrail_configs)
     _details['compartmentId'] = compartment_id
+
+    if input is not None:
+        _details['input'] = cli_util.parse_json_parameter("input", input)
+
+    if multimodal_input is not None:
+        _details['multimodalInput'] = cli_util.parse_json_parameter("multimodal_input", multimodal_input)
+
+    if guardrail_version_config is not None:
+        _details['guardrailVersionConfig'] = cli_util.parse_json_parameter("guardrail_version_config", guardrail_version_config)
 
     client = cli_util.build_client('generative_ai_inference', 'generative_ai_inference', ctx)
     result = client.apply_guardrails(
@@ -99,17 +120,21 @@ def apply_guardrails(ctx, from_json, input, guardrail_configs, compartment_id):
     cli_util.render_response(result, ctx)
 
 
-@apply_guardrails_result_group.command(name=cli_util.override('generative_ai_inference.apply_guardrails_guardrails_text_input.command_name', 'apply-guardrails-guardrails-text-input'), help=u"""Applies guardrails to the input text, including content moderation, PII detection, and prompt injection protection. \n[Command Reference](applyGuardrails)""")
+@apply_guardrails_result_group.command(name=cli_util.override('generative_ai_inference.apply_guardrails_guardrails_text_input.command_name', 'apply-guardrails-guardrails-text-input'), help=u"""Applies guardrails to the input content, including content moderation, PII detection, and prompt injection protection. Case 1: Use `input` when the customer wants simple single-text moderation. Existing customers can continue to use this field without changing their current integration. Case 2: Use `multimodalInput` when the customer wants moderation over text, image, or a combination of both. `multimodalInput` supports a single text item, an array of text items only, an array of images only, or a mixed ordered combination of text and image items. Clients may provide `input`, `multimodalInput`, or both. At least one of these fields must be provided. If both `input` and `multimodalInput` are provided, the service will process `input` and discard `multimodalInput`. \n[Command Reference](applyGuardrails)""")
 @cli_util.option('--guardrail-configs', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--compartment-id', required=True, help=u"""The OCID of the compartment to apply guardrails.""")
+@cli_util.option('--multimodal-input', type=custom_types.CLI_COMPLEX_TYPE, help=u"""An ordered list of text and image inputs for multimodal guardrail evaluation. This field supports a single text item, an array of text items only, an array of images only, or a mixed ordered combination of text and image items. If both `input` and `multimodalInput` are provided, this field is ignored.
+
+This option is a JSON list with items of type GuardrailsInput.  For documentation on GuardrailsInput please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/generativeaiinference/20231130/datatypes/GuardrailsInput.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--guardrail-version-config', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--input-content', help=u"""The actual input data.""")
 @cli_util.option('--input-language-code', help=u"""The language code of the input text. example - en | es | en-US | zh-CN""")
-@json_skeleton_utils.get_cli_json_input_option({'guardrail-configs': {'module': 'generative_ai_inference', 'class': 'GuardrailConfigs'}})
+@json_skeleton_utils.get_cli_json_input_option({'multimodal-input': {'module': 'generative_ai_inference', 'class': 'list[GuardrailsInput]'}, 'guardrail-configs': {'module': 'generative_ai_inference', 'class': 'GuardrailConfigs'}, 'guardrail-version-config': {'module': 'generative_ai_inference', 'class': 'GuardrailVersionConfig'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'guardrail-configs': {'module': 'generative_ai_inference', 'class': 'GuardrailConfigs'}}, output_type={'module': 'generative_ai_inference', 'class': 'ApplyGuardrailsResult'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'multimodal-input': {'module': 'generative_ai_inference', 'class': 'list[GuardrailsInput]'}, 'guardrail-configs': {'module': 'generative_ai_inference', 'class': 'GuardrailConfigs'}, 'guardrail-version-config': {'module': 'generative_ai_inference', 'class': 'GuardrailVersionConfig'}}, output_type={'module': 'generative_ai_inference', 'class': 'ApplyGuardrailsResult'})
 @cli_util.wrap_exceptions
-def apply_guardrails_guardrails_text_input(ctx, from_json, guardrail_configs, compartment_id, input_content, input_language_code):
+def apply_guardrails_guardrails_text_input(ctx, from_json, guardrail_configs, compartment_id, multimodal_input, guardrail_version_config, input_content, input_language_code):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
@@ -119,6 +144,12 @@ def apply_guardrails_guardrails_text_input(ctx, from_json, guardrail_configs, co
     _details['guardrailConfigs'] = cli_util.parse_json_parameter("guardrail_configs", guardrail_configs)
     _details['compartmentId'] = compartment_id
 
+    if multimodal_input is not None:
+        _details['multimodalInput'] = cli_util.parse_json_parameter("multimodal_input", multimodal_input)
+
+    if guardrail_version_config is not None:
+        _details['guardrailVersionConfig'] = cli_util.parse_json_parameter("guardrail_version_config", guardrail_version_config)
+
     if input_content is not None:
         _details['input']['content'] = input_content
 
@@ -126,6 +157,48 @@ def apply_guardrails_guardrails_text_input(ctx, from_json, guardrail_configs, co
         _details['input']['languageCode'] = input_language_code
 
     _details['input']['type'] = 'TEXT'
+
+    client = cli_util.build_client('generative_ai_inference', 'generative_ai_inference', ctx)
+    result = client.apply_guardrails(
+        apply_guardrails_details=_details,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
+@apply_guardrails_result_group.command(name=cli_util.override('generative_ai_inference.apply_guardrails_guardrails_image_input.command_name', 'apply-guardrails-guardrails-image-input'), help=u"""Applies guardrails to the input content, including content moderation, PII detection, and prompt injection protection. Case 1: Use `input` when the customer wants simple single-text moderation. Existing customers can continue to use this field without changing their current integration. Case 2: Use `multimodalInput` when the customer wants moderation over text, image, or a combination of both. `multimodalInput` supports a single text item, an array of text items only, an array of images only, or a mixed ordered combination of text and image items. Clients may provide `input`, `multimodalInput`, or both. At least one of these fields must be provided. If both `input` and `multimodalInput` are provided, the service will process `input` and discard `multimodalInput`. \n[Command Reference](applyGuardrails)""")
+@cli_util.option('--guardrail-configs', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--compartment-id', required=True, help=u"""The OCID of the compartment to apply guardrails.""")
+@cli_util.option('--multimodal-input', type=custom_types.CLI_COMPLEX_TYPE, help=u"""An ordered list of text and image inputs for multimodal guardrail evaluation. This field supports a single text item, an array of text items only, an array of images only, or a mixed ordered combination of text and image items. If both `input` and `multimodalInput` are provided, this field is ignored.
+
+This option is a JSON list with items of type GuardrailsInput.  For documentation on GuardrailsInput please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/generativeaiinference/20231130/datatypes/GuardrailsInput.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--guardrail-version-config', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--input-image-url', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@json_skeleton_utils.get_cli_json_input_option({'multimodal-input': {'module': 'generative_ai_inference', 'class': 'list[GuardrailsInput]'}, 'guardrail-configs': {'module': 'generative_ai_inference', 'class': 'GuardrailConfigs'}, 'guardrail-version-config': {'module': 'generative_ai_inference', 'class': 'GuardrailVersionConfig'}, 'input-image-url': {'module': 'generative_ai_inference', 'class': 'GuardrailsImageUrl'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'multimodal-input': {'module': 'generative_ai_inference', 'class': 'list[GuardrailsInput]'}, 'guardrail-configs': {'module': 'generative_ai_inference', 'class': 'GuardrailConfigs'}, 'guardrail-version-config': {'module': 'generative_ai_inference', 'class': 'GuardrailVersionConfig'}, 'input-image-url': {'module': 'generative_ai_inference', 'class': 'GuardrailsImageUrl'}}, output_type={'module': 'generative_ai_inference', 'class': 'ApplyGuardrailsResult'})
+@cli_util.wrap_exceptions
+def apply_guardrails_guardrails_image_input(ctx, from_json, guardrail_configs, compartment_id, multimodal_input, guardrail_version_config, input_image_url):
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['input'] = {}
+    _details['guardrailConfigs'] = cli_util.parse_json_parameter("guardrail_configs", guardrail_configs)
+    _details['compartmentId'] = compartment_id
+
+    if multimodal_input is not None:
+        _details['multimodalInput'] = cli_util.parse_json_parameter("multimodal_input", multimodal_input)
+
+    if guardrail_version_config is not None:
+        _details['guardrailVersionConfig'] = cli_util.parse_json_parameter("guardrail_version_config", guardrail_version_config)
+
+    if input_image_url is not None:
+        _details['input']['imageUrl'] = cli_util.parse_json_parameter("input_image_url", input_image_url)
+
+    _details['input']['type'] = 'IMAGE'
 
     client = cli_util.build_client('generative_ai_inference', 'generative_ai_inference', ctx)
     result = client.apply_guardrails(
@@ -643,28 +716,36 @@ def chat_cohere_chat_request(ctx, from_json, compartment_id, serving_mode, chat_
 @embed_text_result_group.command(name=cli_util.override('generative_ai_inference.embed_text.command_name', 'embed-text'), help=u"""Produces embeddings for the inputs.
 
 An embedding is numeric representation of a piece of text. This text can be a phrase, a sentence, or one or more paragraphs. The Generative AI embedding model transforms each phrase, sentence, or paragraph that you input, into an array with 1024 numbers. You can use these embeddings for finding similarity in your input text such as finding phrases that are similar in context or category. Embeddings are mostly used for semantic searches where the search function focuses on the meaning of the text that it's searching through rather than finding results based on keywords. \n[Command Reference](embedText)""")
-@cli_util.option('--inputs', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""Provide a list of strings or one base64 encoded image with `input_type` setting to `IMAGE`. If text embedding, each string can be words, a phrase, or a paragraph. The maximum length of each string entry in the list is 512 tokens.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--serving-mode', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--compartment-id', required=True, help=u"""The OCID of compartment in which to call the Generative AI service to create text embeddings.""")
+@cli_util.option('--inputs', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Provide a list of strings or one base64 encoded image with `input_type` setting to `IMAGE`. If text embedding, each string can be words, a phrase, or a paragraph. The maximum length of each string entry in the list is 512 tokens.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--embed-contents', type=custom_types.CLI_COMPLEX_TYPE, help=u"""An array of text/image inputs to be embedded. Supported for Embed v4 models.
+
+This option is a JSON list with items of type EmbedContent.  For documentation on EmbedContent please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/generativeaiinference/20231130/datatypes/EmbedContent.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--is-echo', type=click.BOOL, help=u"""Whether or not to include the original inputs in the response. Results are index-based.""")
 @cli_util.option('--embedding-types', type=custom_types.CliCaseInsensitiveChoice(["float", "int8", "uint8", "binary", "ubinary", "base64"]), help=u"""Specifies the types of embeddings you want to get back. Supports list of enums. Supported values :float, int8, uint8, binary, ubinary, base64. If nothing is passed default will be considered as float.""")
 @cli_util.option('--output-dimensions', type=click.INT, help=u"""The number of dimensions of the output embedding. This is only available for embed-v4 and newer models. Possible values are 256, 512, 1024, and 1536.""")
 @cli_util.option('--truncate', type=custom_types.CliCaseInsensitiveChoice(["NONE", "START", "END"]), help=u"""For an input that's longer than the maximum token length, specifies which part of the input text will be truncated.""")
 @cli_util.option('--input-type', type=custom_types.CliCaseInsensitiveChoice(["SEARCH_DOCUMENT", "SEARCH_QUERY", "CLASSIFICATION", "CLUSTERING", "IMAGE"]), help=u"""Specifies the input type.""")
-@json_skeleton_utils.get_cli_json_input_option({'inputs': {'module': 'generative_ai_inference', 'class': 'list[string]'}, 'serving-mode': {'module': 'generative_ai_inference', 'class': 'ServingMode'}})
+@json_skeleton_utils.get_cli_json_input_option({'inputs': {'module': 'generative_ai_inference', 'class': 'list[string]'}, 'embed-contents': {'module': 'generative_ai_inference', 'class': 'list[EmbedContent]'}, 'serving-mode': {'module': 'generative_ai_inference', 'class': 'ServingMode'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'inputs': {'module': 'generative_ai_inference', 'class': 'list[string]'}, 'serving-mode': {'module': 'generative_ai_inference', 'class': 'ServingMode'}}, output_type={'module': 'generative_ai_inference', 'class': 'EmbedTextResult'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'inputs': {'module': 'generative_ai_inference', 'class': 'list[string]'}, 'embed-contents': {'module': 'generative_ai_inference', 'class': 'list[EmbedContent]'}, 'serving-mode': {'module': 'generative_ai_inference', 'class': 'ServingMode'}}, output_type={'module': 'generative_ai_inference', 'class': 'EmbedTextResult'})
 @cli_util.wrap_exceptions
-def embed_text(ctx, from_json, inputs, serving_mode, compartment_id, is_echo, embedding_types, output_dimensions, truncate, input_type):
+def embed_text(ctx, from_json, serving_mode, compartment_id, inputs, embed_contents, is_echo, embedding_types, output_dimensions, truncate, input_type):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
     _details = {}
-    _details['inputs'] = cli_util.parse_json_parameter("inputs", inputs)
     _details['servingMode'] = cli_util.parse_json_parameter("serving_mode", serving_mode)
     _details['compartmentId'] = compartment_id
+
+    if inputs is not None:
+        _details['inputs'] = cli_util.parse_json_parameter("inputs", inputs)
+
+    if embed_contents is not None:
+        _details['embedContents'] = cli_util.parse_json_parameter("embed_contents", embed_contents)
 
     if is_echo is not None:
         _details['isEcho'] = is_echo
@@ -692,29 +773,37 @@ def embed_text(ctx, from_json, inputs, serving_mode, compartment_id, is_echo, em
 @embed_text_result_group.command(name=cli_util.override('generative_ai_inference.embed_text_dedicated_serving_mode.command_name', 'embed-text-dedicated-serving-mode'), help=u"""Produces embeddings for the inputs.
 
 An embedding is numeric representation of a piece of text. This text can be a phrase, a sentence, or one or more paragraphs. The Generative AI embedding model transforms each phrase, sentence, or paragraph that you input, into an array with 1024 numbers. You can use these embeddings for finding similarity in your input text such as finding phrases that are similar in context or category. Embeddings are mostly used for semantic searches where the search function focuses on the meaning of the text that it's searching through rather than finding results based on keywords. \n[Command Reference](embedText)""")
-@cli_util.option('--inputs', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""Provide a list of strings or one base64 encoded image with `input_type` setting to `IMAGE`. If text embedding, each string can be words, a phrase, or a paragraph. The maximum length of each string entry in the list is 512 tokens.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--compartment-id', required=True, help=u"""The OCID of compartment in which to call the Generative AI service to create text embeddings.""")
 @cli_util.option('--serving-mode-endpoint-id', required=True, help=u"""The OCID of the endpoint to use.""")
+@cli_util.option('--inputs', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Provide a list of strings or one base64 encoded image with `input_type` setting to `IMAGE`. If text embedding, each string can be words, a phrase, or a paragraph. The maximum length of each string entry in the list is 512 tokens.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--embed-contents', type=custom_types.CLI_COMPLEX_TYPE, help=u"""An array of text/image inputs to be embedded. Supported for Embed v4 models.
+
+This option is a JSON list with items of type EmbedContent.  For documentation on EmbedContent please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/generativeaiinference/20231130/datatypes/EmbedContent.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--is-echo', type=click.BOOL, help=u"""Whether or not to include the original inputs in the response. Results are index-based.""")
 @cli_util.option('--embedding-types', type=custom_types.CliCaseInsensitiveChoice(["float", "int8", "uint8", "binary", "ubinary", "base64"]), help=u"""Specifies the types of embeddings you want to get back. Supports list of enums. Supported values :float, int8, uint8, binary, ubinary, base64. If nothing is passed default will be considered as float.""")
 @cli_util.option('--output-dimensions', type=click.INT, help=u"""The number of dimensions of the output embedding. This is only available for embed-v4 and newer models. Possible values are 256, 512, 1024, and 1536.""")
 @cli_util.option('--truncate', type=custom_types.CliCaseInsensitiveChoice(["NONE", "START", "END"]), help=u"""For an input that's longer than the maximum token length, specifies which part of the input text will be truncated.""")
 @cli_util.option('--input-type', type=custom_types.CliCaseInsensitiveChoice(["SEARCH_DOCUMENT", "SEARCH_QUERY", "CLASSIFICATION", "CLUSTERING", "IMAGE"]), help=u"""Specifies the input type.""")
-@json_skeleton_utils.get_cli_json_input_option({'inputs': {'module': 'generative_ai_inference', 'class': 'list[string]'}})
+@json_skeleton_utils.get_cli_json_input_option({'inputs': {'module': 'generative_ai_inference', 'class': 'list[string]'}, 'embed-contents': {'module': 'generative_ai_inference', 'class': 'list[EmbedContent]'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'inputs': {'module': 'generative_ai_inference', 'class': 'list[string]'}}, output_type={'module': 'generative_ai_inference', 'class': 'EmbedTextResult'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'inputs': {'module': 'generative_ai_inference', 'class': 'list[string]'}, 'embed-contents': {'module': 'generative_ai_inference', 'class': 'list[EmbedContent]'}}, output_type={'module': 'generative_ai_inference', 'class': 'EmbedTextResult'})
 @cli_util.wrap_exceptions
-def embed_text_dedicated_serving_mode(ctx, from_json, inputs, compartment_id, serving_mode_endpoint_id, is_echo, embedding_types, output_dimensions, truncate, input_type):
+def embed_text_dedicated_serving_mode(ctx, from_json, compartment_id, serving_mode_endpoint_id, inputs, embed_contents, is_echo, embedding_types, output_dimensions, truncate, input_type):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
     _details = {}
     _details['servingMode'] = {}
-    _details['inputs'] = cli_util.parse_json_parameter("inputs", inputs)
     _details['compartmentId'] = compartment_id
     _details['servingMode']['endpointId'] = serving_mode_endpoint_id
+
+    if inputs is not None:
+        _details['inputs'] = cli_util.parse_json_parameter("inputs", inputs)
+
+    if embed_contents is not None:
+        _details['embedContents'] = cli_util.parse_json_parameter("embed_contents", embed_contents)
 
     if is_echo is not None:
         _details['isEcho'] = is_echo
@@ -744,29 +833,37 @@ def embed_text_dedicated_serving_mode(ctx, from_json, inputs, compartment_id, se
 @embed_text_result_group.command(name=cli_util.override('generative_ai_inference.embed_text_on_demand_serving_mode.command_name', 'embed-text-on-demand-serving-mode'), help=u"""Produces embeddings for the inputs.
 
 An embedding is numeric representation of a piece of text. This text can be a phrase, a sentence, or one or more paragraphs. The Generative AI embedding model transforms each phrase, sentence, or paragraph that you input, into an array with 1024 numbers. You can use these embeddings for finding similarity in your input text such as finding phrases that are similar in context or category. Embeddings are mostly used for semantic searches where the search function focuses on the meaning of the text that it's searching through rather than finding results based on keywords. \n[Command Reference](embedText)""")
-@cli_util.option('--inputs', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""Provide a list of strings or one base64 encoded image with `input_type` setting to `IMAGE`. If text embedding, each string can be words, a phrase, or a paragraph. The maximum length of each string entry in the list is 512 tokens.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--compartment-id', required=True, help=u"""The OCID of compartment in which to call the Generative AI service to create text embeddings.""")
 @cli_util.option('--serving-mode-model-id', required=True, help=u"""The unique ID of a model to use. You can use the [ListModels] API to list the available models.""")
+@cli_util.option('--inputs', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Provide a list of strings or one base64 encoded image with `input_type` setting to `IMAGE`. If text embedding, each string can be words, a phrase, or a paragraph. The maximum length of each string entry in the list is 512 tokens.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--embed-contents', type=custom_types.CLI_COMPLEX_TYPE, help=u"""An array of text/image inputs to be embedded. Supported for Embed v4 models.
+
+This option is a JSON list with items of type EmbedContent.  For documentation on EmbedContent please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/generativeaiinference/20231130/datatypes/EmbedContent.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--is-echo', type=click.BOOL, help=u"""Whether or not to include the original inputs in the response. Results are index-based.""")
 @cli_util.option('--embedding-types', type=custom_types.CliCaseInsensitiveChoice(["float", "int8", "uint8", "binary", "ubinary", "base64"]), help=u"""Specifies the types of embeddings you want to get back. Supports list of enums. Supported values :float, int8, uint8, binary, ubinary, base64. If nothing is passed default will be considered as float.""")
 @cli_util.option('--output-dimensions', type=click.INT, help=u"""The number of dimensions of the output embedding. This is only available for embed-v4 and newer models. Possible values are 256, 512, 1024, and 1536.""")
 @cli_util.option('--truncate', type=custom_types.CliCaseInsensitiveChoice(["NONE", "START", "END"]), help=u"""For an input that's longer than the maximum token length, specifies which part of the input text will be truncated.""")
 @cli_util.option('--input-type', type=custom_types.CliCaseInsensitiveChoice(["SEARCH_DOCUMENT", "SEARCH_QUERY", "CLASSIFICATION", "CLUSTERING", "IMAGE"]), help=u"""Specifies the input type.""")
-@json_skeleton_utils.get_cli_json_input_option({'inputs': {'module': 'generative_ai_inference', 'class': 'list[string]'}})
+@json_skeleton_utils.get_cli_json_input_option({'inputs': {'module': 'generative_ai_inference', 'class': 'list[string]'}, 'embed-contents': {'module': 'generative_ai_inference', 'class': 'list[EmbedContent]'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'inputs': {'module': 'generative_ai_inference', 'class': 'list[string]'}}, output_type={'module': 'generative_ai_inference', 'class': 'EmbedTextResult'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'inputs': {'module': 'generative_ai_inference', 'class': 'list[string]'}, 'embed-contents': {'module': 'generative_ai_inference', 'class': 'list[EmbedContent]'}}, output_type={'module': 'generative_ai_inference', 'class': 'EmbedTextResult'})
 @cli_util.wrap_exceptions
-def embed_text_on_demand_serving_mode(ctx, from_json, inputs, compartment_id, serving_mode_model_id, is_echo, embedding_types, output_dimensions, truncate, input_type):
+def embed_text_on_demand_serving_mode(ctx, from_json, compartment_id, serving_mode_model_id, inputs, embed_contents, is_echo, embedding_types, output_dimensions, truncate, input_type):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
     _details = {}
     _details['servingMode'] = {}
-    _details['inputs'] = cli_util.parse_json_parameter("inputs", inputs)
     _details['compartmentId'] = compartment_id
     _details['servingMode']['modelId'] = serving_mode_model_id
+
+    if inputs is not None:
+        _details['inputs'] = cli_util.parse_json_parameter("inputs", inputs)
+
+    if embed_contents is not None:
+        _details['embedContents'] = cli_util.parse_json_parameter("embed_contents", embed_contents)
 
     if is_echo is not None:
         _details['isEcho'] = is_echo
@@ -1049,6 +1146,57 @@ def generate_text_cohere_llm_inference_request(ctx, from_json, compartment_id, s
         generate_text_details=_details,
         **kwargs
     )
+    cli_util.render_response(result, ctx)
+
+
+@guardrail_version_collection_group.command(name=cli_util.override('generative_ai_inference.list_guardrail_versions.command_name', 'list-guardrail-versions'), help=u"""List the available guardrail system versions. \n[Command Reference](listGuardrailVersions)""")
+@cli_util.option('--opc-compartment-id', required=True, help=u"""The client compartment ID.""")
+@cli_util.option('--state', type=custom_types.CliCaseInsensitiveChoice(["ACTIVE", "PREVIEW", "DEPRECATED", "RETIRED"]), help=u"""A filter to return only the guardrail versions whose state matches the given value.""")
+@cli_util.option('--limit', type=click.INT, help=u"""For list pagination. The maximum number of results per page, or items to return in a paginated \"List\" call. For important details about how pagination works, see [List Pagination].""")
+@cli_util.option('--page', help=u"""For list pagination. The value of the opc-next-page response header from the previous \"List\" call. For important details about how pagination works, see [List Pagination].""")
+@cli_util.option('--all', 'all_pages', is_flag=True, help="""Fetches all pages of results. If you provide this option, then you cannot provide the --limit option.""")
+@cli_util.option('--page-size', type=click.INT, help="""When fetching results, the number of results to fetch per call. Only valid when used with --all or --limit, and ignored otherwise.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'generative_ai_inference', 'class': 'GuardrailVersionCollection'})
+@cli_util.wrap_exceptions
+def list_guardrail_versions(ctx, from_json, all_pages, page_size, opc_compartment_id, state, limit, page):
+
+    if all_pages and limit:
+        raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
+
+    kwargs = {}
+    if state is not None:
+        kwargs['state'] = state
+    if limit is not None:
+        kwargs['limit'] = limit
+    if page is not None:
+        kwargs['page'] = page
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('generative_ai_inference', 'generative_ai_inference', ctx)
+    if all_pages:
+        if page_size:
+            kwargs['limit'] = page_size
+
+        result = cli_util.list_call_get_all_results(
+            client.list_guardrail_versions,
+            opc_compartment_id=opc_compartment_id,
+            **kwargs
+        )
+    elif limit is not None:
+        result = cli_util.list_call_get_up_to_limit(
+            client.list_guardrail_versions,
+            limit,
+            page_size,
+            opc_compartment_id=opc_compartment_id,
+            **kwargs
+        )
+    else:
+        result = client.list_guardrail_versions(
+            opc_compartment_id=opc_compartment_id,
+            **kwargs
+        )
     cli_util.render_response(result, ctx)
 
 

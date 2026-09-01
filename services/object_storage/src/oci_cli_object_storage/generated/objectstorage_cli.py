@@ -390,15 +390,18 @@ def copy_object(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags]. Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags]. Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--kms-key-id', help=u"""The [OCID] of a master encryption key used to call the Key Management service to generate a data encryption key or to encrypt or decrypt a data encryption key.""")
+@cli_util.option('--is-bucket-key-enabled', type=click.BOOL, help=u"""Specifies whether Object Storage should use intermediate cached Bucket Encryption Keys with server-side encryption using KMS (SSE-KMS) for new objects in the bucket. This reduces calls to OCI Vault Key Management Service (KMS). Existing objects are not affected.""")
 @cli_util.option('--versioning', type=custom_types.CliCaseInsensitiveChoice(["Enabled", "Disabled"]), help=u"""Set the versioning status on the bucket. By default, a bucket is created with versioning `Disabled`. Use this option to enable versioning during bucket creation. Objects in a version enabled bucket are protected from overwrites and deletions. Previous versions of the same object will be available in the bucket.""")
 @cli_util.option('--auto-tiering', help=u"""Set the auto tiering status on the bucket. By default, a bucket is created with auto tiering `Disabled`. Use this option to enable auto tiering during bucket creation. Objects in a bucket with auto tiering set to `InfrequentAccess` are transitioned automatically between the 'Standard' and 'InfrequentAccess' tiers based on the access pattern of the objects.""")
-@cli_util.option('--bucket-scope', help=u"""Scope in which the bucket is unique. Default value is NAMESPACE. Bucket scope as NAMESPACE means that the bucket is unique only in the owning namespace/tenancy. Other tenancies can have a bucket with same name in their namespace. Bucket scope as REGION means that the bucket is regionally unique. No other tenancy can have a bucket with same name and scope REGION.""")
+@cli_util.option('--bucket-scope', help=u"""The bucket scope determines weather the bucket name must be unique within the tenancy and region (essentially the namespace) or across all tenancies in the region. The bucket scope also determines if the bucket supports S3 virtual-hosted style URL's or not.
+
+Allowed values: NAMESPACE: Only supports path-style bucket access, bucket name only needs to be unique within the tenancy and region. REGION: Supports both path-style and virtual-hosted URL style access, bucket name needs to be unique across all tenancies in the region.""")
 @json_skeleton_utils.get_cli_json_input_option({'metadata': {'module': 'object_storage', 'class': 'dict(str, string)'}, 'freeform-tags': {'module': 'object_storage', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'object_storage', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.help_option
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'metadata': {'module': 'object_storage', 'class': 'dict(str, string)'}, 'freeform-tags': {'module': 'object_storage', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'object_storage', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'object_storage', 'class': 'Bucket'})
 @cli_util.wrap_exceptions
-def create_bucket(ctx, from_json, namespace_name, name, compartment_id, metadata, public_access_type, storage_tier, object_events_enabled, freeform_tags, defined_tags, kms_key_id, versioning, auto_tiering, bucket_scope):
+def create_bucket(ctx, from_json, namespace_name, name, compartment_id, metadata, public_access_type, storage_tier, object_events_enabled, freeform_tags, defined_tags, kms_key_id, is_bucket_key_enabled, versioning, auto_tiering, bucket_scope):
 
     if isinstance(namespace_name, six.string_types) and len(namespace_name.strip()) == 0:
         raise click.UsageError('Parameter --namespace-name cannot be whitespace or empty string')
@@ -430,6 +433,9 @@ def create_bucket(ctx, from_json, namespace_name, name, compartment_id, metadata
 
     if kms_key_id is not None:
         _details['kmsKeyId'] = kms_key_id
+
+    if is_bucket_key_enabled is not None:
+        _details['isBucketKeyEnabled'] = is_bucket_key_enabled
 
     if versioning is not None:
         _details['versioning'] = versioning
@@ -592,15 +598,18 @@ If you do not provide a value, an available IP address in the subnet is automati
 @cli_util.option('--nsg-ids', type=custom_types.CLI_COMPLEX_TYPE, help=u"""A list of the OCIDs of the network security groups (NSGs) to add the private endpoint's VNIC to. For more information about NSGs, see [NetworkSecurityGroup].""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags]. Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags]. Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--security-attributes', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Security attributes for Private Endpoint resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].
+
+Example: `{\"Oracle-ZPR\": {\"MaxEgressCount\": {\"value\": \"42\", \"mode\": \"enforce\"}}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "COMPLETED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'additional-prefixes': {'module': 'object_storage', 'class': 'list[string]'}, 'nsg-ids': {'module': 'object_storage', 'class': 'list[string]'}, 'access-targets': {'module': 'object_storage', 'class': 'list[AccessTargetDetails]'}, 'freeform-tags': {'module': 'object_storage', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'object_storage', 'class': 'dict(str, dict(str, object))'}})
+@json_skeleton_utils.get_cli_json_input_option({'additional-prefixes': {'module': 'object_storage', 'class': 'list[string]'}, 'nsg-ids': {'module': 'object_storage', 'class': 'list[string]'}, 'access-targets': {'module': 'object_storage', 'class': 'list[AccessTargetDetails]'}, 'freeform-tags': {'module': 'object_storage', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'object_storage', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'object_storage', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'additional-prefixes': {'module': 'object_storage', 'class': 'list[string]'}, 'nsg-ids': {'module': 'object_storage', 'class': 'list[string]'}, 'access-targets': {'module': 'object_storage', 'class': 'list[AccessTargetDetails]'}, 'freeform-tags': {'module': 'object_storage', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'object_storage', 'class': 'dict(str, dict(str, object))'}})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'additional-prefixes': {'module': 'object_storage', 'class': 'list[string]'}, 'nsg-ids': {'module': 'object_storage', 'class': 'list[string]'}, 'access-targets': {'module': 'object_storage', 'class': 'list[AccessTargetDetails]'}, 'freeform-tags': {'module': 'object_storage', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'object_storage', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'object_storage', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.wrap_exceptions
-def create_private_endpoint(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, namespace_name, name, compartment_id, subnet_id, prefix, access_targets, additional_prefixes, private_endpoint_ip, nsg_ids, freeform_tags, defined_tags):
+def create_private_endpoint(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, namespace_name, name, compartment_id, subnet_id, prefix, access_targets, additional_prefixes, private_endpoint_ip, nsg_ids, freeform_tags, defined_tags, security_attributes):
 
     if isinstance(namespace_name, six.string_types) and len(namespace_name.strip()) == 0:
         raise click.UsageError('Parameter --namespace-name cannot be whitespace or empty string')
@@ -629,6 +638,9 @@ def create_private_endpoint(ctx, from_json, wait_for_state, max_wait_seconds, wa
 
     if defined_tags is not None:
         _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    if security_attributes is not None:
+        _details['securityAttributes'] = cli_util.parse_json_parameter("security_attributes", security_attributes)
 
     client = cli_util.build_client('object_storage', 'object_storage', ctx)
     result = client.create_private_endpoint(
@@ -2257,7 +2269,7 @@ The optional header that defines the base64-encoded SHA256 hash of the body. If 
 The optional header that defines the base64-encoded SHA384 hash of the body. If the optional opc-content-sha384 header is present, Object Storage performs an integrity check on the body of the HTTP request by computing the SHA384 hash for the body and comparing it to the SHA384 hash supplied in the header. If the two hashes do not match, the object is rejected and an HTTP-400 Unmatched Content SHA384 error is returned with the message:
 
 \"The computed SHA384 of the request body (ACTUAL_SHA384) does not match the opc-content-sha384 header (HEADER_SHA384)\"""")
-@cli_util.option('--content-type', help=u"""The optional Content-Type header that defines the standard MIME type format of the object. Content type defaults to 'application/octet-stream' if not specified in the PutObject call. Specifying values for this header has no effect on Object Storage behavior. Programs that read the object determine what to do based on the value provided. For example, you could use this header to identify and perform special operations on text only objects.""")
+@cli_util.option('--content-type', help=u"""The optional Content-Type header that defines the standard MIME type format of the object. Content type defaults to 'application/octet-stream' if not specified in the PutObject call. In the OCI CLI, you can set this value to 'auto' to have the CLI infer the content type from the file name. Specifying values for this header has no effect on Object Storage behavior. Programs that read the object determine what to do based on the value provided. For example, you could use this header to identify and perform special operations on text only objects.""")
 @cli_util.option('--content-language', help=u"""The optional Content-Language header that defines the content language of the object to upload. Specifying values for this header has no effect on Object Storage behavior. Programs that read the object determine what to do based on the value provided. For example, you could use this header to identify and differentiate objects based on a particular language.""")
 @cli_util.option('--content-encoding', help=u"""The optional Content-Encoding header that defines the content encodings that were applied to the object to upload. Specifying values for this header has no effect on Object Storage behavior. Programs that read the object determine what to do based on the value provided. For example, you could use this header to determine what decoding mechanisms need to be applied to obtain the media-type specified by the Content-Type header of the object.""")
 @cli_util.option('--content-disposition', help=u"""The optional Content-Disposition header that defines presentational information for the object to be returned in GetObject and HeadObject responses. Specifying values for this header has no effect on Object Storage behavior. Programs that read the object determine what to do based on the value provided. For example, you could use this header to let users download objects with custom filenames in a browser.""")
@@ -2389,11 +2401,12 @@ def put_object_lifecycle_policy(ctx, from_json, force, namespace_name, bucket_na
     cli_util.render_response(result, ctx)
 
 
-@bucket_group.command(name=cli_util.override('os.reencrypt_bucket.command_name', 'reencrypt'), help=u"""Re-encrypts the unique data encryption key that encrypts each object written to the bucket by using the most recent version of the master encryption key assigned to the bucket. (All data encryption keys are encrypted by a master encryption key. Master encryption keys are assigned to buckets and managed by Oracle by default, but you can assign a key that you created and control through the Oracle Cloud Infrastructure Key Management service.) The kmsKeyId property of the bucket determines which master encryption key is assigned to the bucket. If you assigned a different Key Management master encryption key to the bucket, you can call this API to re-encrypt all data encryption keys with the newly assigned key. Similarly, you might want to re-encrypt all data encryption keys if the assigned key has been rotated to a new key version since objects were last added to the bucket. If you call this API and there is no kmsKeyId associated with the bucket, the call will fail.
+@bucket_group.command(name=cli_util.override('os.reencrypt_bucket.command_name', 'reencrypt'), help=u"""Re-encrypts the unique data encryption key that encrypts each object written to the bucket by using the most recent version of the master encryption key assigned to the bucket. (All data encryption keys are encrypted by a master encryption key. Master encryption keys are assigned to buckets and managed by Oracle by default, but you can assign a key that you created and control through the Oracle Cloud Infrastructure Key Management service.) The kmsKeyId property of the bucket determines which master encryption key is assigned to the bucket. If you assigned a different Key Management master encryption key to the bucket, you can call this API to re-encrypt all data encryption keys with the newly assigned key. Similarly, you might want to re-encrypt all data encryption keys if the assigned key has been rotated to a new key version since objects were last added to the bucket. If you call this API and there is no kmsKeyId associated with the bucket, the call will fail. Also, if you set isBucketKeyEnabled, you might want to re-encrypt all data encryption keys using the bucket key. This will help reduce calls to OCI Vault KMS when older objects are downloaded.
 
 Calling this API starts a work request task to re-encrypt the data encryption key of all objects in the bucket. Only objects created before the time of the API call will be re-encrypted. The call can take a long time, depending on how many objects are in the bucket and how big they are. This API returns a work request ID that you can use to retrieve the status of the work request task. All the versions of objects will be re-encrypted whether versioning is enabled or suspended at the bucket. \n[Command Reference](reencryptBucket)""")
 @cli_util.option('--namespace-name', required=True, help=u"""The Object Storage namespace used for the request.""")
 @cli_util.option('--bucket-name', required=True, help=u"""The name of the bucket. Avoid entering confidential information. Example: `my-new-bucket1`""")
+@cli_util.option('--is-reencrypt-bucket-key-only', type=click.BOOL, help=u"""If true, reencrypt only the intermediate bucket keys and skip everything else in the bucket.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "COMPLETED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
@@ -2402,7 +2415,7 @@ Calling this API starts a work request task to re-encrypt the data encryption ke
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
 @cli_util.wrap_exceptions
-def reencrypt_bucket(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, namespace_name, bucket_name):
+def reencrypt_bucket(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, namespace_name, bucket_name, is_reencrypt_bucket_key_only):
 
     if isinstance(namespace_name, six.string_types) and len(namespace_name.strip()) == 0:
         raise click.UsageError('Parameter --namespace-name cannot be whitespace or empty string')
@@ -2411,6 +2424,8 @@ def reencrypt_bucket(ctx, from_json, wait_for_state, max_wait_seconds, wait_inte
         raise click.UsageError('Parameter --bucket-name cannot be whitespace or empty string')
 
     kwargs = {}
+    if is_reencrypt_bucket_key_only is not None:
+        kwargs['is_reencrypt_bucket_key_only'] = is_reencrypt_bucket_key_only
     kwargs['opc_client_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
     client = cli_util.build_client('object_storage', 'object_storage', ctx)
     result = client.reencrypt_bucket(
@@ -2607,16 +2622,21 @@ Use UpdateBucket to move a bucket from one compartment to another within the sam
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags]. Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags]. Example: `{\"Operations\": {\"CostCenter\": \"42\"}}""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--kms-key-id', help=u"""The [OCID] of the Key Management master encryption key to associate with the specified bucket. If this value is empty, the Update operation will remove the associated key, if there is one, from the bucket. (The bucket will continue to be encrypted, but with an encryption key managed by Oracle.)""")
+@cli_util.option('--is-bucket-key-enabled', type=click.BOOL, help=u"""Specifies whether Object Storage should use intermediate cached Bucket Encryption Keys with server-side encryption using KMS (SSE-KMS) for new objects in the bucket. This reduces calls to OCI Vault Key Management Service (KMS). Existing objects are not affected.""")
 @cli_util.option('--versioning', type=custom_types.CliCaseInsensitiveChoice(["Enabled", "Suspended"]), help=u"""The versioning status on the bucket. If in state `Enabled`, multiple versions of the same object can be kept in the bucket. When the object is overwritten or deleted, previous versions will still be available. When versioning is `Suspended`, the previous versions will still remain but new versions will no longer be created when overwitten or deleted. Versioning cannot be disabled on a bucket once enabled.""")
 @cli_util.option('--auto-tiering', help=u"""The auto tiering status on the bucket. If in state `InfrequentAccess`, objects are transitioned automatically between the 'Standard' and 'InfrequentAccess' tiers based on the access pattern of the objects. When auto tiering is `Disabled`, there will be no automatic transitions between storage tiers.""")
-@cli_util.option('--bucket-scope', help=u"""Scope in which the bucket is unique. Default value is NAMESPACE. Bucket scope as NAMESPACE means that the bucket is unique only in the owning namespace/tenancy. Other tenancies can have a bucket with same name in their namespace. Bucket scope as REGION means that the bucket is regionally unique. No other tenancy can have a bucket with same name and scope REGION. BucketScope can only be updated from NAMESPACE to REGION, it cannot be updated from REGION to NAMESPACE. Updating bucket scope is possible only if the bucket name is valid and there is no existing regionally unique bucket with the same name.""")
+@cli_util.option('--bucket-scope', help=u"""The bucket scope determines weather the bucket name must be unique within the tenancy and region (essentially the namespace) or across all tenancies in the region. The bucket scope also determines if the bucket supports S3 virtual-hosted style URL's or not.
+
+Allowed values: NAMESPACE: Only supports path-style bucket access, bucket name only needs to be unique within the tenancy and region. REGION: Supports both path-style and virtual-hosted URL style access, bucket name needs to be unique across all tenancies in the region.
+
+BucketScope can only be updated from NAMESPACE to REGION, it cannot be updated from REGION to NAMESPACE. Updating bucket scope is possible only if the bucket name is valid and there is no existing regionally unique bucket with the same name.""")
 @cli_util.option('--if-match', help=u"""The entity tag (ETag) to match with the ETag of an existing resource. If the specified ETag matches the ETag of the existing resource, GET and HEAD requests will return the resource and PUT and POST requests will upload the resource.""")
 @json_skeleton_utils.get_cli_json_input_option({'metadata': {'module': 'object_storage', 'class': 'dict(str, string)'}, 'freeform-tags': {'module': 'object_storage', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'object_storage', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.help_option
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'metadata': {'module': 'object_storage', 'class': 'dict(str, string)'}, 'freeform-tags': {'module': 'object_storage', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'object_storage', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'object_storage', 'class': 'Bucket'})
 @cli_util.wrap_exceptions
-def update_bucket(ctx, from_json, namespace_name, bucket_name, compartment_id, metadata, public_access_type, object_events_enabled, freeform_tags, defined_tags, kms_key_id, versioning, auto_tiering, bucket_scope, if_match):
+def update_bucket(ctx, from_json, namespace_name, bucket_name, compartment_id, metadata, public_access_type, object_events_enabled, freeform_tags, defined_tags, kms_key_id, is_bucket_key_enabled, versioning, auto_tiering, bucket_scope, if_match):
 
     if isinstance(namespace_name, six.string_types) and len(namespace_name.strip()) == 0:
         raise click.UsageError('Parameter --namespace-name cannot be whitespace or empty string')
@@ -2654,6 +2674,9 @@ def update_bucket(ctx, from_json, namespace_name, bucket_name, compartment_id, m
 
     if kms_key_id is not None:
         _details['kmsKeyId'] = kms_key_id
+
+    if is_bucket_key_enabled is not None:
+        _details['isBucketKeyEnabled'] = is_bucket_key_enabled
 
     if versioning is not None:
         _details['versioning'] = versioning
@@ -2763,16 +2786,19 @@ This API follows replace semantics (rather than merge semantics). That means if 
 This option is a JSON list with items of type AccessTargetDetails.  For documentation on AccessTargetDetails please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/objectstorage/20160918/datatypes/AccessTargetDetails.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags]. Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags]. Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--security-attributes', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Security attributes for Private Endpoint resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].
+
+Example: `{\"Oracle-ZPR\": {\"MaxEgressCount\": {\"value\": \"42\", \"mode\": \"enforce\"}}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--if-match', help=u"""The entity tag (ETag) to match with the ETag of an existing resource. If the specified ETag matches the ETag of the existing resource, GET and HEAD requests will return the resource and PUT and POST requests will upload the resource.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "COMPLETED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'access-targets': {'module': 'object_storage', 'class': 'list[AccessTargetDetails]'}, 'freeform-tags': {'module': 'object_storage', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'object_storage', 'class': 'dict(str, dict(str, object))'}})
+@json_skeleton_utils.get_cli_json_input_option({'access-targets': {'module': 'object_storage', 'class': 'list[AccessTargetDetails]'}, 'freeform-tags': {'module': 'object_storage', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'object_storage', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'object_storage', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'access-targets': {'module': 'object_storage', 'class': 'list[AccessTargetDetails]'}, 'freeform-tags': {'module': 'object_storage', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'object_storage', 'class': 'dict(str, dict(str, object))'}})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'access-targets': {'module': 'object_storage', 'class': 'list[AccessTargetDetails]'}, 'freeform-tags': {'module': 'object_storage', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'object_storage', 'class': 'dict(str, dict(str, object))'}, 'security-attributes': {'module': 'object_storage', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.wrap_exceptions
-def update_private_endpoint(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, namespace_name, pe_name, name, namespace, access_targets, freeform_tags, defined_tags, if_match):
+def update_private_endpoint(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, namespace_name, pe_name, name, namespace, access_targets, freeform_tags, defined_tags, security_attributes, if_match):
 
     if isinstance(namespace_name, six.string_types) and len(namespace_name.strip()) == 0:
         raise click.UsageError('Parameter --namespace-name cannot be whitespace or empty string')
@@ -2801,6 +2827,9 @@ def update_private_endpoint(ctx, from_json, wait_for_state, max_wait_seconds, wa
 
     if defined_tags is not None:
         _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    if security_attributes is not None:
+        _details['securityAttributes'] = cli_util.parse_json_parameter("security_attributes", security_attributes)
 
     client = cli_util.build_client('object_storage', 'object_storage', ctx)
     result = client.update_private_endpoint(

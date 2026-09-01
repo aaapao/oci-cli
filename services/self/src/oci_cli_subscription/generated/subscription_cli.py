@@ -67,6 +67,65 @@ subscription_root_group.add_command(subscription_group)
 subscription_root_group.add_command(work_request_group)
 
 
+@subscription_group.command(name=cli_util.override('subscription.cancel_subscription.command_name', 'cancel'), help=u"""Requests cancellation of a Subscription. The subscription transitions to PendingCancellation and remains active until the end of the current billing cycle, at which point it transitions to Canceled. The subscription must be in the Active state to be canceled. \n[Command Reference](cancelSubscription)""")
+@cli_util.option('--subscription-id', required=True, help=u"""The unique identifier for the subscription.""")
+@cli_util.option('--reason', help=u"""Optional reason provided by the customer for the cancellation.""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACTIVE", "INACTIVE", "DELETED", "FAILED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACTIVE --wait-for-state FAILED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'self', 'class': 'Subscription'})
+@cli_util.wrap_exceptions
+def cancel_subscription(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, subscription_id, reason, if_match):
+
+    if isinstance(subscription_id, six.string_types) and len(subscription_id.strip()) == 0:
+        raise click.UsageError('Parameter --subscription-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+
+    if reason is not None:
+        _details['reason'] = reason
+
+    client = cli_util.build_client('self', 'subscription', ctx)
+    result = client.cancel_subscription(
+        subscription_id=subscription_id,
+        cancel_subscription_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_subscription') and callable(getattr(client, 'get_subscription')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+
+                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_subscription(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
 @work_request_group.command(name=cli_util.override('subscription.cancel_work_request.command_name', 'cancel'), help=u"""Cancels a work request. \n[Command Reference](cancelWorkRequest)""")
 @cli_util.option('--work-request-id', required=True, help=u"""The [OCID] of the asynchronous work request.""")
 @cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
@@ -373,13 +432,13 @@ def get_work_request(ctx, from_json, work_request_id):
 
 @subscription_collection_group.command(name=cli_util.override('subscription.list_subscriptions.command_name', 'list-subscriptions'), help=u"""Lists the subscriptions which have been created in the specified compartment. You can filter results by specifying query parameters. \n[Command Reference](listSubscriptions)""")
 @cli_util.option('--compartment-id', help=u"""The [OCID] of the compartment in which to list resources.""")
-@cli_util.option('--lifecycle-details', type=custom_types.CliCaseInsensitiveChoice(["CREATED", "PENDING_ACTIVATION", "PROVISIONING_STARTED", "PROVISIONING_COMPLETED", "PROVISIONING_FAILED", "ACTIVE", "EXPIRED", "TERMINATED", "FAILED", "DELETING", "UPDATING", "DELETED"]), help=u"""A filter to return only resources that match the given lifecycle state. The state value is case-insensitive.""")
+@cli_util.option('--lifecycle-details', type=custom_types.CliCaseInsensitiveChoice(["CREATED", "PENDING_ACTIVATION", "PROVISIONING_STARTED", "PROVISIONING_COMPLETED", "PROVISIONING_FAILED", "ACTIVE", "EXPIRED", "TERMINATED", "FAILED", "DELETING", "UPDATING", "DELETED", "PENDING_CANCELLATION", "SUSPENDED", "CANCELED"]), help=u"""A filter to return only resources that match the given lifecycle state. The state value is case-insensitive.""")
 @cli_util.option('--display-name', help=u"""A filter to return only resources that match the given name.""")
 @cli_util.option('--id', help=u"""The [OCID] of the Subscription.""")
 @cli_util.option('--limit', type=click.INT, help=u"""For list pagination. The maximum number of results per page, or items to return in a paginated \"List\" call. For important details about how pagination works, see [List Pagination].""")
 @cli_util.option('--page', help=u"""For list pagination. The value of the opc-next-page response header from the previous \"List\" call. For important details about how pagination works, see [List Pagination].""")
 @cli_util.option('--sort-order', type=custom_types.CliCaseInsensitiveChoice(["ASC", "DESC"]), help=u"""The sort order to use, either ascending (`ASC`) or descending (`DESC`).""")
-@cli_util.option('--sort-by', type=custom_types.CliCaseInsensitiveChoice(["timeCreated", "displayName", "selfTokenId", "productId"]), help=u"""The field to sort by. Only one sort order may be provided.""")
+@cli_util.option('--sort-by', type=custom_types.CliCaseInsensitiveChoice(["timeCreated", "displayName", "productId"]), help=u"""The field to sort by. Only one sort order may be provided.""")
 @cli_util.option('--all', 'all_pages', is_flag=True, help="""Fetches all pages of results. If you provide this option, then you cannot provide the --limit option.""")
 @cli_util.option('--page-size', type=click.INT, help="""When fetching results, the number of results to fetch per call. Only valid when used with --all or --limit, and ignored otherwise.""")
 @json_skeleton_utils.get_cli_json_input_option({})

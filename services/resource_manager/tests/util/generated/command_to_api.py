@@ -34,6 +34,8 @@ SDK_client_map = {
     "resource_manager.get_template_logo": "oci.resource_manager.ResourceManagerClient.get_template_logo",
     "resource_manager.get_template_tf_config": "oci.resource_manager.ResourceManagerClient.get_template_tf_config",
     "resource_manager.get_work_request": "oci.resource_manager.ResourceManagerClient.get_work_request",
+    "resource_manager.get_work_request_log_entries": "oci.resource_manager.ResourceManagerClient.get_work_request_log_entries",
+    "resource_manager.get_work_request_log_entries_content": "oci.resource_manager.ResourceManagerClient.get_work_request_log_entries_content",
     "resource_manager.list_configuration_source_providers": "oci.resource_manager.ResourceManagerClient.list_configuration_source_providers",
     "resource_manager.list_job_associated_resources": "oci.resource_manager.ResourceManagerClient.list_job_associated_resources",
     "resource_manager.list_job_outputs": "oci.resource_manager.ResourceManagerClient.list_job_outputs",

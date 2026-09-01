@@ -600,3 +600,20 @@ cloud-bridge, inventory, asset, update
 os-management-hub, managed-instance-group, list-managed-instances
 fusion-apps, fusion-environment, create
 fusion-apps, fusion-environment, update
+database-tools-runtime, database-tools-connection, execute-sql-database-tools-connection-execute-sql-output-object-storage-details
+database-tools-runtime, database-tools-database-api-gateway-config-pool-auto-api-spec, create
+database-tools-runtime, database-tools-database-api-gateway-config-pool-auto-api-spec, create-database-tools-database-api-gateway-config-pool-auto-api-spec-create-database-tools-database-api-gateway-config-pool-auto-api-spec-default-details
+database-tools-runtime, database-tools-database-api-gateway-config-pool-auto-api-spec, update
+database-tools-runtime, database-tools-database-api-gateway-config-pool-auto-api-spec, update-database-tools-database-api-gateway-config-pool-auto-api-spec-update-database-tools-database-api-gateway-config-pool-auto-api-spec-default-details
+dbtools-runtime, connection, execute-sql, async
+dbtools-runtime, database-api-gateway-config-pool-auto-api-spec, create, default
+dbtools-runtime, database-api-gateway-config-pool-auto-api-spec, update, default
+db, cloud-exa-infra, update
+opsi, opsi-private-endpoint, update
+db, database, create-from-backupdata-safe, private-endpoint, update
+db, database, create-from-backup
+data-safe, private-endpoint, update
+db, database, create-from-database
+db, database, create-database-from-database
+iot, iot-flow-runtime, update-iot-flow-runtime-flows
+iot, flow-runtime, update-flows

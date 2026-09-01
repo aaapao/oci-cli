@@ -22,9 +22,21 @@ def partner_integeration_root_group():
     pass
 
 
+@click.command(cli_util.override('partner_integeration.partner_group.command_name', 'partner'), cls=CommandGroupWithAlias, help="""Marketplace publisher partner details.""")
+@cli_util.help_option_group
+def partner_group():
+    pass
+
+
 @click.command(cli_util.override('partner_integeration.partner_subscription_group.command_name', 'partner-subscription'), cls=CommandGroupWithAlias, help="""These api for partner to communicate to OCI.""")
 @cli_util.help_option_group
 def partner_subscription_group():
+    pass
+
+
+@click.command(cli_util.override('partner_integeration.create_subscription_usage_record_details_group.command_name', 'create-subscription-usage-record-details'), cls=CommandGroupWithAlias, help="""A single usage record to submit for a marketplace offer. The usage window must have `timeUsageStarted` before `timeUsageEnded`.""")
+@cli_util.help_option_group
+def create_subscription_usage_record_details_group():
     pass
 
 
@@ -35,7 +47,9 @@ def listing_subscriptions_collection_group():
 
 
 self_service_cli.self_service_group.add_command(partner_integeration_root_group)
+partner_integeration_root_group.add_command(partner_group)
 partner_integeration_root_group.add_command(partner_subscription_group)
+partner_integeration_root_group.add_command(create_subscription_usage_record_details_group)
 partner_integeration_root_group.add_command(listing_subscriptions_collection_group)
 
 
@@ -82,10 +96,66 @@ def activate_subscription(ctx, from_json, subscription_id, product_id, freeform_
     cli_util.render_response(result, ctx)
 
 
+@partner_group.command(name=cli_util.override('partner_integeration.list_partners.command_name', 'list'), help=u"""Lists marketplace publisher partner info for a compartment. \n[Command Reference](listPartners)""")
+@cli_util.option('--compartment-id', help=u"""The [OCID] of the compartment in which to list resources.""")
+@cli_util.option('--display-name', help=u"""A filter to return only resources that match the given name.""")
+@cli_util.option('--sort-by', type=custom_types.CliCaseInsensitiveChoice(["timeCreated", "displayName", "productId"]), help=u"""The field to sort by. Only one sort order may be provided.""")
+@cli_util.option('--sort-order', type=custom_types.CliCaseInsensitiveChoice(["ASC", "DESC"]), help=u"""The sort order to use, either ascending (`ASC`) or descending (`DESC`).""")
+@cli_util.option('--limit', type=click.INT, help=u"""For list pagination. The maximum number of results per page, or items to return in a paginated \"List\" call. For important details about how pagination works, see [List Pagination].""")
+@cli_util.option('--page', help=u"""For list pagination. The value of the opc-next-page response header from the previous \"List\" call. For important details about how pagination works, see [List Pagination].""")
+@cli_util.option('--all', 'all_pages', is_flag=True, help="""Fetches all pages of results. If you provide this option, then you cannot provide the --limit option.""")
+@cli_util.option('--page-size', type=click.INT, help="""When fetching results, the number of results to fetch per call. Only valid when used with --all or --limit, and ignored otherwise.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'self', 'class': 'PartnerCollection'})
+@cli_util.wrap_exceptions
+def list_partners(ctx, from_json, all_pages, page_size, compartment_id, display_name, sort_by, sort_order, limit, page):
+
+    if all_pages and limit:
+        raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
+
+    kwargs = {}
+    if compartment_id is not None:
+        kwargs['compartment_id'] = compartment_id
+    if display_name is not None:
+        kwargs['display_name'] = display_name
+    if sort_by is not None:
+        kwargs['sort_by'] = sort_by
+    if sort_order is not None:
+        kwargs['sort_order'] = sort_order
+    if limit is not None:
+        kwargs['limit'] = limit
+    if page is not None:
+        kwargs['page'] = page
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('self', 'partner_integeration', ctx)
+    if all_pages:
+        if page_size:
+            kwargs['limit'] = page_size
+
+        result = cli_util.list_call_get_all_results(
+            client.list_partners,
+            **kwargs
+        )
+    elif limit is not None:
+        result = cli_util.list_call_get_up_to_limit(
+            client.list_partners,
+            limit,
+            page_size,
+            **kwargs
+        )
+    else:
+        result = client.list_partners(
+            **kwargs
+        )
+    cli_util.render_response(result, ctx)
+
+
 @listing_subscriptions_collection_group.command(name=cli_util.override('partner_integeration.listing_subscriptions.command_name', 'listing-subscriptions'), help=u"""Gets information about a Subscription. \n[Command Reference](listingSubscriptions)""")
 @cli_util.option('--listing-id', required=True, help=u"""The unique identifier for the listing.""")
 @cli_util.option('--display-name', help=u"""A filter to return only resources that match the given name.""")
-@cli_util.option('--sort-by', type=custom_types.CliCaseInsensitiveChoice(["timeCreated", "displayName", "selfTokenId", "productId"]), help=u"""The field to sort by. Only one sort order may be provided.""")
+@cli_util.option('--sort-by', type=custom_types.CliCaseInsensitiveChoice(["timeCreated", "displayName", "productId"]), help=u"""The field to sort by. Only one sort order may be provided.""")
 @cli_util.option('--sort-order', type=custom_types.CliCaseInsensitiveChoice(["ASC", "DESC"]), help=u"""The sort order to use, either ascending (`ASC`) or descending (`DESC`).""")
 @cli_util.option('--limit', type=click.INT, help=u"""For list pagination. The maximum number of results per page, or items to return in a paginated \"List\" call. For important details about how pagination works, see [List Pagination].""")
 @cli_util.option('--page', help=u"""For list pagination. The value of the opc-next-page response header from the previous \"List\" call. For important details about how pagination works, see [List Pagination].""")
@@ -151,6 +221,86 @@ def resolve_subscription(ctx, from_json, self_token, product_id, freeform_tags, 
     client = cli_util.build_client('self', 'partner_integeration', ctx)
     result = client.resolve_subscription(
         resolve_subscription_details=_details,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
+@create_subscription_usage_record_details_group.command(name=cli_util.override('partner_integeration.submit_subscription_usage_batch.command_name', 'submit-subscription-usage-batch'), help=u"""Asynchronously submits a UTF-8 CSV usage file for marketplace offers. The file must not exceed 50 MB or 10,000 rows and must include required usage columns. \n[Command Reference](submitSubscriptionUsageBatch)""")
+@cli_util.option('--compartment-id', required=True, help=u"""The [OCID] of the compartment associated with the usage records request.""")
+@cli_util.option('--submit-subscription-usage-batch-details', required=True, help=u"""UTF-8 CSV file with no more than 10,000 usage records and a maximum size of 50 MB. Required columns are `MarketplaceOfferId`, `Id`, `Amount`, `CurrencyCode`, `UsageStartTime`, `UsageEndTime`, and `UsageDimensionName`. Optional columns are `ConsumedQuantity`, `CustomerTenancyId`, `BillingIdentifier`, `ProductSku`, `UnitOfMeasure`, `UnitPrice`, `ContractDuration`, and `AdditionalMetadata`. When provided in CSV, `AdditionalMetadata` must be a JSON array of `ExtendedMetadata` objects. `MarketplaceOfferId` must be a subscription or private offer OCID.""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "NEEDS_ATTENTION", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def submit_subscription_usage_batch(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, submit_subscription_usage_batch_details):
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    # do not automatically retry operations with binary inputs
+    kwargs['retry_strategy'] = oci.retry.NoneRetryStrategy()
+
+    client = cli_util.build_client('self', 'partner_integeration', ctx)
+    result = client.submit_subscription_usage_batch(
+        compartment_id=compartment_id,
+        submit_subscription_usage_batch_details=submit_subscription_usage_batch_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@create_subscription_usage_record_details_group.command(name=cli_util.override('partner_integeration.submit_subscription_usage_records.command_name', 'submit-subscription-usage-records'), help=u"""Synchronously submits usage records for marketplace offers. Each record must include `id`, `marketplaceOfferId`, `amount`, `currencyCode`, `timeUsageStarted`, `timeUsageEnded`, and `usageDimensionName`. \n[Command Reference](submitSubscriptionUsageRecords)""")
+@cli_util.option('--compartment-id', required=True, help=u"""The [OCID] of the compartment associated with the usage records request.""")
+@cli_util.option('--subscription-usage-records', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""The usage records to submit. The array must contain at least one record and no more than 100 records.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@json_skeleton_utils.get_cli_json_input_option({'subscription-usage-records': {'module': 'self', 'class': 'list[CreateSubscriptionUsageRecordDetails]'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'subscription-usage-records': {'module': 'self', 'class': 'list[CreateSubscriptionUsageRecordDetails]'}})
+@cli_util.wrap_exceptions
+def submit_subscription_usage_records(ctx, from_json, compartment_id, subscription_usage_records):
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['subscriptionUsageRecords'] = cli_util.parse_json_parameter("subscription_usage_records", subscription_usage_records)
+
+    client = cli_util.build_client('self', 'partner_integeration', ctx)
+    result = client.submit_subscription_usage_records(
+        compartment_id=compartment_id,
+        submit_subscription_usage_records_details=_details,
         **kwargs
     )
     cli_util.render_response(result, ctx)

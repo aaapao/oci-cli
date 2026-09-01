@@ -168,6 +168,11 @@ service_mapping = {
         "Oracle Cloud Migrations",
         "Others"
     ],
+    "cluster-health": [
+        "cluster_health",
+        "ITV Control Plane - Diagnosis Store",
+        "Others"
+    ],
     "compute": [
         "core",
         "Compute Service",
@@ -186,6 +191,11 @@ service_mapping = {
     "container-registry": [
         "container_registry",
         "Container Registry",
+        "Others"
+    ],
+    "costad": [
+        "costad",
+        "CostAd",
         "Others"
     ],
     "cpg": [
@@ -243,6 +253,11 @@ service_mapping = {
         "Database Migration",
         "Migration"
     ],
+    "datacc": [
+        "datacc",
+        "Database Infrastructure Cloud@Customer Service",
+        "Others"
+    ],
     "db": [
         "database",
         "Database Service",
@@ -262,6 +277,16 @@ service_mapping = {
         "database_tools",
         "Database Tools",
         "Developer Services"
+    ],
+    "dbtools-runtime": [
+        "database_tools_runtime",
+        "Database Tools Runtime",
+        "Others"
+    ],
+    "ddfs": [
+        "ddfs",
+        "Device Data FHIR Service",
+        "Others"
     ],
     "delegate-access-control": [
         "delegate_access_control",
@@ -295,6 +320,11 @@ service_mapping = {
     ],
     "distributed-database": [
         "distributed_database",
+        "Globally Distributed Database",
+        "Others"
+    ],
+    "distributed-database-v26": [
+        "distributed_database_v26",
         "Globally Distributed Database",
         "Others"
     ],
@@ -564,7 +594,7 @@ service_mapping = {
         "Databases"
     ],
     "occ": [
-        "oci_control_center",
+        "occ",
         "OCI Control Center",
         "Others"
     ],
@@ -605,7 +635,7 @@ service_mapping = {
     ],
     "opctl": [
         "operator_access_control",
-        "OperatorAccessControl",
+        "Operator Access Control",
         "Oracle Database"
     ],
     "opensearch": [

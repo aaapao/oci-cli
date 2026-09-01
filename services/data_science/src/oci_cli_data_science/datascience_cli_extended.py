@@ -543,7 +543,7 @@ def change_data_science_private_endpoint_compartment_extended(ctx, **kwargs):
 
 @cli_util.copy_params_from_generated_command(datascience_cli.create_data_science_private_endpoint, params_to_exclude=['data_science_resource_type'])
 @datascience_cli.data_science_private_endpoint_group.command(name=datascience_cli.create_data_science_private_endpoint.name, help=datascience_cli.create_data_science_private_endpoint.help)
-@cli_util.option('--ds-resource-type', required=True, type=custom_types.CliCaseInsensitiveChoice(["NOTEBOOK_SESSION"]), help=u"""Data Science resource type. [required]""")
+@cli_util.option('--ds-resource-type', required=True, type=custom_types.CliCaseInsensitiveChoice(["NOTEBOOK_SESSION", "MODEL_DEPLOYMENT"]), help=u"""Data Science resource type. [required]""")
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'freeform-tags': {'module': 'data_science', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'data_science', 'class': 'dict(str, dict(str, object))'}, 'nsg-ids': {'module': 'data_science', 'class': 'list[string]'}}, output_type={'module': 'data_science', 'class': 'DataSciencePrivateEndpoint'})
 @cli_util.wrap_exceptions
@@ -588,7 +588,7 @@ def get_data_science_private_endpoint_extended(ctx, **kwargs):
 
 @cli_util.copy_params_from_generated_command(datascience_cli.list_data_science_private_endpoints, params_to_exclude=['data_science_resource_type'])
 @datascience_cli.data_science_private_endpoint_group.command(name=datascience_cli.list_data_science_private_endpoints.name, help=datascience_cli.list_data_science_private_endpoints.help)
-@cli_util.option('--ds-resource-type', type=custom_types.CliCaseInsensitiveChoice(["NOTEBOOK_SESSION"]), help=u"""Resource types in the Data Science service such as notebooks.""")
+@cli_util.option('--ds-resource-type', type=custom_types.CliCaseInsensitiveChoice(["NOTEBOOK_SESSION", "MODEL_DEPLOYMENT"]), help=u"""Resource types in the Data Science service such as notebooks.""")
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'data_science', 'class': 'list[DataSciencePrivateEndpointSummary]'})
 @cli_util.wrap_exceptions
@@ -660,16 +660,8 @@ cli_util.rename_command(datascience_cli, datascience_cli.data_science_root_group
 cli_util.rename_command(datascience_cli, datascience_cli.ml_application_instance_group, datascience_cli.trigger_ml_application_instance_flow, "trigger")
 
 
-# oci data-science ml-app-instance create-ml-application-instance-create-idcs-auth-configuration-details -> oci data-science ml-app-instance create-with-idcs-auth
-cli_util.rename_command(datascience_cli, datascience_cli.ml_application_instance_group, datascience_cli.create_ml_application_instance_create_idcs_auth_configuration_details, "create-with-idcs-auth")
-
-
 # oci data-science ml-app-instance create-ml-application-instance-create-iam-auth-configuration-create-details -> oci data-science ml-app-instance create-with-iam-auth
 cli_util.rename_command(datascience_cli, datascience_cli.ml_application_instance_group, datascience_cli.create_ml_application_instance_create_iam_auth_configuration_create_details, "create-with-iam-auth")
-
-
-# oci data-science ml-app-instance create-ml-application-instance-create-idcs-custom-service-auth-configuration-details -> oci data-science ml-app-instance create-with-custom-service-idcs-auth
-cli_util.rename_command(datascience_cli, datascience_cli.ml_application_instance_group, datascience_cli.create_ml_application_instance_create_idcs_custom_service_auth_configuration_details, "create-with-custom-service-idcs-auth")
 
 
 # oci data-science ml-application-implementation -> oci data-science ml-app-implementation
@@ -839,50 +831,6 @@ def create_ml_application_instance(ctx, **kwargs):
         del kwargs['ml_app_implementation_id']
 
     ctx.invoke(datascience_cli.create_ml_application_instance, **kwargs)
-
-
-# Rename oci data-science ml-app-instance create_ml_application_instance_create_idcs_auth_configuration_details --ml-application-id --ml-application-implementation-id
-#   to oci data-science ml-app-instance create_ml_application_instance_create_idcs_auth_configuration_details --ml-app-id --ml-app-implementation-id
-@cli_util.copy_params_from_generated_command(datascience_cli.create_ml_application_instance_create_idcs_auth_configuration_details, params_to_exclude=['ml_application_id', 'ml_application_implementation_id'])
-@datascience_cli.ml_application_instance_group.command(name=datascience_cli.create_ml_application_instance_create_idcs_auth_configuration_details.name, help=datascience_cli.create_ml_application_instance_create_idcs_auth_configuration_details.help)
-@cli_util.option('--ml-app-id', required=True, help=u"""The OCID of ML Application. This resource is an instance of ML Application referenced by this OCID.""")
-@cli_util.option('--ml-app-implementation-id', help=u"""The OCID of ML Application Implementation selected as a certain solution for a given ML problem (ML Application)""")
-@click.pass_context
-def create_ml_application_instance_create_idcs_auth_configuration_details(ctx, **kwargs):
-
-    if isinstance(kwargs['ml_app_id'], six.string_types) and len(kwargs['ml_app_id'].strip()) == 0:
-        raise click.UsageError('Parameter --ml-app-id cannot be whitespace or empty string')
-
-    if 'ml_app_id' in kwargs:
-        kwargs['ml_application_id'] = kwargs['ml_app_id']
-        del kwargs['ml_app_id']
-    if 'ml_app_implementation_id' in kwargs:
-        kwargs['ml_application_implementation_id'] = kwargs['ml_app_implementation_id']
-        del kwargs['ml_app_implementation_id']
-
-    ctx.invoke(datascience_cli.create_ml_application_instance_create_idcs_auth_configuration_details, **kwargs)
-
-
-# Rename oci data-science ml-app-instance create_ml_application_instance_create_idcs_custom_service_auth_configuration_details --ml-application-id --ml-application-implementation-id
-#   to oci data-science ml-app-instance create_ml_application_instance_create_idcs_custom_service_auth_configuration_details --ml-app-id --ml-app-implementation-id
-@cli_util.copy_params_from_generated_command(datascience_cli.create_ml_application_instance_create_idcs_custom_service_auth_configuration_details, params_to_exclude=['ml_application_id', 'ml_application_implementation_id'])
-@datascience_cli.ml_application_instance_group.command(name=datascience_cli.create_ml_application_instance_create_idcs_custom_service_auth_configuration_details.name, help=datascience_cli.create_ml_application_instance_create_idcs_custom_service_auth_configuration_details.help)
-@cli_util.option('--ml-app-id', required=True, help=u"""The OCID of ML Application. This resource is an instance of ML Application referenced by this OCID.""")
-@cli_util.option('--ml-app-implementation-id', help=u"""The OCID of ML Application Implementation selected as a certain solution for a given ML problem (ML Application)""")
-@click.pass_context
-def create_ml_application_instance_create_idcs_custom_service_auth_configuration_details(ctx, **kwargs):
-
-    if isinstance(kwargs['ml_app_id'], six.string_types) and len(kwargs['ml_app_id'].strip()) == 0:
-        raise click.UsageError('Parameter --ml-app-id cannot be whitespace or empty string')
-
-    if 'ml_app_id' in kwargs:
-        kwargs['ml_application_id'] = kwargs['ml_app_id']
-        del kwargs['ml_app_id']
-    if 'ml_app_implementation_id' in kwargs:
-        kwargs['ml_application_implementation_id'] = kwargs['ml_app_implementation_id']
-        del kwargs['ml_app_implementation_id']
-
-    ctx.invoke(datascience_cli.create_ml_application_instance_create_idcs_custom_service_auth_configuration_details, **kwargs)
 
 
 # Rename oci data-science ml-app-instance create_ml_application_instance_create_iam_auth_configuration_create_details --ml-application-id --ml-application-implementation-id

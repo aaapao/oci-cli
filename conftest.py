@@ -25,6 +25,12 @@ import sys
 
 from inspect import getsourcefile
 from os.path import abspath
+from packaging import version
+
+try:
+    from importlib.metadata import version as pkg_version
+except ImportError:
+    from importlib_metadata import version as pkg_version
 
 this_file_path = abspath(getsourcefile(lambda: 0))
 python_cli_root_dir = this_file_path[:-20]
@@ -43,8 +49,14 @@ vcr_log.setLevel(logging.INFO)
 if not os.path.exists(os.path.join('tests', 'temp')):
     os.makedirs(os.path.join('tests', 'temp'))
 
-dynamic_loader.load_all_services()
-final_command_processor.process()
+
+def _load_services_for_pytest(service_name):
+    if service_name == "all":
+        dynamic_loader.load_all_services()
+    elif service_name not in dynamic_loader.NON_SERVICE_TOP_LEVEL_COMMANDS:
+        dynamic_loader.load_service(service_name)
+
+    final_command_processor.process()
 
 
 def pytest_addoption(parser):
@@ -70,6 +82,7 @@ def add_test_option(parser, option, action, default, help):
 
 def pytest_configure(config):
     test_config_container.vcr_mode = config.getoption("--vcr-record-mode")
+    _load_services_for_pytest(config.getoption("service"))
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -187,7 +200,27 @@ def runner():
             except TypeError:
                 new_output_bytes = cleaned_output
             finally:
-                result = click.testing.Result(result.runner, new_output_bytes, result.stderr_bytes, result, result.exit_code, result.exception, result.exc_info)
+                if version.parse(pkg_version("click")) >= version.parse('8.2.0'):
+                    result = click.testing.Result(
+                        result.runner,
+                        result.stdout_bytes,
+                        result.stderr_bytes,
+                        new_output_bytes,
+                        result.return_value,
+                        result.exit_code,
+                        result.exception,
+                        result.exc_info
+                    )
+                else:
+                    result = click.testing.Result(
+                        result.runner,
+                        new_output_bytes,
+                        result.stderr_bytes,
+                        result,
+                        result.exit_code,
+                        result.exception,
+                        result.exc_info
+                    )
 
         return result
 

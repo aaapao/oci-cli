@@ -57,17 +57,19 @@ This option is a JSON list with items of type ResourceBundle.  For documentation
 @cli_util.option('--custom-fields', type=custom_types.CLI_COMPLEX_TYPE, help=u"""A list of key value pairs specified by the seller
 
 This option is a JSON list with items of type CustomField.  For documentation on CustomField please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/offer/20220901/datatypes/CustomField.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--offer-type', help=u"""The type of the offer.""")
+@cli_util.option('--offer-quote-ids', type=custom_types.CLI_COMPLEX_TYPE, help=u"""A list of associated offer quotes.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Simple key-value pair that is applied without any predefined name, type or scope. Exists for cross-compatibility only. Example: `{\"bar-key\": \"value\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. Example: `{\"foo-namespace\": {\"bar-key\": \"value\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "UPDATING", "ACTIVE", "DELETING", "DELETED", "FAILED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state CREATING --wait-for-state FAILED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'pricing': {'module': 'marketplace_private_offer', 'class': 'Pricing'}, 'buyer-information': {'module': 'marketplace_private_offer', 'class': 'BuyerInformation'}, 'seller-information': {'module': 'marketplace_private_offer', 'class': 'SellerInformation'}, 'resource-bundles': {'module': 'marketplace_private_offer', 'class': 'list[ResourceBundle]'}, 'custom-fields': {'module': 'marketplace_private_offer', 'class': 'list[CustomField]'}, 'freeform-tags': {'module': 'marketplace_private_offer', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'marketplace_private_offer', 'class': 'dict(str, dict(str, object))'}})
+@json_skeleton_utils.get_cli_json_input_option({'pricing': {'module': 'marketplace_private_offer', 'class': 'Pricing'}, 'buyer-information': {'module': 'marketplace_private_offer', 'class': 'BuyerInformation'}, 'seller-information': {'module': 'marketplace_private_offer', 'class': 'SellerInformation'}, 'resource-bundles': {'module': 'marketplace_private_offer', 'class': 'list[ResourceBundle]'}, 'custom-fields': {'module': 'marketplace_private_offer', 'class': 'list[CustomField]'}, 'offer-quote-ids': {'module': 'marketplace_private_offer', 'class': 'list[string]'}, 'freeform-tags': {'module': 'marketplace_private_offer', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'marketplace_private_offer', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'pricing': {'module': 'marketplace_private_offer', 'class': 'Pricing'}, 'buyer-information': {'module': 'marketplace_private_offer', 'class': 'BuyerInformation'}, 'seller-information': {'module': 'marketplace_private_offer', 'class': 'SellerInformation'}, 'resource-bundles': {'module': 'marketplace_private_offer', 'class': 'list[ResourceBundle]'}, 'custom-fields': {'module': 'marketplace_private_offer', 'class': 'list[CustomField]'}, 'freeform-tags': {'module': 'marketplace_private_offer', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'marketplace_private_offer', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'marketplace_private_offer', 'class': 'Offer'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'pricing': {'module': 'marketplace_private_offer', 'class': 'Pricing'}, 'buyer-information': {'module': 'marketplace_private_offer', 'class': 'BuyerInformation'}, 'seller-information': {'module': 'marketplace_private_offer', 'class': 'SellerInformation'}, 'resource-bundles': {'module': 'marketplace_private_offer', 'class': 'list[ResourceBundle]'}, 'custom-fields': {'module': 'marketplace_private_offer', 'class': 'list[CustomField]'}, 'offer-quote-ids': {'module': 'marketplace_private_offer', 'class': 'list[string]'}, 'freeform-tags': {'module': 'marketplace_private_offer', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'marketplace_private_offer', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'marketplace_private_offer', 'class': 'Offer'})
 @cli_util.wrap_exceptions
-def create_offer(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, display_name, seller_compartment_id, buyer_compartment_id, description, internal_notes, time_start_date, duration, time_accept_by, pricing, buyer_information, seller_information, resource_bundles, custom_fields, freeform_tags, defined_tags):
+def create_offer(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, display_name, seller_compartment_id, buyer_compartment_id, description, internal_notes, time_start_date, duration, time_accept_by, pricing, buyer_information, seller_information, resource_bundles, custom_fields, offer_type, offer_quote_ids, freeform_tags, defined_tags):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
@@ -108,6 +110,12 @@ def create_offer(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval
 
     if custom_fields is not None:
         _details['customFields'] = cli_util.parse_json_parameter("custom_fields", custom_fields)
+
+    if offer_type is not None:
+        _details['offerType'] = offer_type
+
+    if offer_quote_ids is not None:
+        _details['offerQuoteIds'] = cli_util.parse_json_parameter("offer_quote_ids", offer_quote_ids)
 
     if freeform_tags is not None:
         _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
@@ -319,6 +327,31 @@ def list_offers(ctx, from_json, all_pages, page_size, buyer_compartment_id, sell
     cli_util.render_response(result, ctx)
 
 
+@offer_group.command(name=cli_util.override('offer.send_offer.command_name', 'send'), help=u"""Sends an Offer to be reviewed and accepted by the buyer. Validation will be run on the offer first to verify the offer is valid and contains all required fields. \n[Command Reference](sendOffer)""")
+@cli_util.option('--offer-id', required=True, help=u"""unique Offer identifier""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def send_offer(ctx, from_json, offer_id, if_match):
+
+    if isinstance(offer_id, six.string_types) and len(offer_id.strip()) == 0:
+        raise click.UsageError('Parameter --offer-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('marketplace_private_offer', 'offer', ctx)
+    result = client.send_offer(
+        offer_id=offer_id,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
 @offer_group.command(name=cli_util.override('offer.update_offer.command_name', 'update'), help=u"""Updates the Offer \n[Command Reference](updateOffer)""")
 @cli_util.option('--offer-id', required=True, help=u"""unique Offer identifier""")
 @cli_util.option('--display-name', help=u"""Offers Identifier""")
@@ -436,4 +469,29 @@ def update_offer(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_i
                 raise
         else:
             click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@offer_group.command(name=cli_util.override('offer.withdraw_offer.command_name', 'withdraw'), help=u"""Withdraws an Offer and sends it back into DRAFT state. Offers can only be withdrawn before they are accepted by the buyer. \n[Command Reference](withdrawOffer)""")
+@cli_util.option('--offer-id', required=True, help=u"""unique Offer identifier""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def withdraw_offer(ctx, from_json, offer_id, if_match):
+
+    if isinstance(offer_id, six.string_types) and len(offer_id.strip()) == 0:
+        raise click.UsageError('Parameter --offer-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('marketplace_private_offer', 'offer', ctx)
+    result = client.withdraw_offer(
+        offer_id=offer_id,
+        **kwargs
+    )
     cli_util.render_response(result, ctx)

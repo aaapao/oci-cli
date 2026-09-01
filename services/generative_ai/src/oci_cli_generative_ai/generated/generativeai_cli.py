@@ -186,6 +186,14 @@ def work_request_log_entry_group():
     pass
 
 
+@click.command(cli_util.override('generative_ai.hosted_application_iam_group.command_name', 'hosted-application-iam'), cls=CommandGroupWithAlias, help="""Hosted Application IAM, defines shared configurations that apply across multiple deployments of the Agent or MCP application.
+
+To use any of the API operations, you must be authorized in an IAM policy. If you're not authorized, talk to an administrator who gives OCI resource access to users. See [Getting Started with Policies] and [Getting Access to Generative AI Resources].""")
+@cli_util.help_option_group
+def hosted_application_iam_group():
+    pass
+
+
 @click.command(cli_util.override('generative_ai.generative_ai_project_group.command_name', 'generative-ai-project'), cls=CommandGroupWithAlias, help="""A GenerativeAiProject is a logical container that stores conversation, file and containers.
 
 To use any of the API operations, you must be authorized in an IAM policy. If you're not authorized, talk to an administrator who gives OCI resource access to users. See [Getting Started with Policies] and [Getting Access to Generative AI Resources].""")
@@ -226,7 +234,7 @@ def dedicated_ai_cluster_group():
     pass
 
 
-@click.command(cli_util.override('generative_ai.hosted_application_storage_group.command_name', 'hosted-application-storage'), cls=CommandGroupWithAlias, help="""defines a physical storage (database or cache) managed by service. Each application can choose one or two storages for certain purpose such as agent memory.
+@click.command(cli_util.override('generative_ai.hosted_application_storage_group.command_name', 'hosted-application-storage'), cls=CommandGroupWithAlias, help="""Represents managed storage for an application. An application can use at most one managed storage resource of each type.
 
 To use any of the API operations, you must be authorized in an IAM policy. If you're not authorized, talk to an administrator who gives OCI resource access to users. See [Getting Started with Policies] and [Getting Access to Generative AI Resources].""")
 @cli_util.help_option_group
@@ -264,6 +272,7 @@ generative_ai_root_group.add_command(hosted_application_collection_group)
 generative_ai_root_group.add_command(imported_model_group)
 generative_ai_root_group.add_command(hosted_deployment_collection_group)
 generative_ai_root_group.add_command(work_request_log_entry_group)
+generative_ai_root_group.add_command(hosted_application_iam_group)
 generative_ai_root_group.add_command(generative_ai_project_group)
 generative_ai_root_group.add_command(model_collection_group)
 generative_ai_root_group.add_command(generative_ai_private_endpoint_group)
@@ -356,6 +365,7 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 
 Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--artifact-is-vulnerability-scan-required', type=click.BOOL, help=u"""Optional flag that requires an OCI Vulnerability Scanning Service compliance report for this artifact before it can become active. When omitted, the value defaults to false.""")
 @cli_util.option('--artifact-container-uri', help=u"""image url.""")
 @cli_util.option('--artifact-tag', help=u"""image tag.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
@@ -366,7 +376,7 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.wrap_exceptions
-def add_artifact_create_single_docker_artifact_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, hosted_deployment_id, freeform_tags, defined_tags, if_match, artifact_container_uri, artifact_tag):
+def add_artifact_create_single_docker_artifact_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, hosted_deployment_id, freeform_tags, defined_tags, if_match, artifact_is_vulnerability_scan_required, artifact_container_uri, artifact_tag):
 
     if isinstance(hosted_deployment_id, six.string_types) and len(hosted_deployment_id.strip()) == 0:
         raise click.UsageError('Parameter --hosted-deployment-id cannot be whitespace or empty string')
@@ -384,6 +394,9 @@ def add_artifact_create_single_docker_artifact_details(ctx, from_json, wait_for_
 
     if defined_tags is not None:
         _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    if artifact_is_vulnerability_scan_required is not None:
+        _details['artifact']['isVulnerabilityScanRequired'] = artifact_is_vulnerability_scan_required
 
     if artifact_container_uri is not None:
         _details['artifact']['containerUri'] = artifact_container_uri
@@ -701,6 +714,37 @@ def change_hosted_application_compartment(ctx, from_json, hosted_application_id,
     cli_util.render_response(result, ctx)
 
 
+@hosted_application_iam_group.command(name=cli_util.override('generative_ai.change_hosted_application_iam_compartment.command_name', 'change-compartment'), help=u"""Moves a hosted application into a different compartment within the same tenancy. For information about moving resources between compartments, see [Moving Resources to a Different Compartment]. \n[Command Reference](changeHostedApplicationIamCompartment)""")
+@cli_util.option('--hosted-application-iam-id', required=True, help=u"""The [OCID] of the hosted application.""")
+@cli_util.option('--compartment-id', required=True, help=u"""The OCID of the compartment to move the hosted application to.""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def change_hosted_application_iam_compartment(ctx, from_json, hosted_application_iam_id, compartment_id, if_match):
+
+    if isinstance(hosted_application_iam_id, six.string_types) and len(hosted_application_iam_id.strip()) == 0:
+        raise click.UsageError('Parameter --hosted-application-iam-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['compartmentId'] = compartment_id
+
+    client = cli_util.build_client('generative_ai', 'generative_ai', ctx)
+    result = client.change_hosted_application_iam_compartment(
+        hosted_application_iam_id=hosted_application_iam_id,
+        change_hosted_application_compartment_details=_details,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
 @hosted_application_storage_group.command(name=cli_util.override('generative_ai.change_hosted_application_storage_compartment.command_name', 'change-compartment'), help=u"""Moves a hosted application storage into a different compartment within the same tenancy. For information about moving resources between compartments, see [Moving Resources to a Different Compartment]. \n[Command Reference](changeHostedApplicationStorageCompartment)""")
 @cli_util.option('--hosted-application-storage-id', required=True, help=u"""The [OCID] of the hosted application storage.""")
 @cli_util.option('--compartment-id', required=True, help=u"""The OCID of the compartment to move the hosted application storage to.""")
@@ -930,11 +974,11 @@ def create_api_key(ctx, from_json, wait_for_state, max_wait_seconds, wait_interv
 Allowed values are: - HOSTING - FINE_TUNING""")
 @cli_util.option('--compartment-id', required=True, help=u"""The compartment OCID to create the dedicated AI cluster in.""")
 @cli_util.option('--unit-count', required=True, type=click.INT, help=u"""The number of dedicated units in this AI cluster.""")
-@cli_util.option('--unit-shape', required=True, help=u"""The shape of dedicated unit in this AI cluster. The underlying hardware configuration is hidden from customers.
+@cli_util.option('--unit-shape', required=True, help=u"""The shape of dedicated unit in this AI cluster.
 
-Allowed values are: - LARGE_COHERE - LARGE_COHERE_V2 - SMALL_COHERE - SMALL_COHERE_V2 - SMALL_COHERE_4 - EMBED_COHERE - LLAMA2_70 - LARGE_GENERIC - LARGE_COHERE_V2_2 - LARGE_GENERIC_4 - SMALL_GENERIC_V2 - LARGE_GENERIC_2 - LARGE_GENERIC_V3 - LARGE_COHERE_V3 - RERANK_COHERE - SMALL_GENERIC_V1 - MEDIUM_GENERIC_V1 - LARGE_GENERIC_V1 - A10_X1 - A10_X2 - A10_X4 - A100_40G_X1 - A100_40G_X2 - A100_40G_X4 - A100_40G_X8 - A100_80G_X1 - A100_80G_X2 - A100_80G_X4 - A100_80G_X8 - H100_X1 - H100_X2 - H100_X4 - H100_X8 - H200_X1 - H200_X2 - H200_X4 - H200_X8
+Allowed values are: - LARGE_COHERE - LARGE_COHERE_V2 - SMALL_COHERE - SMALL_COHERE_V2 - SMALL_COHERE_4 - EMBED_COHERE - LLAMA2_70 - LARGE_GENERIC - LARGE_COHERE_V2_2 - LARGE_GENERIC_4 - SMALL_GENERIC_V2 - LARGE_GENERIC_2 - LARGE_GENERIC_V3 - LARGE_COHERE_V3 - RERANK_COHERE - SMALL_GENERIC_V1 - MEDIUM_GENERIC_V1 - LARGE_GENERIC_V1 - A10_X1 - A10_X2 - A10_X4 - A100_40G_X1 - A100_40G_X2 - A100_40G_X4 - A100_40G_X8 - A100_80G_X1 - A100_80G_X2 - A100_80G_X4 - A100_80G_X8 - H100_X1 - H100_X2 - H100_X4 - H100_X8 - H100_X16 - H100_X32 - H200_X1 - H200_X2 - H200_X4 - H200_X8
 
-The following shapes can only be used to deploy imported models: - A10_X1, A10_X2, A10_X4 - A100_40G_X1, A100_40G_X2, A100_40G_X4, A100_40G_X8 - A100_80G_X1, A100_80G_X2, A100_80G_X4, A100_80G_X8 - H100_X1, H100_X2, H100_X4, H100_X8 - H200_X1, H200_X2, H200_X4, H200_X8 - OAI_A10_X2 - OAI_H100_X1 - OAI_H100_X2 - OAI_H200_X1 - OAI_A100_80G_X1 - OAI_A100_80G_X2 - OAI_A100_40G_X1 - OAI_A100_40G_X4""")
+The following shapes can only be used to deploy imported models: - A10_X1, A10_X2, A10_X4 - A100_40G_X1, A100_40G_X2, A100_40G_X4, A100_40G_X8 - A100_80G_X1, A100_80G_X2, A100_80G_X4, A100_80G_X8 - H100_X1, H100_X2, H100_X4, H100_X8 - H100_X16, H100_X32 - H200_X1, H200_X2, H200_X4, H200_X8 - B200_X16, B200_X32 - B300_X1, B300_X2, B300_X4, B300_X8, B300_X16, B300_X32 - L40S_X1, L40S_X2, L40S_X4, L40S_X8, L40S_X16, L40S_X32 - MI300X_X1, MI300X_X2, MI300X_X4, MI300X_X8, MI300X_X16, MI300X_X32 - OAI_A10_X2 - OAI_H100_X1 - OAI_H100_X2 - OAI_H200_X1 - OAI_A100_80G_X1 - OAI_A100_80G_X2 - OAI_A100_40G_X1 - OAI_A100_40G_X4 - B200_X1 - B200_X2 - B200_X4 - B200_X8 - OAI_B200_X1 - OAI_B200_X2 - OAI_B200_X4 - OAI_B200_X8 - SB_B200_X1 - B200_X16 - B200_X32 - B300_X1 - B300_X2 - B300_X4 - B300_X8 - B300_X16 - B300_X32 - L40S_X1 - L40S_X2 - L40S_X4 - L40S_X8 - L40S_X16 - L40S_X32 - MI300X_X1 - MI300X_X2 - MI300X_X4 - MI300X_X8 - MI300X_X16 - MI300X_X32 - COHERE_B300_X1 - META_B300_X1 - OAI_B300_X1""")
 @cli_util.option('--display-name', help=u"""A user-friendly name. Does not have to be unique, and it's changeable.""")
 @cli_util.option('--description', help=u"""An optional description of the dedicated AI cluster.""")
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
@@ -1283,13 +1327,13 @@ def create_generative_ai_project(ctx, from_json, wait_for_state, max_wait_second
 
 
 @hosted_application_group.command(name=cli_util.override('generative_ai.create_hosted_application.command_name', 'create'), help=u"""Creates a hosted application. \n[Command Reference](createHostedApplication)""")
+@cli_util.option('--inbound-auth-config', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--display-name', required=True, help=u"""The user-friendly display name for the Hosted Application. Does not need to be unique and can be updated after creation.""")
 @cli_util.option('--compartment-id', required=True, help=u"""The compartment OCID for the Hosted Application.""")
 @cli_util.option('--description', help=u"""The description for the Hosted Application.""")
 @cli_util.option('--scaling-config', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--inbound-auth-config', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--networking-config', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--storage-configs', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of storage configuration for the Hosted Application. Defines a list of service-managed storage back-ends.
+@cli_util.option('--storage-configs', type=custom_types.CLI_COMPLEX_TYPE, help=u"""A list of managed storage configurations for the application.
 
 This option is a JSON list with items of type StorageConfig.  For documentation on StorageConfig please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/generativeai/20231130/datatypes/StorageConfig.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--environment-variables', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of environment variables for the Hosted Application. Defines a list of environment variables injected at runtime.
@@ -1304,17 +1348,18 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'scaling-config': {'module': 'generative_ai', 'class': 'ScalingConfig'}, 'inbound-auth-config': {'module': 'generative_ai', 'class': 'InboundAuthConfig'}, 'networking-config': {'module': 'generative_ai', 'class': 'NetworkingConfig'}, 'storage-configs': {'module': 'generative_ai', 'class': 'list[StorageConfig]'}, 'environment-variables': {'module': 'generative_ai', 'class': 'list[EnvironmentVariable]'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
+@json_skeleton_utils.get_cli_json_input_option({'inbound-auth-config': {'module': 'generative_ai', 'class': 'InboundAuthConfig'}, 'scaling-config': {'module': 'generative_ai', 'class': 'ScalingConfig'}, 'networking-config': {'module': 'generative_ai', 'class': 'NetworkingConfig'}, 'storage-configs': {'module': 'generative_ai', 'class': 'list[StorageConfig]'}, 'environment-variables': {'module': 'generative_ai', 'class': 'list[EnvironmentVariable]'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'scaling-config': {'module': 'generative_ai', 'class': 'ScalingConfig'}, 'inbound-auth-config': {'module': 'generative_ai', 'class': 'InboundAuthConfig'}, 'networking-config': {'module': 'generative_ai', 'class': 'NetworkingConfig'}, 'storage-configs': {'module': 'generative_ai', 'class': 'list[StorageConfig]'}, 'environment-variables': {'module': 'generative_ai', 'class': 'list[EnvironmentVariable]'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'HostedApplication'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'inbound-auth-config': {'module': 'generative_ai', 'class': 'InboundAuthConfig'}, 'scaling-config': {'module': 'generative_ai', 'class': 'ScalingConfig'}, 'networking-config': {'module': 'generative_ai', 'class': 'NetworkingConfig'}, 'storage-configs': {'module': 'generative_ai', 'class': 'list[StorageConfig]'}, 'environment-variables': {'module': 'generative_ai', 'class': 'list[EnvironmentVariable]'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'HostedApplication'})
 @cli_util.wrap_exceptions
-def create_hosted_application(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, display_name, compartment_id, description, scaling_config, inbound_auth_config, networking_config, storage_configs, environment_variables, freeform_tags, defined_tags):
+def create_hosted_application(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, inbound_auth_config, display_name, compartment_id, description, scaling_config, networking_config, storage_configs, environment_variables, freeform_tags, defined_tags):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
     _details = {}
+    _details['inboundAuthConfig'] = cli_util.parse_json_parameter("inbound_auth_config", inbound_auth_config)
     _details['displayName'] = display_name
     _details['compartmentId'] = compartment_id
 
@@ -1323,9 +1368,6 @@ def create_hosted_application(ctx, from_json, wait_for_state, max_wait_seconds, 
 
     if scaling_config is not None:
         _details['scalingConfig'] = cli_util.parse_json_parameter("scaling_config", scaling_config)
-
-    if inbound_auth_config is not None:
-        _details['inboundAuthConfig'] = cli_util.parse_json_parameter("inbound_auth_config", inbound_auth_config)
 
     if networking_config is not None:
         _details['networkingConfig'] = cli_util.parse_json_parameter("networking_config", networking_config)
@@ -1377,10 +1419,101 @@ def create_hosted_application(ctx, from_json, wait_for_state, max_wait_seconds, 
     cli_util.render_response(result, ctx)
 
 
+@hosted_application_iam_group.command(name=cli_util.override('generative_ai.create_hosted_application_iam.command_name', 'create'), help=u"""Creates a hosted application. \n[Command Reference](createHostedApplicationIam)""")
+@cli_util.option('--display-name', required=True, help=u"""The user-friendly display name for the Hosted Application. Does not need to be unique and can be updated after creation.""")
+@cli_util.option('--compartment-id', required=True, help=u"""The compartment OCID for the Hosted Application.""")
+@cli_util.option('--description', help=u"""The description for the Hosted Application.""")
+@cli_util.option('--scaling-config', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--networking-config', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--storage-configs', type=custom_types.CLI_COMPLEX_TYPE, help=u"""A list of managed storage configurations for the application.
+
+This option is a JSON list with items of type StorageConfig.  For documentation on StorageConfig please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/generativeai/20231130/datatypes/StorageConfig.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--environment-variables', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of environment variables for the Hosted Application. Defines a list of environment variables injected at runtime.
+
+This option is a JSON list with items of type EnvironmentVariable.  For documentation on EnvironmentVariable please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/generativeai/20231130/datatypes/EnvironmentVariable.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
+
+Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].
+
+Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'scaling-config': {'module': 'generative_ai', 'class': 'ScalingConfig'}, 'networking-config': {'module': 'generative_ai', 'class': 'NetworkingConfig'}, 'storage-configs': {'module': 'generative_ai', 'class': 'list[StorageConfig]'}, 'environment-variables': {'module': 'generative_ai', 'class': 'list[EnvironmentVariable]'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'scaling-config': {'module': 'generative_ai', 'class': 'ScalingConfig'}, 'networking-config': {'module': 'generative_ai', 'class': 'NetworkingConfig'}, 'storage-configs': {'module': 'generative_ai', 'class': 'list[StorageConfig]'}, 'environment-variables': {'module': 'generative_ai', 'class': 'list[EnvironmentVariable]'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'HostedApplicationIam'})
+@cli_util.wrap_exceptions
+def create_hosted_application_iam(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, display_name, compartment_id, description, scaling_config, networking_config, storage_configs, environment_variables, freeform_tags, defined_tags):
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['displayName'] = display_name
+    _details['compartmentId'] = compartment_id
+
+    if description is not None:
+        _details['description'] = description
+
+    if scaling_config is not None:
+        _details['scalingConfig'] = cli_util.parse_json_parameter("scaling_config", scaling_config)
+
+    if networking_config is not None:
+        _details['networkingConfig'] = cli_util.parse_json_parameter("networking_config", networking_config)
+
+    if storage_configs is not None:
+        _details['storageConfigs'] = cli_util.parse_json_parameter("storage_configs", storage_configs)
+
+    if environment_variables is not None:
+        _details['environmentVariables'] = cli_util.parse_json_parameter("environment_variables", environment_variables)
+
+    if freeform_tags is not None:
+        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
+
+    if defined_tags is not None:
+        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    client = cli_util.build_client('generative_ai', 'generative_ai', ctx)
+    result = client.create_hosted_application_iam(
+        create_hosted_application_iam_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
 @hosted_application_storage_group.command(name=cli_util.override('generative_ai.create_hosted_application_storage.command_name', 'create'), help=u"""Creates a hosted application storage. \n[Command Reference](createHostedApplicationStorage)""")
 @cli_util.option('--display-name', required=True, help=u"""A user-friendly name. Does not have to be unique, and it's changeable.""")
 @cli_util.option('--compartment-id', required=True, help=u"""The compartment OCID to create the hosted application in.""")
-@cli_util.option('--storage-type', required=True, help=u"""type like Cache, Postgresql and ADB.""")
+@cli_util.option('--storage-type', required=True, help=u"""The managed storage type for the application.""")
 @cli_util.option('--description', help=u"""An optional description of the hosted application.""")
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
@@ -1451,10 +1584,10 @@ def create_hosted_application_storage(ctx, from_json, wait_for_state, max_wait_s
 
 
 @hosted_deployment_group.command(name=cli_util.override('generative_ai.create_hosted_deployment.command_name', 'create'), help=u"""Creates a hosted deployment. \n[Command Reference](createHostedDeployment)""")
-@cli_util.option('--hosted-application-id', required=True, help=u"""The [OCID] of the application.""")
 @cli_util.option('--active-artifact', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--display-name', help=u"""A user-friendly name. Does not have to be unique, and it's changeable.""")
 @cli_util.option('--compartment-id', help=u"""The compartment OCID to create the hosted deployment in.""")
+@cli_util.option('--hosted-application-id', help=u"""The [OCID] of the HostedApplication parent.""")
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
@@ -1469,13 +1602,12 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'active-artifact': {'module': 'generative_ai', 'class': 'Artifact'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'HostedDeployment'})
 @cli_util.wrap_exceptions
-def create_hosted_deployment(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, hosted_application_id, active_artifact, display_name, compartment_id, freeform_tags, defined_tags):
+def create_hosted_deployment(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, active_artifact, display_name, compartment_id, hosted_application_id, freeform_tags, defined_tags):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
     _details = {}
-    _details['hostedApplicationId'] = hosted_application_id
     _details['activeArtifact'] = cli_util.parse_json_parameter("active_artifact", active_artifact)
 
     if display_name is not None:
@@ -1483,6 +1615,9 @@ def create_hosted_deployment(ctx, from_json, wait_for_state, max_wait_seconds, w
 
     if compartment_id is not None:
         _details['compartmentId'] = compartment_id
+
+    if hosted_application_id is not None:
+        _details['hostedApplicationId'] = hosted_application_id
 
     if freeform_tags is not None:
         _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
@@ -1526,9 +1661,9 @@ def create_hosted_deployment(ctx, from_json, wait_for_state, max_wait_seconds, w
 
 
 @hosted_deployment_group.command(name=cli_util.override('generative_ai.create_hosted_deployment_single_docker_artifact.command_name', 'create-hosted-deployment-single-docker-artifact'), help=u"""Creates a hosted deployment. \n[Command Reference](createHostedDeployment)""")
-@cli_util.option('--hosted-application-id', required=True, help=u"""The [OCID] of the application.""")
 @cli_util.option('--display-name', help=u"""A user-friendly name. Does not have to be unique, and it's changeable.""")
 @cli_util.option('--compartment-id', help=u"""The compartment OCID to create the hosted deployment in.""")
+@cli_util.option('--hosted-application-id', help=u"""The [OCID] of the HostedApplication parent.""")
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
@@ -1538,7 +1673,8 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.option('--active-artifact-id', help=u"""if put artifact to a table, the id is needed""")
 @cli_util.option('--active-artifact-time-created', type=custom_types.CLI_DATETIME, help=u"""The date and time the artifact was created.""" + custom_types.CLI_DATETIME.VALID_DATETIME_CLI_HELP_MESSAGE)
 @cli_util.option('--active-artifact-hosted-deployment-id', help=u"""The [OCID] of the application.""")
-@cli_util.option('--active-artifact-status', type=custom_types.CliCaseInsensitiveChoice(["ACTIVE", "INACTIVE", "UPDATING"]), help=u"""The current status of the artifact.""")
+@cli_util.option('--active-artifact-is-vulnerability-scan-required', type=click.BOOL, help=u"""Optional flag that requires an OCI Vulnerability Scanning Service compliance report for this artifact before it can become active. When not provided, the value defaults to false and the artifact is not blocked on a scan result.""")
+@cli_util.option('--active-artifact-status', type=custom_types.CliCaseInsensitiveChoice(["ACTIVE", "INACTIVE", "UPDATING", "FAILED"]), help=u"""The current status of the artifact.""")
 @cli_util.option('--active-artifact-container-uri', help=u"""image url.""")
 @cli_util.option('--active-artifact-tag', help=u"""image tag.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
@@ -1549,20 +1685,22 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'HostedDeployment'})
 @cli_util.wrap_exceptions
-def create_hosted_deployment_single_docker_artifact(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, hosted_application_id, display_name, compartment_id, freeform_tags, defined_tags, active_artifact_id, active_artifact_time_created, active_artifact_hosted_deployment_id, active_artifact_status, active_artifact_container_uri, active_artifact_tag):
+def create_hosted_deployment_single_docker_artifact(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, display_name, compartment_id, hosted_application_id, freeform_tags, defined_tags, active_artifact_id, active_artifact_time_created, active_artifact_hosted_deployment_id, active_artifact_is_vulnerability_scan_required, active_artifact_status, active_artifact_container_uri, active_artifact_tag):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
 
     _details = {}
     _details['activeArtifact'] = {}
-    _details['hostedApplicationId'] = hosted_application_id
 
     if display_name is not None:
         _details['displayName'] = display_name
 
     if compartment_id is not None:
         _details['compartmentId'] = compartment_id
+
+    if hosted_application_id is not None:
+        _details['hostedApplicationId'] = hosted_application_id
 
     if freeform_tags is not None:
         _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
@@ -1578,6 +1716,9 @@ def create_hosted_deployment_single_docker_artifact(ctx, from_json, wait_for_sta
 
     if active_artifact_hosted_deployment_id is not None:
         _details['activeArtifact']['hostedDeploymentId'] = active_artifact_hosted_deployment_id
+
+    if active_artifact_is_vulnerability_scan_required is not None:
+        _details['activeArtifact']['isVulnerabilityScanRequired'] = active_artifact_is_vulnerability_scan_required
 
     if active_artifact_status is not None:
         _details['activeArtifact']['status'] = active_artifact_status
@@ -1634,7 +1775,7 @@ The header contains an opc-work-request-id, which is the id for the WorkRequest 
 @cli_util.option('--description', help=u"""An optional description of the imported model.""")
 @cli_util.option('--vendor', help=u"""The provider of the imported model.""")
 @cli_util.option('--version-parameterconflict', help=u"""The version of the imported model.""")
-@cli_util.option('--capabilities', type=custom_types.CliCaseInsensitiveChoice(["TEXT_TO_TEXT", "IMAGE_TEXT_TO_TEXT", "EMBEDDING", "RERANK", "TEXT_TO_IMAGE"]), help=u"""Specifies the intended use or supported capabilities of the imported model.""")
+@cli_util.option('--capabilities', type=custom_types.CliCaseInsensitiveChoice(["TEXT_TO_TEXT", "IMAGE_TEXT_TO_TEXT", "EMBEDDING", "RERANK", "TEXT_TO_IMAGE", "IMAGE_TEXT_TO_IMAGE", "IMAGE_TEXT_TO_VIDEO", "IMAGE_TO_IMAGE", "REALTIME", "AUDIO_TO_AUDIO", "AUDIO_TO_TEXT", "TEXT_TO_AUDIO", "TEXT_TO_VIDEO"]), help=u"""Specifies the intended use or supported capabilities of the imported model.""")
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
@@ -1725,7 +1866,7 @@ The header contains an opc-work-request-id, which is the id for the WorkRequest 
 @cli_util.option('--description', help=u"""An optional description of the imported model.""")
 @cli_util.option('--vendor', help=u"""The provider of the imported model.""")
 @cli_util.option('--version-parameterconflict', help=u"""The version of the imported model.""")
-@cli_util.option('--capabilities', type=custom_types.CliCaseInsensitiveChoice(["TEXT_TO_TEXT", "IMAGE_TEXT_TO_TEXT", "EMBEDDING", "RERANK", "TEXT_TO_IMAGE"]), help=u"""Specifies the intended use or supported capabilities of the imported model.""")
+@cli_util.option('--capabilities', type=custom_types.CliCaseInsensitiveChoice(["TEXT_TO_TEXT", "IMAGE_TEXT_TO_TEXT", "EMBEDDING", "RERANK", "TEXT_TO_IMAGE", "IMAGE_TEXT_TO_IMAGE", "IMAGE_TEXT_TO_VIDEO", "IMAGE_TO_IMAGE", "REALTIME", "AUDIO_TO_AUDIO", "AUDIO_TO_TEXT", "TEXT_TO_AUDIO", "TEXT_TO_VIDEO"]), help=u"""Specifies the intended use or supported capabilities of the imported model.""")
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
@@ -1823,7 +1964,7 @@ The header contains an opc-work-request-id, which is the id for the WorkRequest 
 @cli_util.option('--description', help=u"""An optional description of the imported model.""")
 @cli_util.option('--vendor', help=u"""The provider of the imported model.""")
 @cli_util.option('--version-parameterconflict', help=u"""The version of the imported model.""")
-@cli_util.option('--capabilities', type=custom_types.CliCaseInsensitiveChoice(["TEXT_TO_TEXT", "IMAGE_TEXT_TO_TEXT", "EMBEDDING", "RERANK", "TEXT_TO_IMAGE"]), help=u"""Specifies the intended use or supported capabilities of the imported model.""")
+@cli_util.option('--capabilities', type=custom_types.CliCaseInsensitiveChoice(["TEXT_TO_TEXT", "IMAGE_TEXT_TO_TEXT", "EMBEDDING", "RERANK", "TEXT_TO_IMAGE", "IMAGE_TEXT_TO_IMAGE", "IMAGE_TEXT_TO_VIDEO", "IMAGE_TO_IMAGE", "REALTIME", "AUDIO_TO_AUDIO", "AUDIO_TO_TEXT", "TEXT_TO_AUDIO", "TEXT_TO_VIDEO"]), help=u"""Specifies the intended use or supported capabilities of the imported model.""")
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
@@ -2011,6 +2152,8 @@ def create_model(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval
 @cli_util.option('--data-source', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--schemas', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--description', help=u"""An optional description of the SemanticStore.""")
+@cli_util.option('--is-user-defined-semantics-enabled', type=click.BOOL, help=u"""Whether to include user-defined semantic inputs, such as annotations, comments, and synonyms, during semantic-store enrichment. When true, enrichment uses both metadata and user-defined semantics. When false, enrichment uses metadata only. When omitted, this value defaults to true.""")
+@cli_util.option('--model-selection', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--refresh-schedule', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
@@ -2021,12 +2164,12 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
+@json_skeleton_utils.get_cli_json_input_option({'model-selection': {'module': 'generative_ai', 'class': 'SemanticStoreModelSelection'}, 'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'model-selection': {'module': 'generative_ai', 'class': 'SemanticStoreModelSelection'}, 'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
 @cli_util.wrap_exceptions
-def create_semantic_store(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, display_name, data_source, schemas, description, refresh_schedule, freeform_tags, defined_tags):
+def create_semantic_store(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, display_name, data_source, schemas, description, is_user_defined_semantics_enabled, model_selection, refresh_schedule, freeform_tags, defined_tags):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
@@ -2039,6 +2182,12 @@ def create_semantic_store(ctx, from_json, wait_for_state, max_wait_seconds, wait
 
     if description is not None:
         _details['description'] = description
+
+    if is_user_defined_semantics_enabled is not None:
+        _details['isUserDefinedSemanticsEnabled'] = is_user_defined_semantics_enabled
+
+    if model_selection is not None:
+        _details['modelSelection'] = cli_util.parse_json_parameter("model_selection", model_selection)
 
     if refresh_schedule is not None:
         _details['refreshSchedule'] = cli_util.parse_json_parameter("refresh_schedule", refresh_schedule)
@@ -2091,6 +2240,8 @@ def create_semantic_store(ctx, from_json, wait_for_state, max_wait_seconds, wait
 @cli_util.option('--data-source-querying-connection-id', required=True, help=u"""The [OCID] of the OCI Database Tools Connection for querying.""")
 @cli_util.option('--data-source-enrichment-connection-id', required=True, help=u"""The [OCID] of the OCI Database Tools Connection for enrichment.""")
 @cli_util.option('--description', help=u"""An optional description of the SemanticStore.""")
+@cli_util.option('--is-user-defined-semantics-enabled', type=click.BOOL, help=u"""Whether to include user-defined semantic inputs, such as annotations, comments, and synonyms, during semantic-store enrichment. When true, enrichment uses both metadata and user-defined semantics. When false, enrichment uses metadata only. When omitted, this value defaults to true.""")
+@cli_util.option('--model-selection', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--refresh-schedule', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
@@ -2101,12 +2252,12 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
+@json_skeleton_utils.get_cli_json_input_option({'model-selection': {'module': 'generative_ai', 'class': 'SemanticStoreModelSelection'}, 'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'model-selection': {'module': 'generative_ai', 'class': 'SemanticStoreModelSelection'}, 'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
 @cli_util.wrap_exceptions
-def create_semantic_store_create_data_source_database_tools_connection_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, display_name, schemas, data_source_querying_connection_id, data_source_enrichment_connection_id, description, refresh_schedule, freeform_tags, defined_tags):
+def create_semantic_store_create_data_source_database_tools_connection_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, display_name, schemas, data_source_querying_connection_id, data_source_enrichment_connection_id, description, is_user_defined_semantics_enabled, model_selection, refresh_schedule, freeform_tags, defined_tags):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
@@ -2121,6 +2272,12 @@ def create_semantic_store_create_data_source_database_tools_connection_details(c
 
     if description is not None:
         _details['description'] = description
+
+    if is_user_defined_semantics_enabled is not None:
+        _details['isUserDefinedSemanticsEnabled'] = is_user_defined_semantics_enabled
+
+    if model_selection is not None:
+        _details['modelSelection'] = cli_util.parse_json_parameter("model_selection", model_selection)
 
     if refresh_schedule is not None:
         _details['refreshSchedule'] = cli_util.parse_json_parameter("refresh_schedule", refresh_schedule)
@@ -2174,6 +2331,8 @@ def create_semantic_store_create_data_source_database_tools_connection_details(c
 @cli_util.option('--data-source', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--schemas-schemas', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""Array of database schemas to be included in the connection. Each schema must define a name. A simple schema definition includes only the name, for example: {   \"schemas\": [     { \"name\": \"HR\" }   ] } Only one schema name is allowed now. Additional configuration options may be supported in extended forms later.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--description', help=u"""An optional description of the SemanticStore.""")
+@cli_util.option('--is-user-defined-semantics-enabled', type=click.BOOL, help=u"""Whether to include user-defined semantic inputs, such as annotations, comments, and synonyms, during semantic-store enrichment. When true, enrichment uses both metadata and user-defined semantics. When false, enrichment uses metadata only. When omitted, this value defaults to true.""")
+@cli_util.option('--model-selection', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--refresh-schedule', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
@@ -2184,12 +2343,12 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}, 'schemas-schemas': {'module': 'generative_ai', 'class': 'list[SchemaItem]'}})
+@json_skeleton_utils.get_cli_json_input_option({'model-selection': {'module': 'generative_ai', 'class': 'SemanticStoreModelSelection'}, 'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}, 'schemas-schemas': {'module': 'generative_ai', 'class': 'list[SchemaItem]'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}, 'schemas-schemas': {'module': 'generative_ai', 'class': 'list[SchemaItem]'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'model-selection': {'module': 'generative_ai', 'class': 'SemanticStoreModelSelection'}, 'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}, 'schemas-schemas': {'module': 'generative_ai', 'class': 'list[SchemaItem]'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
 @cli_util.wrap_exceptions
-def create_semantic_store_create_schemas_database_tools_connection_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, display_name, data_source, schemas_schemas, description, refresh_schedule, freeform_tags, defined_tags):
+def create_semantic_store_create_schemas_database_tools_connection_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, display_name, data_source, schemas_schemas, description, is_user_defined_semantics_enabled, model_selection, refresh_schedule, freeform_tags, defined_tags):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
@@ -2203,6 +2362,12 @@ def create_semantic_store_create_schemas_database_tools_connection_details(ctx, 
 
     if description is not None:
         _details['description'] = description
+
+    if is_user_defined_semantics_enabled is not None:
+        _details['isUserDefinedSemanticsEnabled'] = is_user_defined_semantics_enabled
+
+    if model_selection is not None:
+        _details['modelSelection'] = cli_util.parse_json_parameter("model_selection", model_selection)
 
     if refresh_schedule is not None:
         _details['refreshSchedule'] = cli_util.parse_json_parameter("refresh_schedule", refresh_schedule)
@@ -2250,12 +2415,14 @@ def create_semantic_store_create_schemas_database_tools_connection_details(ctx, 
     cli_util.render_response(result, ctx)
 
 
-@semantic_store_group.command(name=cli_util.override('generative_ai.create_semantic_store_refresh_schedule_on_create_details.command_name', 'create-semantic-store-refresh-schedule-on-create-details'), help=u"""Creates a SemanticStore. \n[Command Reference](createSemanticStore)""")
+@semantic_store_group.command(name=cli_util.override('generative_ai.create_semantic_store_default_semantic_store_model_selection.command_name', 'create-semantic-store-default-semantic-store-model-selection'), help=u"""Creates a SemanticStore. \n[Command Reference](createSemanticStore)""")
 @cli_util.option('--compartment-id', required=True, help=u"""Owning compartment [OCID] for a SemanticStore.""")
 @cli_util.option('--display-name', required=True, help=u"""A user-friendly name.""")
 @cli_util.option('--data-source', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--schemas', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--description', help=u"""An optional description of the SemanticStore.""")
+@cli_util.option('--is-user-defined-semantics-enabled', type=click.BOOL, help=u"""Whether to include user-defined semantic inputs, such as annotations, comments, and synonyms, during semantic-store enrichment. When true, enrichment uses both metadata and user-defined semantics. When false, enrichment uses metadata only. When omitted, this value defaults to true.""")
+@cli_util.option('--refresh-schedule', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
@@ -2265,12 +2432,186 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
+@json_skeleton_utils.get_cli_json_input_option({'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
 @cli_util.wrap_exceptions
-def create_semantic_store_refresh_schedule_on_create_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, display_name, data_source, schemas, description, freeform_tags, defined_tags):
+def create_semantic_store_default_semantic_store_model_selection(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, display_name, data_source, schemas, description, is_user_defined_semantics_enabled, refresh_schedule, freeform_tags, defined_tags):
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['modelSelection'] = {}
+    _details['compartmentId'] = compartment_id
+    _details['displayName'] = display_name
+    _details['dataSource'] = cli_util.parse_json_parameter("data_source", data_source)
+    _details['schemas'] = cli_util.parse_json_parameter("schemas", schemas)
+
+    if description is not None:
+        _details['description'] = description
+
+    if is_user_defined_semantics_enabled is not None:
+        _details['isUserDefinedSemanticsEnabled'] = is_user_defined_semantics_enabled
+
+    if refresh_schedule is not None:
+        _details['refreshSchedule'] = cli_util.parse_json_parameter("refresh_schedule", refresh_schedule)
+
+    if freeform_tags is not None:
+        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
+
+    if defined_tags is not None:
+        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    _details['modelSelection']['modelSelectionType'] = 'DEFAULT'
+
+    client = cli_util.build_client('generative_ai', 'generative_ai', ctx)
+    result = client.create_semantic_store(
+        create_semantic_store_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@semantic_store_group.command(name=cli_util.override('generative_ai.create_semantic_store_custom_semantic_store_model_selection.command_name', 'create-semantic-store-custom-semantic-store-model-selection'), help=u"""Creates a SemanticStore. \n[Command Reference](createSemanticStore)""")
+@cli_util.option('--compartment-id', required=True, help=u"""Owning compartment [OCID] for a SemanticStore.""")
+@cli_util.option('--display-name', required=True, help=u"""A user-friendly name.""")
+@cli_util.option('--data-source', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--schemas', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--model-selection-model-id', required=True, help=u"""The generative AI modelId to use for SemanticStore enrichment. You can use the ListModels API to list the available models. https://docs.oracle.com/en-us/iaas/api/#/en/generative-ai/20231130/ModelCollection/ListModels""")
+@cli_util.option('--description', help=u"""An optional description of the SemanticStore.""")
+@cli_util.option('--is-user-defined-semantics-enabled', type=click.BOOL, help=u"""Whether to include user-defined semantic inputs, such as annotations, comments, and synonyms, during semantic-store enrichment. When true, enrichment uses both metadata and user-defined semantics. When false, enrichment uses metadata only. When omitted, this value defaults to true.""")
+@cli_util.option('--refresh-schedule', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
+
+Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].
+
+Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
+@cli_util.wrap_exceptions
+def create_semantic_store_custom_semantic_store_model_selection(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, display_name, data_source, schemas, model_selection_model_id, description, is_user_defined_semantics_enabled, refresh_schedule, freeform_tags, defined_tags):
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['modelSelection'] = {}
+    _details['compartmentId'] = compartment_id
+    _details['displayName'] = display_name
+    _details['dataSource'] = cli_util.parse_json_parameter("data_source", data_source)
+    _details['schemas'] = cli_util.parse_json_parameter("schemas", schemas)
+    _details['modelSelection']['modelId'] = model_selection_model_id
+
+    if description is not None:
+        _details['description'] = description
+
+    if is_user_defined_semantics_enabled is not None:
+        _details['isUserDefinedSemanticsEnabled'] = is_user_defined_semantics_enabled
+
+    if refresh_schedule is not None:
+        _details['refreshSchedule'] = cli_util.parse_json_parameter("refresh_schedule", refresh_schedule)
+
+    if freeform_tags is not None:
+        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
+
+    if defined_tags is not None:
+        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    _details['modelSelection']['modelSelectionType'] = 'CUSTOM'
+
+    client = cli_util.build_client('generative_ai', 'generative_ai', ctx)
+    result = client.create_semantic_store(
+        create_semantic_store_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@semantic_store_group.command(name=cli_util.override('generative_ai.create_semantic_store_refresh_schedule_on_create_details.command_name', 'create-semantic-store-refresh-schedule-on-create-details'), help=u"""Creates a SemanticStore. \n[Command Reference](createSemanticStore)""")
+@cli_util.option('--compartment-id', required=True, help=u"""Owning compartment [OCID] for a SemanticStore.""")
+@cli_util.option('--display-name', required=True, help=u"""A user-friendly name.""")
+@cli_util.option('--data-source', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--schemas', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--description', help=u"""An optional description of the SemanticStore.""")
+@cli_util.option('--is-user-defined-semantics-enabled', type=click.BOOL, help=u"""Whether to include user-defined semantic inputs, such as annotations, comments, and synonyms, during semantic-store enrichment. When true, enrichment uses both metadata and user-defined semantics. When false, enrichment uses metadata only. When omitted, this value defaults to true.""")
+@cli_util.option('--model-selection', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
+
+Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].
+
+Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'model-selection': {'module': 'generative_ai', 'class': 'SemanticStoreModelSelection'}, 'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'model-selection': {'module': 'generative_ai', 'class': 'SemanticStoreModelSelection'}, 'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
+@cli_util.wrap_exceptions
+def create_semantic_store_refresh_schedule_on_create_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, display_name, data_source, schemas, description, is_user_defined_semantics_enabled, model_selection, freeform_tags, defined_tags):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
@@ -2284,6 +2625,12 @@ def create_semantic_store_refresh_schedule_on_create_details(ctx, from_json, wai
 
     if description is not None:
         _details['description'] = description
+
+    if is_user_defined_semantics_enabled is not None:
+        _details['isUserDefinedSemanticsEnabled'] = is_user_defined_semantics_enabled
+
+    if model_selection is not None:
+        _details['modelSelection'] = cli_util.parse_json_parameter("model_selection", model_selection)
 
     if freeform_tags is not None:
         _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
@@ -2334,6 +2681,8 @@ def create_semantic_store_refresh_schedule_on_create_details(ctx, from_json, wai
 @cli_util.option('--data-source', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--schemas', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--description', help=u"""An optional description of the SemanticStore.""")
+@cli_util.option('--is-user-defined-semantics-enabled', type=click.BOOL, help=u"""Whether to include user-defined semantic inputs, such as annotations, comments, and synonyms, during semantic-store enrichment. When true, enrichment uses both metadata and user-defined semantics. When false, enrichment uses metadata only. When omitted, this value defaults to true.""")
+@cli_util.option('--model-selection', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
@@ -2343,12 +2692,12 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
+@json_skeleton_utils.get_cli_json_input_option({'model-selection': {'module': 'generative_ai', 'class': 'SemanticStoreModelSelection'}, 'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'model-selection': {'module': 'generative_ai', 'class': 'SemanticStoreModelSelection'}, 'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
 @cli_util.wrap_exceptions
-def create_semantic_store_refresh_schedule_none_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, display_name, data_source, schemas, description, freeform_tags, defined_tags):
+def create_semantic_store_refresh_schedule_none_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, display_name, data_source, schemas, description, is_user_defined_semantics_enabled, model_selection, freeform_tags, defined_tags):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
@@ -2362,6 +2711,12 @@ def create_semantic_store_refresh_schedule_none_details(ctx, from_json, wait_for
 
     if description is not None:
         _details['description'] = description
+
+    if is_user_defined_semantics_enabled is not None:
+        _details['isUserDefinedSemanticsEnabled'] = is_user_defined_semantics_enabled
+
+    if model_selection is not None:
+        _details['modelSelection'] = cli_util.parse_json_parameter("model_selection", model_selection)
 
     if freeform_tags is not None:
         _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
@@ -2413,6 +2768,8 @@ def create_semantic_store_refresh_schedule_none_details(ctx, from_json, wait_for
 @cli_util.option('--schemas', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--refresh-schedule-value', required=True, help=u"""Specifies the refresh interval value. The interval must be provided using the ISO 8601 extended format, either as PnW or PnYnMnDTnHnMnS, where 'P' is always required, 'T' precedes any time components less than one day, and each included component is properly suffixed. For example, \"P1DT6H\" represents a duration of 1 day and 6 hours.""")
 @cli_util.option('--description', help=u"""An optional description of the SemanticStore.""")
+@cli_util.option('--is-user-defined-semantics-enabled', type=click.BOOL, help=u"""Whether to include user-defined semantic inputs, such as annotations, comments, and synonyms, during semantic-store enrichment. When true, enrichment uses both metadata and user-defined semantics. When false, enrichment uses metadata only. When omitted, this value defaults to true.""")
+@cli_util.option('--model-selection', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
@@ -2422,12 +2779,12 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
+@json_skeleton_utils.get_cli_json_input_option({'model-selection': {'module': 'generative_ai', 'class': 'SemanticStoreModelSelection'}, 'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'model-selection': {'module': 'generative_ai', 'class': 'SemanticStoreModelSelection'}, 'data-source': {'module': 'generative_ai', 'class': 'CreateDataSourceDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
 @cli_util.wrap_exceptions
-def create_semantic_store_refresh_schedule_interval_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, display_name, data_source, schemas, refresh_schedule_value, description, freeform_tags, defined_tags):
+def create_semantic_store_refresh_schedule_interval_details(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, display_name, data_source, schemas, refresh_schedule_value, description, is_user_defined_semantics_enabled, model_selection, freeform_tags, defined_tags):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
@@ -2442,6 +2799,12 @@ def create_semantic_store_refresh_schedule_interval_details(ctx, from_json, wait
 
     if description is not None:
         _details['description'] = description
+
+    if is_user_defined_semantics_enabled is not None:
+        _details['isUserDefinedSemanticsEnabled'] = is_user_defined_semantics_enabled
+
+    if model_selection is not None:
+        _details['modelSelection'] = cli_util.parse_json_parameter("model_selection", model_selection)
 
     if freeform_tags is not None:
         _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
@@ -3264,6 +3627,62 @@ def delete_hosted_application(ctx, from_json, wait_for_state, max_wait_seconds, 
     cli_util.render_response(result, ctx)
 
 
+@hosted_application_iam_group.command(name=cli_util.override('generative_ai.delete_hosted_application_iam.command_name', 'delete'), help=u"""Deletes a hosted application. You can only delete hosted application without attached resources. Before you delete a hosting hosted application, you must delete the endpoints associated to that application. Before you delete a fine-tuning hosted application, you must delete the custom model on that application. The delete action permanently deletes the cluster. This action can't be undone. \n[Command Reference](deleteHostedApplicationIam)""")
+@cli_util.option('--hosted-application-iam-id', required=True, help=u"""The [OCID] of the hosted application.""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.confirm_delete_option
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={})
+@cli_util.wrap_exceptions
+def delete_hosted_application_iam(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, hosted_application_iam_id, if_match):
+
+    if isinstance(hosted_application_iam_id, six.string_types) and len(hosted_application_iam_id.strip()) == 0:
+        raise click.UsageError('Parameter --hosted-application-iam-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('generative_ai', 'generative_ai', ctx)
+    result = client.delete_hosted_application_iam(
+        hosted_application_iam_id=hosted_application_iam_id,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Please retrieve the work request to find its current state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
 @hosted_application_storage_group.command(name=cli_util.override('generative_ai.delete_hosted_application_storage.command_name', 'delete'), help=u"""Deletes a hosted application. You can only delete hosted application without attached resources. Before you delete a hosting hosted application, you must delete the endpoints associated to that application. Before you delete a fine-tuning hosted application, you must delete the custom model on that application. The delete action permanently deletes the cluster. This action can't be undone. \n[Command Reference](deleteHostedApplicationStorage)""")
 @cli_util.option('--hosted-application-storage-id', required=True, help=u"""The [OCID] of the hosted application storage.""")
 @cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
@@ -3788,6 +4207,28 @@ def get_hosted_application(ctx, from_json, hosted_application_id):
     client = cli_util.build_client('generative_ai', 'generative_ai', ctx)
     result = client.get_hosted_application(
         hosted_application_id=hosted_application_id,
+        **kwargs
+    )
+    cli_util.render_response(result, ctx)
+
+
+@hosted_application_iam_group.command(name=cli_util.override('generative_ai.get_hosted_application_iam.command_name', 'get'), help=u"""Gets information about a hosted application. \n[Command Reference](getHostedApplicationIam)""")
+@cli_util.option('--hosted-application-iam-id', required=True, help=u"""The [OCID] of the hosted application.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'generative_ai', 'class': 'HostedApplicationIam'})
+@cli_util.wrap_exceptions
+def get_hosted_application_iam(ctx, from_json, hosted_application_iam_id):
+
+    if isinstance(hosted_application_iam_id, six.string_types) and len(hosted_application_iam_id.strip()) == 0:
+        raise click.UsageError('Parameter --hosted-application-iam-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('generative_ai', 'generative_ai', ctx)
+    result = client.get_hosted_application_iam(
+        hosted_application_iam_id=hosted_application_iam_id,
         **kwargs
     )
     cli_util.render_response(result, ctx)
@@ -4441,10 +4882,73 @@ def list_hosted_applications(ctx, from_json, all_pages, page_size, compartment_i
     cli_util.render_response(result, ctx)
 
 
-@hosted_deployment_collection_group.command(name=cli_util.override('generative_ai.list_hosted_deployments.command_name', 'list-hosted-deployments'), help=u"""Lists the hosted applications in a specific compartment. \n[Command Reference](listHostedDeployments)""")
+@hosted_application_collection_group.command(name=cli_util.override('generative_ai.list_hosted_applications_iam.command_name', 'list-hosted-applications-iam'), help=u"""Lists the hosted applications in a specific compartment. \n[Command Reference](listHostedApplicationsIam)""")
 @cli_util.option('--compartment-id', required=True, help=u"""The [OCID] of the compartment in which to list resources.""")
-@cli_util.option('--application-id', help=u"""The [OCID] of the hosted application.""")
-@cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "ACTIVE", "INACTIVE", "UPDATING", "DELETING", "DELETED", "FAILED"]), help=u"""A filter to return only the hosted deployments that their lifecycle state matches the given lifecycle state.""")
+@cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "ACTIVE", "UPDATING", "DELETING", "DELETED", "FAILED"]), help=u"""A filter to return only the hosted applications that their lifecycle state matches the given lifecycle state.""")
+@cli_util.option('--display-name', help=u"""A filter to return only resources that match the given display name exactly.""")
+@cli_util.option('--id', help=u"""The [OCID] of the hosted application.""")
+@cli_util.option('--limit', type=click.INT, help=u"""For list pagination. The maximum number of results per page, or items to return in a paginated \"List\" call. For important details about how pagination works, see [List Pagination].""")
+@cli_util.option('--page', help=u"""For list pagination. The value of the opc-next-page response header from the previous \"List\" call. For important details about how pagination works, see [List Pagination].""")
+@cli_util.option('--sort-order', type=custom_types.CliCaseInsensitiveChoice(["ASC", "DESC"]), help=u"""The sort order to use, either 'ASC' or 'DESC'.""")
+@cli_util.option('--sort-by', type=custom_types.CliCaseInsensitiveChoice(["timeCreated", "displayName", "lifecycleState"]), help=u"""The field to sort by. You can provide only one sort order. Default order for `timeCreated` is descending. Default order for `displayName` is ascending.""")
+@cli_util.option('--all', 'all_pages', is_flag=True, help="""Fetches all pages of results. If you provide this option, then you cannot provide the --limit option.""")
+@cli_util.option('--page-size', type=click.INT, help="""When fetching results, the number of results to fetch per call. Only valid when used with --all or --limit, and ignored otherwise.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'generative_ai', 'class': 'HostedApplicationCollection'})
+@cli_util.wrap_exceptions
+def list_hosted_applications_iam(ctx, from_json, all_pages, page_size, compartment_id, lifecycle_state, display_name, id, limit, page, sort_order, sort_by):
+
+    if all_pages and limit:
+        raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
+
+    kwargs = {}
+    if lifecycle_state is not None:
+        kwargs['lifecycle_state'] = lifecycle_state
+    if display_name is not None:
+        kwargs['display_name'] = display_name
+    if id is not None:
+        kwargs['id'] = id
+    if limit is not None:
+        kwargs['limit'] = limit
+    if page is not None:
+        kwargs['page'] = page
+    if sort_order is not None:
+        kwargs['sort_order'] = sort_order
+    if sort_by is not None:
+        kwargs['sort_by'] = sort_by
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('generative_ai', 'generative_ai', ctx)
+    if all_pages:
+        if page_size:
+            kwargs['limit'] = page_size
+
+        result = cli_util.list_call_get_all_results(
+            client.list_hosted_applications_iam,
+            compartment_id=compartment_id,
+            **kwargs
+        )
+    elif limit is not None:
+        result = cli_util.list_call_get_up_to_limit(
+            client.list_hosted_applications_iam,
+            limit,
+            page_size,
+            compartment_id=compartment_id,
+            **kwargs
+        )
+    else:
+        result = client.list_hosted_applications_iam(
+            compartment_id=compartment_id,
+            **kwargs
+        )
+    cli_util.render_response(result, ctx)
+
+
+@hosted_deployment_collection_group.command(name=cli_util.override('generative_ai.list_hosted_deployments.command_name', 'list-hosted-deployments'), help=u"""Lists the hosted applications in a specific compartment. Provide either applicationId or applicationIamId to filter by parent. \n[Command Reference](listHostedDeployments)""")
+@cli_util.option('--compartment-id', required=True, help=u"""The [OCID] of the compartment in which to list resources.""")
+@cli_util.option('--application-id', help=u"""The [OCID] of the HostedApplication parent.""")
+@cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "NEEDS_ATTENTION", "ACTIVE", "INACTIVE", "UPDATING", "DELETING", "DELETED", "FAILED"]), help=u"""A filter to return only the hosted deployments that their lifecycle state matches the given lifecycle state.""")
 @cli_util.option('--display-name', help=u"""A filter to return only resources that match the given display name exactly.""")
 @cli_util.option('--id', help=u"""The [OCID] of the hosted deployment.""")
 @cli_util.option('--limit', type=click.INT, help=u"""For list pagination. The maximum number of results per page, or items to return in a paginated \"List\" call. For important details about how pagination works, see [List Pagination].""")
@@ -4510,7 +5014,7 @@ def list_hosted_deployments(ctx, from_json, all_pages, page_size, compartment_id
 @imported_model_collection_group.command(name=cli_util.override('generative_ai.list_imported_models.command_name', 'list-imported-models'), help=u"""Lists imported models in a specific compartment. \n[Command Reference](listImportedModels)""")
 @cli_util.option('--compartment-id', required=True, help=u"""The [OCID] of the compartment in which to list resources.""")
 @cli_util.option('--vendor', help=u"""A filter to return only resources that match the entire vendor given.""")
-@cli_util.option('--capability', type=custom_types.CliCaseInsensitiveChoice(["TEXT_TO_TEXT", "IMAGE_TEXT_TO_TEXT", "EMBEDDING", "RERANK", "TEXT_TO_IMAGE"]), multiple=True, help=u"""A filter to return only resources their capability matches the given capability.""")
+@cli_util.option('--capability', type=custom_types.CliCaseInsensitiveChoice(["TEXT_TO_TEXT", "IMAGE_TEXT_TO_TEXT", "EMBEDDING", "RERANK", "TEXT_TO_IMAGE", "IMAGE_TEXT_TO_IMAGE", "IMAGE_TEXT_TO_VIDEO", "IMAGE_TO_IMAGE", "REALTIME", "AUDIO_TO_AUDIO", "AUDIO_TO_TEXT", "TEXT_TO_AUDIO", "TEXT_TO_VIDEO"]), multiple=True, help=u"""A filter to return only resources their capability matches the given capability.""")
 @cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["ACTIVE", "CREATING", "UPDATING", "DELETING", "DELETED", "FAILED"]), help=u"""A filter to return only resources their lifecycleState matches the given lifecycleState.""")
 @cli_util.option('--display-name', help=u"""A filter to return only resources that match the given display name exactly.""")
 @cli_util.option('--id', help=u"""The ID of the importedModel.""")
@@ -4579,7 +5083,7 @@ def list_imported_models(ctx, from_json, all_pages, page_size, compartment_id, v
 @model_collection_group.command(name=cli_util.override('generative_ai.list_models.command_name', 'list-models'), help=u"""Lists the models in a specific compartment. Includes pretrained base models and fine-tuned custom models. \n[Command Reference](listModels)""")
 @cli_util.option('--compartment-id', required=True, help=u"""The [OCID] of the compartment in which to list resources.""")
 @cli_util.option('--vendor', help=u"""A filter to return only resources that match the entire vendor given.""")
-@cli_util.option('--capability', type=custom_types.CliCaseInsensitiveChoice(["TEXT_GENERATION", "TEXT_SUMMARIZATION", "TEXT_EMBEDDINGS", "FINE_TUNE", "CHAT", "TEXT_RERANK", "TEXT_TO_IMAGE"]), multiple=True, help=u"""A filter to return only resources their capability matches the given capability.""")
+@cli_util.option('--capability', type=custom_types.CliCaseInsensitiveChoice(["TEXT_GENERATION", "TEXT_SUMMARIZATION", "TEXT_EMBEDDINGS", "FINE_TUNE", "CHAT", "TEXT_RERANK", "TEXT_TO_IMAGE", "IMAGE_TEXT_TO_IMAGE", "IMAGE_TEXT_TO_TEXT", "IMAGE_TEXT_TO_VIDEO", "IMAGE_TO_IMAGE", "REALTIME", "AUDIO_TO_AUDIO", "AUDIO_TO_TEXT", "TEXT_TO_AUDIO", "TEXT_TO_VIDEO"]), multiple=True, help=u"""A filter to return only resources their capability matches the given capability.""")
 @cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["ACTIVE", "CREATING", "DELETING", "DELETED", "FAILED"]), help=u"""A filter to return only resources their lifecycleState matches the given lifecycleState.""")
 @cli_util.option('--display-name', help=u"""A filter to return only resources that match the given display name exactly.""")
 @cli_util.option('--id', help=u"""The ID of the model.""")
@@ -5745,10 +6249,10 @@ def update_generative_ai_project(ctx, from_json, force, wait_for_state, max_wait
 
 @hosted_application_group.command(name=cli_util.override('generative_ai.update_hosted_application.command_name', 'update'), help=u"""Updates a hosted application. \n[Command Reference](updateHostedApplication)""")
 @cli_util.option('--hosted-application-id', required=True, help=u"""The [OCID] of the hosted application.""")
+@cli_util.option('--inbound-auth-config', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--display-name', help=u"""A user-friendly name. Does not have to be unique, and it's changeable.""")
 @cli_util.option('--description', help=u"""An optional description of the hosted application.""")
 @cli_util.option('--scaling-config', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--inbound-auth-config', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--environment-variables', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of environment variables for the Hosted Application. Defines a list of environment variables injected at runtime.
 
 This option is a JSON list with items of type EnvironmentVariable.  For documentation on EnvironmentVariable please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/generativeai/20231130/datatypes/EnvironmentVariable.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
@@ -5763,18 +6267,115 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'scaling-config': {'module': 'generative_ai', 'class': 'ScalingConfig'}, 'inbound-auth-config': {'module': 'generative_ai', 'class': 'InboundAuthConfig'}, 'environment-variables': {'module': 'generative_ai', 'class': 'list[EnvironmentVariable]'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
+@json_skeleton_utils.get_cli_json_input_option({'inbound-auth-config': {'module': 'generative_ai', 'class': 'InboundAuthConfig'}, 'scaling-config': {'module': 'generative_ai', 'class': 'ScalingConfig'}, 'environment-variables': {'module': 'generative_ai', 'class': 'list[EnvironmentVariable]'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'scaling-config': {'module': 'generative_ai', 'class': 'ScalingConfig'}, 'inbound-auth-config': {'module': 'generative_ai', 'class': 'InboundAuthConfig'}, 'environment-variables': {'module': 'generative_ai', 'class': 'list[EnvironmentVariable]'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'inbound-auth-config': {'module': 'generative_ai', 'class': 'InboundAuthConfig'}, 'scaling-config': {'module': 'generative_ai', 'class': 'ScalingConfig'}, 'environment-variables': {'module': 'generative_ai', 'class': 'list[EnvironmentVariable]'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.wrap_exceptions
-def update_hosted_application(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, hosted_application_id, display_name, description, scaling_config, inbound_auth_config, environment_variables, freeform_tags, defined_tags, if_match):
+def update_hosted_application(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, hosted_application_id, inbound_auth_config, display_name, description, scaling_config, environment_variables, freeform_tags, defined_tags, if_match):
 
     if isinstance(hosted_application_id, six.string_types) and len(hosted_application_id.strip()) == 0:
         raise click.UsageError('Parameter --hosted-application-id cannot be whitespace or empty string')
     if not force:
-        if scaling_config or inbound_auth_config or environment_variables or freeform_tags or defined_tags:
-            if not click.confirm("WARNING: Updates to scaling-config and inbound-auth-config and environment-variables and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
+        if inbound_auth_config or scaling_config or environment_variables or freeform_tags or defined_tags:
+            if not click.confirm("WARNING: Updates to inbound-auth-config and scaling-config and environment-variables and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
+                ctx.abort()
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+
+    if inbound_auth_config is not None:
+        _details['inboundAuthConfig'] = cli_util.parse_json_parameter("inbound_auth_config", inbound_auth_config)
+
+    if display_name is not None:
+        _details['displayName'] = display_name
+
+    if description is not None:
+        _details['description'] = description
+
+    if scaling_config is not None:
+        _details['scalingConfig'] = cli_util.parse_json_parameter("scaling_config", scaling_config)
+
+    if environment_variables is not None:
+        _details['environmentVariables'] = cli_util.parse_json_parameter("environment_variables", environment_variables)
+
+    if freeform_tags is not None:
+        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
+
+    if defined_tags is not None:
+        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    client = cli_util.build_client('generative_ai', 'generative_ai', ctx)
+    result = client.update_hosted_application(
+        hosted_application_id=hosted_application_id,
+        update_hosted_application_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_work_request') and callable(getattr(client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@hosted_application_iam_group.command(name=cli_util.override('generative_ai.update_hosted_application_iam.command_name', 'update'), help=u"""Updates a hosted application. \n[Command Reference](updateHostedApplicationIam)""")
+@cli_util.option('--hosted-application-iam-id', required=True, help=u"""The [OCID] of the hosted application.""")
+@cli_util.option('--display-name', help=u"""A user-friendly name. Does not have to be unique, and it's changeable.""")
+@cli_util.option('--description', help=u"""An optional description of the hosted application.""")
+@cli_util.option('--scaling-config', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--environment-variables', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The list of environment variables for the Hosted Application. Defines a list of environment variables injected at runtime.
+
+This option is a JSON list with items of type EnvironmentVariable.  For documentation on EnvironmentVariable please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/generativeai/20231130/datatypes/EnvironmentVariable.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
+
+Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].
+
+Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'scaling-config': {'module': 'generative_ai', 'class': 'ScalingConfig'}, 'environment-variables': {'module': 'generative_ai', 'class': 'list[EnvironmentVariable]'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'scaling-config': {'module': 'generative_ai', 'class': 'ScalingConfig'}, 'environment-variables': {'module': 'generative_ai', 'class': 'list[EnvironmentVariable]'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
+@cli_util.wrap_exceptions
+def update_hosted_application_iam(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, hosted_application_iam_id, display_name, description, scaling_config, environment_variables, freeform_tags, defined_tags, if_match):
+
+    if isinstance(hosted_application_iam_id, six.string_types) and len(hosted_application_iam_id.strip()) == 0:
+        raise click.UsageError('Parameter --hosted-application-iam-id cannot be whitespace or empty string')
+    if not force:
+        if scaling_config or environment_variables or freeform_tags or defined_tags:
+            if not click.confirm("WARNING: Updates to scaling-config and environment-variables and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
                 ctx.abort()
 
     kwargs = {}
@@ -5793,9 +6394,6 @@ def update_hosted_application(ctx, from_json, force, wait_for_state, max_wait_se
     if scaling_config is not None:
         _details['scalingConfig'] = cli_util.parse_json_parameter("scaling_config", scaling_config)
 
-    if inbound_auth_config is not None:
-        _details['inboundAuthConfig'] = cli_util.parse_json_parameter("inbound_auth_config", inbound_auth_config)
-
     if environment_variables is not None:
         _details['environmentVariables'] = cli_util.parse_json_parameter("environment_variables", environment_variables)
 
@@ -5806,9 +6404,9 @@ def update_hosted_application(ctx, from_json, force, wait_for_state, max_wait_se
         _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
 
     client = cli_util.build_client('generative_ai', 'generative_ai', ctx)
-    result = client.update_hosted_application(
-        hosted_application_id=hosted_application_id,
-        update_hosted_application_details=_details,
+    result = client.update_hosted_application_iam(
+        hosted_application_iam_id=hosted_application_iam_id,
+        update_hosted_application_iam_details=_details,
         **kwargs
     )
     if wait_for_state:
@@ -6103,6 +6701,8 @@ def update_model(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_i
 @cli_util.option('--semantic-store-id', required=True, help=u"""The [OCID] of the SemanticStore.""")
 @cli_util.option('--description', help=u"""An optional description of the SemanticStore.""")
 @cli_util.option('--display-name', help=u"""A user-friendly name.""")
+@cli_util.option('--model-selection', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--is-user-defined-semantics-enabled', type=click.BOOL, help=u"""Whether to include user-defined semantic inputs, such as annotations, comments, and synonyms, during semantic-store enrichment. When true, enrichment uses both metadata and user-defined semantics. When false, enrichment uses metadata only. If omitted, the existing setting is unchanged.""")
 @cli_util.option('--refresh-schedule', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--schemas', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
@@ -6116,18 +6716,18 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACTIVE", "CREATING", "UPDATING", "DELETING", "DELETED", "FAILED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACTIVE --wait-for-state FAILED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
+@json_skeleton_utils.get_cli_json_input_option({'model-selection': {'module': 'generative_ai', 'class': 'SemanticStoreModelSelection'}, 'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'model-selection': {'module': 'generative_ai', 'class': 'SemanticStoreModelSelection'}, 'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
 @cli_util.wrap_exceptions
-def update_semantic_store(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, semantic_store_id, description, display_name, refresh_schedule, schemas, freeform_tags, defined_tags, if_match):
+def update_semantic_store(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, semantic_store_id, description, display_name, model_selection, is_user_defined_semantics_enabled, refresh_schedule, schemas, freeform_tags, defined_tags, if_match):
 
     if isinstance(semantic_store_id, six.string_types) and len(semantic_store_id.strip()) == 0:
         raise click.UsageError('Parameter --semantic-store-id cannot be whitespace or empty string')
     if not force:
-        if refresh_schedule or schemas or freeform_tags or defined_tags:
-            if not click.confirm("WARNING: Updates to refresh-schedule and schemas and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
+        if model_selection or refresh_schedule or schemas or freeform_tags or defined_tags:
+            if not click.confirm("WARNING: Updates to model-selection and refresh-schedule and schemas and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
                 ctx.abort()
 
     kwargs = {}
@@ -6142,6 +6742,12 @@ def update_semantic_store(ctx, from_json, force, wait_for_state, max_wait_second
 
     if display_name is not None:
         _details['displayName'] = display_name
+
+    if model_selection is not None:
+        _details['modelSelection'] = cli_util.parse_json_parameter("model_selection", model_selection)
+
+    if is_user_defined_semantics_enabled is not None:
+        _details['isUserDefinedSemanticsEnabled'] = is_user_defined_semantics_enabled
 
     if refresh_schedule is not None:
         _details['refreshSchedule'] = cli_util.parse_json_parameter("refresh_schedule", refresh_schedule)
@@ -6187,10 +6793,12 @@ def update_semantic_store(ctx, from_json, force, wait_for_state, max_wait_second
     cli_util.render_response(result, ctx)
 
 
-@semantic_store_group.command(name=cli_util.override('generative_ai.update_semantic_store_refresh_schedule_on_create_details.command_name', 'update-semantic-store-refresh-schedule-on-create-details'), help=u"""Updates the properties of a SemanticStore. \n[Command Reference](updateSemanticStore)""")
+@semantic_store_group.command(name=cli_util.override('generative_ai.update_semantic_store_default_semantic_store_model_selection.command_name', 'update-semantic-store-default-semantic-store-model-selection'), help=u"""Updates the properties of a SemanticStore. \n[Command Reference](updateSemanticStore)""")
 @cli_util.option('--semantic-store-id', required=True, help=u"""The [OCID] of the SemanticStore.""")
 @cli_util.option('--description', help=u"""An optional description of the SemanticStore.""")
 @cli_util.option('--display-name', help=u"""A user-friendly name.""")
+@cli_util.option('--is-user-defined-semantics-enabled', type=click.BOOL, help=u"""Whether to include user-defined semantic inputs, such as annotations, comments, and synonyms, during semantic-store enrichment. When true, enrichment uses both metadata and user-defined semantics. When false, enrichment uses metadata only. If omitted, the existing setting is unchanged.""")
+@cli_util.option('--refresh-schedule', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--schemas', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
@@ -6203,18 +6811,210 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACTIVE", "CREATING", "UPDATING", "DELETING", "DELETED", "FAILED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACTIVE --wait-for-state FAILED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
+@json_skeleton_utils.get_cli_json_input_option({'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
 @cli_util.wrap_exceptions
-def update_semantic_store_refresh_schedule_on_create_details(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, semantic_store_id, description, display_name, schemas, freeform_tags, defined_tags, if_match):
+def update_semantic_store_default_semantic_store_model_selection(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, semantic_store_id, description, display_name, is_user_defined_semantics_enabled, refresh_schedule, schemas, freeform_tags, defined_tags, if_match):
 
     if isinstance(semantic_store_id, six.string_types) and len(semantic_store_id.strip()) == 0:
         raise click.UsageError('Parameter --semantic-store-id cannot be whitespace or empty string')
     if not force:
-        if schemas or freeform_tags or defined_tags:
-            if not click.confirm("WARNING: Updates to schemas and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
+        if refresh_schedule or schemas or freeform_tags or defined_tags:
+            if not click.confirm("WARNING: Updates to refresh-schedule and schemas and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
+                ctx.abort()
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['modelSelection'] = {}
+
+    if description is not None:
+        _details['description'] = description
+
+    if display_name is not None:
+        _details['displayName'] = display_name
+
+    if is_user_defined_semantics_enabled is not None:
+        _details['isUserDefinedSemanticsEnabled'] = is_user_defined_semantics_enabled
+
+    if refresh_schedule is not None:
+        _details['refreshSchedule'] = cli_util.parse_json_parameter("refresh_schedule", refresh_schedule)
+
+    if schemas is not None:
+        _details['schemas'] = cli_util.parse_json_parameter("schemas", schemas)
+
+    if freeform_tags is not None:
+        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
+
+    if defined_tags is not None:
+        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    _details['modelSelection']['modelSelectionType'] = 'DEFAULT'
+
+    client = cli_util.build_client('generative_ai', 'generative_ai', ctx)
+    result = client.update_semantic_store(
+        semantic_store_id=semantic_store_id,
+        update_semantic_store_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_semantic_store') and callable(getattr(client, 'get_semantic_store')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+
+                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_semantic_store(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@semantic_store_group.command(name=cli_util.override('generative_ai.update_semantic_store_custom_semantic_store_model_selection.command_name', 'update-semantic-store-custom-semantic-store-model-selection'), help=u"""Updates the properties of a SemanticStore. \n[Command Reference](updateSemanticStore)""")
+@cli_util.option('--semantic-store-id', required=True, help=u"""The [OCID] of the SemanticStore.""")
+@cli_util.option('--model-selection-model-id', required=True, help=u"""The generative AI modelId to use for SemanticStore enrichment. You can use the ListModels API to list the available models. https://docs.oracle.com/en-us/iaas/api/#/en/generative-ai/20231130/ModelCollection/ListModels""")
+@cli_util.option('--description', help=u"""An optional description of the SemanticStore.""")
+@cli_util.option('--display-name', help=u"""A user-friendly name.""")
+@cli_util.option('--is-user-defined-semantics-enabled', type=click.BOOL, help=u"""Whether to include user-defined semantic inputs, such as annotations, comments, and synonyms, during semantic-store enrichment. When true, enrichment uses both metadata and user-defined semantics. When false, enrichment uses metadata only. If omitted, the existing setting is unchanged.""")
+@cli_util.option('--refresh-schedule', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--schemas', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
+
+Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].
+
+Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACTIVE", "CREATING", "UPDATING", "DELETING", "DELETED", "FAILED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACTIVE --wait-for-state FAILED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
+@cli_util.wrap_exceptions
+def update_semantic_store_custom_semantic_store_model_selection(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, semantic_store_id, model_selection_model_id, description, display_name, is_user_defined_semantics_enabled, refresh_schedule, schemas, freeform_tags, defined_tags, if_match):
+
+    if isinstance(semantic_store_id, six.string_types) and len(semantic_store_id.strip()) == 0:
+        raise click.UsageError('Parameter --semantic-store-id cannot be whitespace or empty string')
+    if not force:
+        if refresh_schedule or schemas or freeform_tags or defined_tags:
+            if not click.confirm("WARNING: Updates to refresh-schedule and schemas and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
+                ctx.abort()
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['modelSelection'] = {}
+    _details['modelSelection']['modelId'] = model_selection_model_id
+
+    if description is not None:
+        _details['description'] = description
+
+    if display_name is not None:
+        _details['displayName'] = display_name
+
+    if is_user_defined_semantics_enabled is not None:
+        _details['isUserDefinedSemanticsEnabled'] = is_user_defined_semantics_enabled
+
+    if refresh_schedule is not None:
+        _details['refreshSchedule'] = cli_util.parse_json_parameter("refresh_schedule", refresh_schedule)
+
+    if schemas is not None:
+        _details['schemas'] = cli_util.parse_json_parameter("schemas", schemas)
+
+    if freeform_tags is not None:
+        _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
+
+    if defined_tags is not None:
+        _details['definedTags'] = cli_util.parse_json_parameter("defined_tags", defined_tags)
+
+    _details['modelSelection']['modelSelectionType'] = 'CUSTOM'
+
+    client = cli_util.build_client('generative_ai', 'generative_ai', ctx)
+    result = client.update_semantic_store(
+        semantic_store_id=semantic_store_id,
+        update_semantic_store_details=_details,
+        **kwargs
+    )
+    if wait_for_state:
+
+        if hasattr(client, 'get_semantic_store') and callable(getattr(client, 'get_semantic_store')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+
+                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_semantic_store(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@semantic_store_group.command(name=cli_util.override('generative_ai.update_semantic_store_refresh_schedule_on_create_details.command_name', 'update-semantic-store-refresh-schedule-on-create-details'), help=u"""Updates the properties of a SemanticStore. \n[Command Reference](updateSemanticStore)""")
+@cli_util.option('--semantic-store-id', required=True, help=u"""The [OCID] of the SemanticStore.""")
+@cli_util.option('--description', help=u"""An optional description of the SemanticStore.""")
+@cli_util.option('--display-name', help=u"""A user-friendly name.""")
+@cli_util.option('--model-selection', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--is-user-defined-semantics-enabled', type=click.BOOL, help=u"""Whether to include user-defined semantic inputs, such as annotations, comments, and synonyms, during semantic-store enrichment. When true, enrichment uses both metadata and user-defined semantics. When false, enrichment uses metadata only. If omitted, the existing setting is unchanged.""")
+@cli_util.option('--schemas', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
+
+Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].
+
+Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACTIVE", "CREATING", "UPDATING", "DELETING", "DELETED", "FAILED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACTIVE --wait-for-state FAILED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'model-selection': {'module': 'generative_ai', 'class': 'SemanticStoreModelSelection'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'model-selection': {'module': 'generative_ai', 'class': 'SemanticStoreModelSelection'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
+@cli_util.wrap_exceptions
+def update_semantic_store_refresh_schedule_on_create_details(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, semantic_store_id, description, display_name, model_selection, is_user_defined_semantics_enabled, schemas, freeform_tags, defined_tags, if_match):
+
+    if isinstance(semantic_store_id, six.string_types) and len(semantic_store_id.strip()) == 0:
+        raise click.UsageError('Parameter --semantic-store-id cannot be whitespace or empty string')
+    if not force:
+        if model_selection or schemas or freeform_tags or defined_tags:
+            if not click.confirm("WARNING: Updates to model-selection and schemas and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
                 ctx.abort()
 
     kwargs = {}
@@ -6230,6 +7030,12 @@ def update_semantic_store_refresh_schedule_on_create_details(ctx, from_json, for
 
     if display_name is not None:
         _details['displayName'] = display_name
+
+    if model_selection is not None:
+        _details['modelSelection'] = cli_util.parse_json_parameter("model_selection", model_selection)
+
+    if is_user_defined_semantics_enabled is not None:
+        _details['isUserDefinedSemanticsEnabled'] = is_user_defined_semantics_enabled
 
     if schemas is not None:
         _details['schemas'] = cli_util.parse_json_parameter("schemas", schemas)
@@ -6278,6 +7084,8 @@ def update_semantic_store_refresh_schedule_on_create_details(ctx, from_json, for
 @cli_util.option('--semantic-store-id', required=True, help=u"""The [OCID] of the SemanticStore.""")
 @cli_util.option('--description', help=u"""An optional description of the SemanticStore.""")
 @cli_util.option('--display-name', help=u"""A user-friendly name.""")
+@cli_util.option('--model-selection', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--is-user-defined-semantics-enabled', type=click.BOOL, help=u"""Whether to include user-defined semantic inputs, such as annotations, comments, and synonyms, during semantic-store enrichment. When true, enrichment uses both metadata and user-defined semantics. When false, enrichment uses metadata only. If omitted, the existing setting is unchanged.""")
 @cli_util.option('--schemas', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
@@ -6290,18 +7098,18 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACTIVE", "CREATING", "UPDATING", "DELETING", "DELETED", "FAILED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACTIVE --wait-for-state FAILED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
+@json_skeleton_utils.get_cli_json_input_option({'model-selection': {'module': 'generative_ai', 'class': 'SemanticStoreModelSelection'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'model-selection': {'module': 'generative_ai', 'class': 'SemanticStoreModelSelection'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
 @cli_util.wrap_exceptions
-def update_semantic_store_refresh_schedule_none_details(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, semantic_store_id, description, display_name, schemas, freeform_tags, defined_tags, if_match):
+def update_semantic_store_refresh_schedule_none_details(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, semantic_store_id, description, display_name, model_selection, is_user_defined_semantics_enabled, schemas, freeform_tags, defined_tags, if_match):
 
     if isinstance(semantic_store_id, six.string_types) and len(semantic_store_id.strip()) == 0:
         raise click.UsageError('Parameter --semantic-store-id cannot be whitespace or empty string')
     if not force:
-        if schemas or freeform_tags or defined_tags:
-            if not click.confirm("WARNING: Updates to schemas and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
+        if model_selection or schemas or freeform_tags or defined_tags:
+            if not click.confirm("WARNING: Updates to model-selection and schemas and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
                 ctx.abort()
 
     kwargs = {}
@@ -6317,6 +7125,12 @@ def update_semantic_store_refresh_schedule_none_details(ctx, from_json, force, w
 
     if display_name is not None:
         _details['displayName'] = display_name
+
+    if model_selection is not None:
+        _details['modelSelection'] = cli_util.parse_json_parameter("model_selection", model_selection)
+
+    if is_user_defined_semantics_enabled is not None:
+        _details['isUserDefinedSemanticsEnabled'] = is_user_defined_semantics_enabled
 
     if schemas is not None:
         _details['schemas'] = cli_util.parse_json_parameter("schemas", schemas)
@@ -6366,6 +7180,8 @@ def update_semantic_store_refresh_schedule_none_details(ctx, from_json, force, w
 @cli_util.option('--refresh-schedule-value', required=True, help=u"""Specifies the refresh interval value. The interval must be provided using the ISO 8601 extended format, either as PnW or PnYnMnDTnHnMnS, where 'P' is always required, 'T' precedes any time components less than one day, and each included component is properly suffixed. For example, \"P1DT6H\" represents a duration of 1 day and 6 hours.""")
 @cli_util.option('--description', help=u"""An optional description of the SemanticStore.""")
 @cli_util.option('--display-name', help=u"""A user-friendly name.""")
+@cli_util.option('--model-selection', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--is-user-defined-semantics-enabled', type=click.BOOL, help=u"""Whether to include user-defined semantic inputs, such as annotations, comments, and synonyms, during semantic-store enrichment. When true, enrichment uses both metadata and user-defined semantics. When false, enrichment uses metadata only. If omitted, the existing setting is unchanged.""")
 @cli_util.option('--schemas', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
@@ -6378,18 +7194,18 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACTIVE", "CREATING", "UPDATING", "DELETING", "DELETED", "FAILED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACTIVE --wait-for-state FAILED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
+@json_skeleton_utils.get_cli_json_input_option({'model-selection': {'module': 'generative_ai', 'class': 'SemanticStoreModelSelection'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'model-selection': {'module': 'generative_ai', 'class': 'SemanticStoreModelSelection'}, 'schemas': {'module': 'generative_ai', 'class': 'CreateSchemasDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
 @cli_util.wrap_exceptions
-def update_semantic_store_refresh_schedule_interval_details(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, semantic_store_id, refresh_schedule_value, description, display_name, schemas, freeform_tags, defined_tags, if_match):
+def update_semantic_store_refresh_schedule_interval_details(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, semantic_store_id, refresh_schedule_value, description, display_name, model_selection, is_user_defined_semantics_enabled, schemas, freeform_tags, defined_tags, if_match):
 
     if isinstance(semantic_store_id, six.string_types) and len(semantic_store_id.strip()) == 0:
         raise click.UsageError('Parameter --semantic-store-id cannot be whitespace or empty string')
     if not force:
-        if schemas or freeform_tags or defined_tags:
-            if not click.confirm("WARNING: Updates to schemas and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
+        if model_selection or schemas or freeform_tags or defined_tags:
+            if not click.confirm("WARNING: Updates to model-selection and schemas and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
                 ctx.abort()
 
     kwargs = {}
@@ -6406,6 +7222,12 @@ def update_semantic_store_refresh_schedule_interval_details(ctx, from_json, forc
 
     if display_name is not None:
         _details['displayName'] = display_name
+
+    if model_selection is not None:
+        _details['modelSelection'] = cli_util.parse_json_parameter("model_selection", model_selection)
+
+    if is_user_defined_semantics_enabled is not None:
+        _details['isUserDefinedSemanticsEnabled'] = is_user_defined_semantics_enabled
 
     if schemas is not None:
         _details['schemas'] = cli_util.parse_json_parameter("schemas", schemas)
@@ -6455,6 +7277,8 @@ def update_semantic_store_refresh_schedule_interval_details(ctx, from_json, forc
 @cli_util.option('--schemas-schemas', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""Array of database schemas to be included in the connection. Each schema must define a name. A simple schema definition includes only the name, for example: {   \"schemas\": [     { \"name\": \"HR\" }   ] } Only one schema name is allowed now. Additional configuration options may be supported in extended forms later.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--description', help=u"""An optional description of the SemanticStore.""")
 @cli_util.option('--display-name', help=u"""A user-friendly name.""")
+@cli_util.option('--model-selection', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--is-user-defined-semantics-enabled', type=click.BOOL, help=u"""Whether to include user-defined semantic inputs, such as annotations, comments, and synonyms, during semantic-store enrichment. When true, enrichment uses both metadata and user-defined semantics. When false, enrichment uses metadata only. If omitted, the existing setting is unchanged.""")
 @cli_util.option('--refresh-schedule', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
@@ -6467,18 +7291,18 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACTIVE", "CREATING", "UPDATING", "DELETING", "DELETED", "FAILED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACTIVE --wait-for-state FAILED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}, 'schemas-schemas': {'module': 'generative_ai', 'class': 'list[SchemaItem]'}})
+@json_skeleton_utils.get_cli_json_input_option({'model-selection': {'module': 'generative_ai', 'class': 'SemanticStoreModelSelection'}, 'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}, 'schemas-schemas': {'module': 'generative_ai', 'class': 'list[SchemaItem]'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}, 'schemas-schemas': {'module': 'generative_ai', 'class': 'list[SchemaItem]'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'model-selection': {'module': 'generative_ai', 'class': 'SemanticStoreModelSelection'}, 'refresh-schedule': {'module': 'generative_ai', 'class': 'RefreshScheduleDetails'}, 'freeform-tags': {'module': 'generative_ai', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'generative_ai', 'class': 'dict(str, dict(str, object))'}, 'schemas-schemas': {'module': 'generative_ai', 'class': 'list[SchemaItem]'}}, output_type={'module': 'generative_ai', 'class': 'SemanticStore'})
 @cli_util.wrap_exceptions
-def update_semantic_store_create_schemas_database_tools_connection_details(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, semantic_store_id, schemas_schemas, description, display_name, refresh_schedule, freeform_tags, defined_tags, if_match):
+def update_semantic_store_create_schemas_database_tools_connection_details(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, semantic_store_id, schemas_schemas, description, display_name, model_selection, is_user_defined_semantics_enabled, refresh_schedule, freeform_tags, defined_tags, if_match):
 
     if isinstance(semantic_store_id, six.string_types) and len(semantic_store_id.strip()) == 0:
         raise click.UsageError('Parameter --semantic-store-id cannot be whitespace or empty string')
     if not force:
-        if refresh_schedule or freeform_tags or defined_tags:
-            if not click.confirm("WARNING: Updates to refresh-schedule and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
+        if model_selection or refresh_schedule or freeform_tags or defined_tags:
+            if not click.confirm("WARNING: Updates to model-selection and refresh-schedule and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
                 ctx.abort()
 
     kwargs = {}
@@ -6495,6 +7319,12 @@ def update_semantic_store_create_schemas_database_tools_connection_details(ctx, 
 
     if display_name is not None:
         _details['displayName'] = display_name
+
+    if model_selection is not None:
+        _details['modelSelection'] = cli_util.parse_json_parameter("model_selection", model_selection)
+
+    if is_user_defined_semantics_enabled is not None:
+        _details['isUserDefinedSemanticsEnabled'] = is_user_defined_semantics_enabled
 
     if refresh_schedule is not None:
         _details['refreshSchedule'] = cli_util.parse_json_parameter("refresh_schedule", refresh_schedule)

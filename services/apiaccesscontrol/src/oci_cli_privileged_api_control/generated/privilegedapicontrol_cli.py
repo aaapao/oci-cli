@@ -109,13 +109,16 @@ def change_privileged_api_control_compartment(ctx, from_json, wait_for_state, ma
 
 @privileged_api_control_group.command(name=cli_util.override('privileged_api_control.create_privileged_api_control.command_name', 'create'), help=u"""Creates a PrivilegedApiControl. \n[Command Reference](createPrivilegedApiControl)""")
 @cli_util.option('--compartment-id', required=True, help=u"""The [OCID] of the compartment to create the PrivilegedApiControl in.""")
-@cli_util.option('--notification-topic-id', required=True, help=u"""The OCID of the OCI Notification topic to publish messages related to this Delegation Control.""")
+@cli_util.option('--notification-topic-id', required=True, help=u"""The OCID of the OCI Notification topic to publish messages related to this Privileged Api Control.""")
 @cli_util.option('--approver-group-id-list', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""List of user IAM group ids who can approve an privilegedApi request associated with a resource governed by this operator control.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--privileged-operation-list', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""List of privileged operator operations. If Privileged API Managment is enabled for a resource it will be validated whether the operation done by the operator is a part of privileged operation.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--resource-type', required=True, help=u"""resourceType for which the PrivilegedApiControl is applicable""")
-@cli_util.option('--resources', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""contains Resource details""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--display-name', help=u"""Name of the privilegedApi control It has to be unique.""")
 @cli_util.option('--description', help=u"""Description of the privilegedApi control.""")
+@cli_util.option('--approver-group-level-list', type=custom_types.CLI_COMPLEX_TYPE, help=u"""List of Group containing the levels at which the users belonging to the group can authorize.
+
+This option is a JSON list with items of type ApproverGroupLevel.  For documentation on ApproverGroupLevel please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/privilegedapicontrol/20241130/datatypes/ApproverGroupLevel.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--resources', type=custom_types.CLI_COMPLEX_TYPE, help=u"""contains Resource details""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--number-of-approvers', type=click.INT, help=u"""Number of approvers required to approve an privilegedApi request.""")
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
@@ -126,12 +129,12 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "NEEDS_ATTENTION", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'approver-group-id-list': {'module': 'apiaccesscontrol', 'class': 'list[string]'}, 'privileged-operation-list': {'module': 'apiaccesscontrol', 'class': 'list[PrivilegedApiDetails]'}, 'resources': {'module': 'apiaccesscontrol', 'class': 'list[string]'}, 'freeform-tags': {'module': 'apiaccesscontrol', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'apiaccesscontrol', 'class': 'dict(str, dict(str, object))'}})
+@json_skeleton_utils.get_cli_json_input_option({'approver-group-id-list': {'module': 'apiaccesscontrol', 'class': 'list[string]'}, 'approver-group-level-list': {'module': 'apiaccesscontrol', 'class': 'list[ApproverGroupLevel]'}, 'privileged-operation-list': {'module': 'apiaccesscontrol', 'class': 'list[PrivilegedApiDetails]'}, 'resources': {'module': 'apiaccesscontrol', 'class': 'list[string]'}, 'freeform-tags': {'module': 'apiaccesscontrol', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'apiaccesscontrol', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'approver-group-id-list': {'module': 'apiaccesscontrol', 'class': 'list[string]'}, 'privileged-operation-list': {'module': 'apiaccesscontrol', 'class': 'list[PrivilegedApiDetails]'}, 'resources': {'module': 'apiaccesscontrol', 'class': 'list[string]'}, 'freeform-tags': {'module': 'apiaccesscontrol', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'apiaccesscontrol', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'apiaccesscontrol', 'class': 'PrivilegedApiControl'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'approver-group-id-list': {'module': 'apiaccesscontrol', 'class': 'list[string]'}, 'approver-group-level-list': {'module': 'apiaccesscontrol', 'class': 'list[ApproverGroupLevel]'}, 'privileged-operation-list': {'module': 'apiaccesscontrol', 'class': 'list[PrivilegedApiDetails]'}, 'resources': {'module': 'apiaccesscontrol', 'class': 'list[string]'}, 'freeform-tags': {'module': 'apiaccesscontrol', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'apiaccesscontrol', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'apiaccesscontrol', 'class': 'PrivilegedApiControl'})
 @cli_util.wrap_exceptions
-def create_privileged_api_control(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, notification_topic_id, approver_group_id_list, privileged_operation_list, resource_type, resources, display_name, description, number_of_approvers, freeform_tags, defined_tags):
+def create_privileged_api_control(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, notification_topic_id, approver_group_id_list, privileged_operation_list, resource_type, display_name, description, approver_group_level_list, resources, number_of_approvers, freeform_tags, defined_tags):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
@@ -142,13 +145,18 @@ def create_privileged_api_control(ctx, from_json, wait_for_state, max_wait_secon
     _details['approverGroupIdList'] = cli_util.parse_json_parameter("approver_group_id_list", approver_group_id_list)
     _details['privilegedOperationList'] = cli_util.parse_json_parameter("privileged_operation_list", privileged_operation_list)
     _details['resourceType'] = resource_type
-    _details['resources'] = cli_util.parse_json_parameter("resources", resources)
 
     if display_name is not None:
         _details['displayName'] = display_name
 
     if description is not None:
         _details['description'] = description
+
+    if approver_group_level_list is not None:
+        _details['approverGroupLevelList'] = cli_util.parse_json_parameter("approver_group_level_list", approver_group_level_list)
+
+    if resources is not None:
+        _details['resources'] = cli_util.parse_json_parameter("resources", resources)
 
     if number_of_approvers is not None:
         _details['numberOfApprovers'] = number_of_approvers
@@ -276,7 +284,7 @@ def get_privileged_api_control(ctx, from_json, privileged_api_control_id):
 
 
 @privileged_api_control_collection_group.command(name=cli_util.override('privileged_api_control.list_privileged_api_controls.command_name', 'list-privileged-api-controls'), help=u"""Gets a list of PrivilegedApiControls. \n[Command Reference](listPrivilegedApiControls)""")
-@cli_util.option('--compartment-id', help=u"""The [OCID] of the compartment in which to list resources.""")
+@cli_util.option('--compartment-id', required=True, help=u"""The [OCID] of the compartment in which to list resources.""")
 @cli_util.option('--id', help=u"""The [OCID] of the PrivilegedApiControl.""")
 @cli_util.option('--lifecycle-state', type=custom_types.CliCaseInsensitiveChoice(["CREATING", "UPDATING", "ACTIVE", "DELETING", "DELETED", "FAILED", "NEEDS_ATTENTION"]), help=u"""A filter to return only resources that match the given lifecycle state. The state value is case-insensitive.""")
 @cli_util.option('--display-name', help=u"""A filter to return only resources that match the given display name exactly.""")
@@ -298,8 +306,6 @@ def list_privileged_api_controls(ctx, from_json, all_pages, page_size, compartme
         raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
 
     kwargs = {}
-    if compartment_id is not None:
-        kwargs['compartment_id'] = compartment_id
     if id is not None:
         kwargs['id'] = id
     if lifecycle_state is not None:
@@ -324,6 +330,7 @@ def list_privileged_api_controls(ctx, from_json, all_pages, page_size, compartme
 
         result = cli_util.list_call_get_all_results(
             client.list_privileged_api_controls,
+            compartment_id=compartment_id,
             **kwargs
         )
     elif limit is not None:
@@ -331,10 +338,12 @@ def list_privileged_api_controls(ctx, from_json, all_pages, page_size, compartme
             client.list_privileged_api_controls,
             limit,
             page_size,
+            compartment_id=compartment_id,
             **kwargs
         )
     else:
         result = client.list_privileged_api_controls(
+            compartment_id=compartment_id,
             **kwargs
         )
     cli_util.render_response(result, ctx)
@@ -346,8 +355,11 @@ def list_privileged_api_controls(ctx, from_json, all_pages, page_size, compartme
 @cli_util.option('--description', help=u"""Description of the privilegedApi control.""")
 @cli_util.option('--resource-type', help=u"""resourceType for which the PrivilegedApiControl is applicable""")
 @cli_util.option('--resources', type=custom_types.CLI_COMPLEX_TYPE, help=u"""contains Resource details""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--notification-topic-id', help=u"""The OCID of the OCI Notification topic to publish messages related to this Delegation Control.""")
+@cli_util.option('--notification-topic-id', help=u"""The OCID of the OCI Notification topic to publish messages related to this Privileged Api Control.""")
 @cli_util.option('--approver-group-id-list', type=custom_types.CLI_COMPLEX_TYPE, help=u"""List of user IAM group ids who can approve an privilegedApi request associated with a target resource under the governance of this privilegedApi control.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--approver-group-level-list', type=custom_types.CLI_COMPLEX_TYPE, help=u"""List of Group containing the levels at which the users belonging to the group can authorize.
+
+This option is a JSON list with items of type ApproverGroupLevel.  For documentation on ApproverGroupLevel please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/privilegedapicontrol/20241130/datatypes/ApproverGroupLevel.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--privileged-operation-list', type=custom_types.CLI_COMPLEX_TYPE, help=u"""List of privileged operator operations. If Privileged API Managment is enabled for a resource it will be validated whether the operation done by the operator is a part of privileged operation.
 
 This option is a JSON list with items of type PrivilegedApiDetails.  For documentation on PrivilegedApiDetails please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/privilegedapicontrol/20241130/datatypes/PrivilegedApiDetails.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
@@ -363,18 +375,18 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "WAITING", "NEEDS_ATTENTION", "FAILED", "SUCCEEDED", "CANCELING", "CANCELED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state CANCELED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
-@json_skeleton_utils.get_cli_json_input_option({'resources': {'module': 'apiaccesscontrol', 'class': 'list[string]'}, 'approver-group-id-list': {'module': 'apiaccesscontrol', 'class': 'list[string]'}, 'privileged-operation-list': {'module': 'apiaccesscontrol', 'class': 'list[PrivilegedApiDetails]'}, 'freeform-tags': {'module': 'apiaccesscontrol', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'apiaccesscontrol', 'class': 'dict(str, dict(str, object))'}})
+@json_skeleton_utils.get_cli_json_input_option({'resources': {'module': 'apiaccesscontrol', 'class': 'list[string]'}, 'approver-group-id-list': {'module': 'apiaccesscontrol', 'class': 'list[string]'}, 'approver-group-level-list': {'module': 'apiaccesscontrol', 'class': 'list[ApproverGroupLevel]'}, 'privileged-operation-list': {'module': 'apiaccesscontrol', 'class': 'list[PrivilegedApiDetails]'}, 'freeform-tags': {'module': 'apiaccesscontrol', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'apiaccesscontrol', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.help_option
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'resources': {'module': 'apiaccesscontrol', 'class': 'list[string]'}, 'approver-group-id-list': {'module': 'apiaccesscontrol', 'class': 'list[string]'}, 'privileged-operation-list': {'module': 'apiaccesscontrol', 'class': 'list[PrivilegedApiDetails]'}, 'freeform-tags': {'module': 'apiaccesscontrol', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'apiaccesscontrol', 'class': 'dict(str, dict(str, object))'}})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'resources': {'module': 'apiaccesscontrol', 'class': 'list[string]'}, 'approver-group-id-list': {'module': 'apiaccesscontrol', 'class': 'list[string]'}, 'approver-group-level-list': {'module': 'apiaccesscontrol', 'class': 'list[ApproverGroupLevel]'}, 'privileged-operation-list': {'module': 'apiaccesscontrol', 'class': 'list[PrivilegedApiDetails]'}, 'freeform-tags': {'module': 'apiaccesscontrol', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'apiaccesscontrol', 'class': 'dict(str, dict(str, object))'}})
 @cli_util.wrap_exceptions
-def update_privileged_api_control(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, privileged_api_control_id, display_name, description, resource_type, resources, notification_topic_id, approver_group_id_list, privileged_operation_list, number_of_approvers, freeform_tags, defined_tags, if_match):
+def update_privileged_api_control(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, privileged_api_control_id, display_name, description, resource_type, resources, notification_topic_id, approver_group_id_list, approver_group_level_list, privileged_operation_list, number_of_approvers, freeform_tags, defined_tags, if_match):
 
     if isinstance(privileged_api_control_id, six.string_types) and len(privileged_api_control_id.strip()) == 0:
         raise click.UsageError('Parameter --privileged-api-control-id cannot be whitespace or empty string')
     if not force:
-        if resources or approver_group_id_list or privileged_operation_list or freeform_tags or defined_tags:
-            if not click.confirm("WARNING: Updates to resources and approver-group-id-list and privileged-operation-list and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
+        if resources or approver_group_id_list or approver_group_level_list or privileged_operation_list or freeform_tags or defined_tags:
+            if not click.confirm("WARNING: Updates to resources and approver-group-id-list and approver-group-level-list and privileged-operation-list and freeform-tags and defined-tags will replace any existing values. Are you sure you want to continue?"):
                 ctx.abort()
 
     kwargs = {}
@@ -401,6 +413,9 @@ def update_privileged_api_control(ctx, from_json, force, wait_for_state, max_wai
 
     if approver_group_id_list is not None:
         _details['approverGroupIdList'] = cli_util.parse_json_parameter("approver_group_id_list", approver_group_id_list)
+
+    if approver_group_level_list is not None:
+        _details['approverGroupLevelList'] = cli_util.parse_json_parameter("approver_group_level_list", approver_group_level_list)
 
     if privileged_operation_list is not None:
         _details['privilegedOperationList'] = cli_util.parse_json_parameter("privileged_operation_list", privileged_operation_list)

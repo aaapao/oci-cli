@@ -206,6 +206,12 @@ def drg_route_table_group():
     pass
 
 
+@click.command(cli_util.override('virtual_network.provider_remote_region_name_group.command_name', 'provider-remote-region-name'), cls=CommandGroupWithAlias, help="""A pair of OCI region and Provider remote region names for FastConnect MultiCloud interconnect.""")
+@cli_util.help_option_group
+def provider_remote_region_name_group():
+    pass
+
+
 @click.command(cli_util.override('virtual_network.tunnel_security_association_group.command_name', 'tunnel-security-association'), cls=CommandGroupWithAlias, help="""A summary of the IPSec tunnel security association details.""")
 @cli_util.help_option_group
 def tunnel_security_association_group():
@@ -591,6 +597,7 @@ virtual_network_root_group.add_command(fast_connect_provider_service_key_group)
 virtual_network_root_group.add_command(drg_route_distribution_statement_group)
 virtual_network_root_group.add_command(ip_inventory_subnet_resource_collection_group)
 virtual_network_root_group.add_command(drg_route_table_group)
+virtual_network_root_group.add_command(provider_remote_region_name_group)
 virtual_network_root_group.add_command(tunnel_security_association_group)
 virtual_network_root_group.add_command(internet_gateway_group)
 virtual_network_root_group.add_command(ip_sec_connection_group)
@@ -1187,9 +1194,9 @@ def bulk_add_virtual_circuit_public_prefixes(ctx, from_json, virtual_circuit_id,
     cli_util.render_response(result, ctx)
 
 
-@ipv6_group.command(name=cli_util.override('virtual_network.bulk_create_ipv6s.command_name', 'bulk-create'), help=u"""Create new IPv6s for a VNIC or Subnet. \n[Command Reference](bulkCreateIpv6s)""")
-@cli_util.option('--bulk-create-ipv6s-item', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""Secondary IPv6 addresses to assign.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--vnic-id', help=u"""The [OCID] of the VNIC to assign the IPv6s to. The IPv6 will be in the VNIC's subnet.""")
+@ipv6_group.command(name=cli_util.override('virtual_network.bulk_create_ipv6s.command_name', 'bulk-create'), help=u"""Create new IPv6s in bulk for a VNIC or subnet. \n[Command Reference](bulkCreateIpv6s)""")
+@cli_util.option('--bulk-create-ipv6s-item', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""A secondary IPv6 address to assign.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--vnic-id', help=u"""The [OCID] of the VNIC to assign the IPv6s to. The IPv6s will be in the VNIC's subnet.""")
 @cli_util.option('--subnet-id', help=u"""The [OCID] of the subnet from which the IPv6s are to be drawn. The IP addresses, *if supplied*, must be valid for the given subnet, only valid for reserved IPs currently.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state SUCCEEDED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
@@ -1257,7 +1264,7 @@ def bulk_create_ipv6s(ctx, from_json, wait_for_state, max_wait_seconds, wait_int
 
 
 @private_ip_group.command(name=cli_util.override('virtual_network.bulk_create_private_ips.command_name', 'bulk-create'), help=u"""Create secondary private IPv4 addresses. \n[Command Reference](bulkCreatePrivateIps)""")
-@cli_util.option('--bulk-create-private-ip-item', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""Secondary IPv4 addresses to assign.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--bulk-create-private-ip-item', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""A secondary IPv4 address to assign.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--vnic-id', help=u"""The [OCID] of the VNIC to assign the private IPs to. The VNIC and private IPs must be in the same subnet.""")
 @cli_util.option('--vlan-id', help=u"""Use this attribute only with the Oracle Cloud VMware Solution. The [OCID] of the VLAN from which the private IPs is to be drawn. The IP addresses, *if supplied*, must be valid for the given VLAN. See [Vlan].""")
 @cli_util.option('--subnet-id', help=u"""The [OCID] of the subnet from which the private IPs is to be drawn. The IP addresses, *if supplied*, must be valid for the given subnet.""")
@@ -1329,10 +1336,10 @@ def bulk_create_private_ips(ctx, from_json, wait_for_state, max_wait_seconds, wa
     cli_util.render_response(result, ctx)
 
 
-@ipv6_group.command(name=cli_util.override('virtual_network.bulk_delete_ipv6s.command_name', 'bulk-delete'), help=u"""Unassigns and deletes IPv6s for a VNIC. \n[Command Reference](bulkDeleteIpv6s)""")
-@cli_util.option('--bulk-delete-ipv6s-item', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""IPv6 addresses to deleted.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@ipv6_group.command(name=cli_util.override('virtual_network.bulk_delete_ipv6s.command_name', 'bulk-delete'), help=u"""Unassign and delete IPv6s for a VNIC in bulk. \n[Command Reference](bulkDeleteIpv6s)""")
+@cli_util.option('--bulk-delete-ipv6s-item', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""An IPv6 address to delete.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--vnic-id', help=u"""The [OCID] of the VNIC to assign the IPv6s to. The IPv6 will be in the VNIC's subnet.""")
-@cli_util.option('--subnet-id', help=u"""The [OCID] of the subnet from which the IPv6s addresses are to be deleted.""")
+@cli_util.option('--subnet-id', help=u"""The [OCID] of the subnet from which the IPv6s addresses are deleted.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state SUCCEEDED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
@@ -1398,8 +1405,8 @@ def bulk_delete_ipv6s(ctx, from_json, wait_for_state, max_wait_seconds, wait_int
     cli_util.render_response(result, ctx)
 
 
-@private_ip_group.command(name=cli_util.override('virtual_network.bulk_delete_private_ips.command_name', 'bulk-delete'), help=u"""Unassigns and deletes secondary private IPv4s for a VNIC. \n[Command Reference](bulkDeletePrivateIps)""")
-@cli_util.option('--bulk-delete-private-ip-item', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""Secondary IPv4 addresses to deleted""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@private_ip_group.command(name=cli_util.override('virtual_network.bulk_delete_private_ips.command_name', 'bulk-delete'), help=u"""Unassign and delete secondary private IPv4s for a VNIC. \n[Command Reference](bulkDeletePrivateIps)""")
+@cli_util.option('--bulk-delete-private-ip-item', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""A secondary IPv4 address to delete.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--vnic-id', help=u"""The [OCID] of the VNIC of which private IPs should be deleted. The VNIC and private IPs must be in the same subnet.""")
 @cli_util.option('--vlan-id', help=u"""Use this attribute only with the Oracle Cloud VMware Solution. The [OCID] of the VLAN from which the private IP is to be deleted.""")
 @cli_util.option('--subnet-id', help=u"""The [OCID] of the subnet from which the private IPs is to be deleted.""")
@@ -1498,9 +1505,9 @@ def bulk_delete_virtual_circuit_public_prefixes(ctx, from_json, virtual_circuit_
     cli_util.render_response(result, ctx)
 
 
-@ipv6_group.command(name=cli_util.override('virtual_network.bulk_detach_ipv6s.command_name', 'bulk-detach'), help=u"""detach the specified IPv6s. \n[Command Reference](bulkDetachIpv6s)""")
-@cli_util.option('--bulk-detach-ipv6s-item', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""Secondary IPv6 addresses to detached.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--vnic-id', help=u"""The [OCID] of the VNIC of which IPv6s should be detached. The VNIC and IPv6s must be in the same subnet.""")
+@ipv6_group.command(name=cli_util.override('virtual_network.bulk_detach_ipv6s.command_name', 'bulk-detach'), help=u"""Detach the specified IPv6s. \n[Command Reference](bulkDetachIpv6s)""")
+@cli_util.option('--bulk-detach-ipv6s-item', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""A secondary IPv6 address to detach.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--vnic-id', help=u"""The [OCID] of the VNIC from which multiple IPv6s should be detached. The VNIC and IPv6s must be in the same subnet.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state SUCCEEDED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
@@ -1563,8 +1570,8 @@ def bulk_detach_ipv6s(ctx, from_json, wait_for_state, max_wait_seconds, wait_int
     cli_util.render_response(result, ctx)
 
 
-@private_ip_group.command(name=cli_util.override('virtual_network.bulk_detach_private_ips.command_name', 'bulk-detach'), help=u"""Unassign the specified PrivateIP address from Virtual Network Interface Card (VNIC). You must specify the PrivateIP [OCID]. \n[Command Reference](bulkDetachPrivateIps)""")
-@cli_util.option('--bulk-detach-private-ip-item', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""Secondary IPv4 addresses to detached.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@private_ip_group.command(name=cli_util.override('virtual_network.bulk_detach_private_ips.command_name', 'bulk-detach'), help=u"""Unassign the specified private IP addresses from the Virtual Network Interface Card (VNIC). You must specify the PrivateIP object's [OCID]. \n[Command Reference](bulkDetachPrivateIps)""")
+@cli_util.option('--bulk-detach-private-ip-item', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""Secondary IPv4 addresses to detach.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--vnic-id', help=u"""The [OCID] of the VNIC of which private IPs should be detached. The VNIC and private IPs must be in the same subnet.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state SUCCEEDED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
@@ -1628,8 +1635,8 @@ def bulk_detach_private_ips(ctx, from_json, wait_for_state, max_wait_seconds, wa
     cli_util.render_response(result, ctx)
 
 
-@ipv6_group.command(name=cli_util.override('virtual_network.bulk_update_ipv6s.command_name', 'bulk-update'), help=u"""Updates the specified IPv6s. \n[Command Reference](bulkUpdateIpv6s)""")
-@cli_util.option('--bulk-update-ipv6s-item', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""Secondary IPv6 addresses to updated.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@ipv6_group.command(name=cli_util.override('virtual_network.bulk_update_ipv6s.command_name', 'bulk-update'), help=u"""Updates the specified IPv6s in bulk. \n[Command Reference](bulkUpdateIpv6s)""")
+@cli_util.option('--bulk-update-ipv6s-item', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""A secondary IPv6 address to update.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--vnic-id', help=u"""The [OCID] of the VNIC to move the IPv6s to. The VNIC and IPv6s must be in the same subnet.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state SUCCEEDED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
@@ -1693,8 +1700,8 @@ def bulk_update_ipv6s(ctx, from_json, wait_for_state, max_wait_seconds, wait_int
     cli_util.render_response(result, ctx)
 
 
-@private_ip_group.command(name=cli_util.override('virtual_network.bulk_update_private_ips.command_name', 'bulk-update'), help=u"""Updates existing secondary Private IPv4s for a VNIC. \n[Command Reference](bulkUpdatePrivateIps)""")
-@cli_util.option('--bulk-update-private-ip-item', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""Secondary IPv4 addresses to updated.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@private_ip_group.command(name=cli_util.override('virtual_network.bulk_update_private_ips.command_name', 'bulk-update'), help=u"""Update existing secondary private IPv4s for a VNIC. \n[Command Reference](bulkUpdatePrivateIps)""")
+@cli_util.option('--bulk-update-private-ip-item', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""A secondary IPv4 address to update.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--vnic-id', help=u"""The [OCID] of the VNIC to reassign the private IPs to. The VNIC and private IPs must be in the same subnet.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state SUCCEEDED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
@@ -3041,6 +3048,9 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @cli_util.option('--near-cross-connect-or-cross-connect-group-id', help=u"""If you already have an existing cross-connect or cross-connect group at this FastConnect location, and you want this new cross-connect to be on the same router, provide the [OCID] of that existing cross-connect or cross-connect group.""")
 @cli_util.option('--customer-reference-name', help=u"""A reference name or identifier for the physical fiber connection that this cross-connect uses.""")
 @cli_util.option('--macsec-properties', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--is-interface-hold-timer-enabled', type=click.BOOL, help=u"""The flag to enable or disable the down timer for the interface.""")
+@cli_util.option('--interface-down-timer-value-in-milliseconds', type=click.INT, help=u"""The duration of the interface down timer in milliseconds between 0 and 3000 in multiples of 500.""")
+@cli_util.option('--is-qos-enabled', type=click.BOOL, help=u"""When true, restricts placement so cross-connects lands only on QoS-capable devices. When false (default), placement may use any supported device. If no QoS-capable devices are available in the selected location, the request fails.""")
 @cli_util.option('--oci-physical-device-name', help=u"""The name of the FastConnect device where this cross-connect is installed.""")
 @cli_util.option('--interface-name', help=u"""The name of the FastConnect interface where this cross-connect is installed.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["PENDING_CUSTOMER", "PROVISIONING", "PROVISIONED", "INACTIVE", "TERMINATING", "TERMINATED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state PENDING_CUSTOMER --wait-for-state TERMINATED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
@@ -3051,7 +3061,7 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}, 'macsec-properties': {'module': 'core', 'class': 'CreateMacsecProperties'}}, output_type={'module': 'core', 'class': 'CrossConnect'})
 @cli_util.wrap_exceptions
-def create_cross_connect(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, location_name, port_speed_shape_name, cross_connect_group_id, defined_tags, display_name, far_cross_connect_or_cross_connect_group_id, freeform_tags, near_cross_connect_or_cross_connect_group_id, customer_reference_name, macsec_properties, oci_physical_device_name, interface_name):
+def create_cross_connect(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, location_name, port_speed_shape_name, cross_connect_group_id, defined_tags, display_name, far_cross_connect_or_cross_connect_group_id, freeform_tags, near_cross_connect_or_cross_connect_group_id, customer_reference_name, macsec_properties, is_interface_hold_timer_enabled, interface_down_timer_value_in_milliseconds, is_qos_enabled, oci_physical_device_name, interface_name):
 
     kwargs = {}
 
@@ -3083,6 +3093,15 @@ def create_cross_connect(ctx, from_json, wait_for_state, max_wait_seconds, wait_
 
     if macsec_properties is not None:
         _details['macsecProperties'] = cli_util.parse_json_parameter("macsec_properties", macsec_properties)
+
+    if is_interface_hold_timer_enabled is not None:
+        _details['isInterfaceHoldTimerEnabled'] = is_interface_hold_timer_enabled
+
+    if interface_down_timer_value_in_milliseconds is not None:
+        _details['interfaceDownTimerValueInMilliseconds'] = interface_down_timer_value_in_milliseconds
+
+    if is_qos_enabled is not None:
+        _details['isQosEnabled'] = is_qos_enabled
 
     if oci_physical_device_name is not None:
         _details['ociPhysicalDeviceName'] = oci_physical_device_name
@@ -3136,6 +3155,10 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--macsec-properties', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--minimum-links', type=click.INT, help=u"""(Optional) Minimum number of active cross-connects required for the cross-connect group to be considered operational. During create cross-connect-group operation this value can only be set to 1 (If not specified, this value defaults to 1) and can be edited using the update cross-connect group operation. Value must not exceed the total number of cross-connects in the cross-connect group.""")
+@cli_util.option('--is-interface-hold-timer-enabled', type=click.BOOL, help=u"""The flag to enable or disable the down timer for the interface.""")
+@cli_util.option('--interface-down-timer-value-in-milliseconds', type=click.INT, help=u"""The duration of the interface down timer in milliseconds between 0 and 3000 in multiples of 500.""")
+@cli_util.option('--is-qos-enabled', type=click.BOOL, help=u"""(Optional) When true, restricts placement so cross-connects lands only on QoS-capable devices. When false (default), placement may use any supported device. If no QoS-capable devices are available in the selected location, the request fails.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["PROVISIONING", "PROVISIONED", "INACTIVE", "TERMINATING", "TERMINATED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state PROVISIONING --wait-for-state TERMINATED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
@@ -3144,7 +3167,7 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}, 'macsec-properties': {'module': 'core', 'class': 'CreateMacsecProperties'}}, output_type={'module': 'core', 'class': 'CrossConnectGroup'})
 @cli_util.wrap_exceptions
-def create_cross_connect_group(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, defined_tags, display_name, customer_reference_name, freeform_tags, macsec_properties):
+def create_cross_connect_group(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, defined_tags, display_name, customer_reference_name, freeform_tags, macsec_properties, minimum_links, is_interface_hold_timer_enabled, interface_down_timer_value_in_milliseconds, is_qos_enabled):
 
     kwargs = {}
 
@@ -3165,6 +3188,18 @@ def create_cross_connect_group(ctx, from_json, wait_for_state, max_wait_seconds,
 
     if macsec_properties is not None:
         _details['macsecProperties'] = cli_util.parse_json_parameter("macsec_properties", macsec_properties)
+
+    if minimum_links is not None:
+        _details['minimumLinks'] = minimum_links
+
+    if is_interface_hold_timer_enabled is not None:
+        _details['isInterfaceHoldTimerEnabled'] = is_interface_hold_timer_enabled
+
+    if interface_down_timer_value_in_milliseconds is not None:
+        _details['interfaceDownTimerValueInMilliseconds'] = interface_down_timer_value_in_milliseconds
+
+    if is_qos_enabled is not None:
+        _details['isQosEnabled'] = is_qos_enabled
 
     client = cli_util.build_client('core', 'virtual_network', ctx)
     result = client.create_cross_connect_group(
@@ -3885,6 +3920,7 @@ Example: `2001:DB8::`""")
 @cli_util.option('--lifetime', type=custom_types.CliCaseInsensitiveChoice(["EPHEMERAL", "RESERVED"]), help=u"""Lifetime of the IP address. There are two types of IPs:  - Ephemeral  - Reserved""")
 @cli_util.option('--route-table-id', help=u"""The [OCID] of the route table the IP address or VNIC will use. For more information, see [Per-resource Routing].""")
 @cli_util.option('--ipv6-subnet-cidr', help=u"""The IPv6 prefix allocated to the subnet. This is required if more than one IPv6 prefix exists on the subnet.""")
+@cli_util.option('--hostname', help=u"""The hostname associated with the IPv6 address. Only the hostname label, not the FQDN.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["PROVISIONING", "AVAILABLE", "TERMINATING", "TERMINATED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state PROVISIONING --wait-for-state TERMINATED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
@@ -3893,7 +3929,7 @@ Example: `2001:DB8::`""")
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}}, output_type={'module': 'core', 'class': 'Ipv6'})
 @cli_util.wrap_exceptions
-def create_ipv6(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, defined_tags, display_name, freeform_tags, ip_address, cidr_prefix_length, vnic_id, subnet_id, lifetime, route_table_id, ipv6_subnet_cidr):
+def create_ipv6(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, defined_tags, display_name, freeform_tags, ip_address, cidr_prefix_length, vnic_id, subnet_id, lifetime, route_table_id, ipv6_subnet_cidr, hostname):
 
     kwargs = {}
     kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
@@ -3929,6 +3965,9 @@ def create_ipv6(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_
 
     if ipv6_subnet_cidr is not None:
         _details['ipv6SubnetCidr'] = ipv6_subnet_cidr
+
+    if hostname is not None:
+        _details['hostname'] = hostname
 
     client = cli_util.build_client('core', 'virtual_network', ctx)
     result = client.create_ipv6(
@@ -4916,7 +4955,11 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @cli_util.option('--security-attributes', type=custom_types.CLI_COMPLEX_TYPE, help=u"""[Security attributes] are labels for a resource that can be referenced in a [Zero Trust Packet Routing] (ZPR) policy to control access to ZPR-supported resources.
 
 Example: `{\"Oracle-DataSecurity-ZPR\": {\"MaxEgressCount\": {\"value\":\"42\",\"mode\":\"audit\"}}}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
-@cli_util.option('--is-ipv6-enabled', type=click.BOOL, help=u"""Whether IPv6 is enabled for the VCN. Default is `false`. If enabled, Oracle will assign the VCN a IPv6 /56 CIDR block. You may skip having Oracle allocate the VCN a IPv6 /56 CIDR block by setting isOracleGuaAllocationEnabled to `false`. For important details about IPv6 addressing in a VCN, see [IPv6 Addresses].
+@cli_util.option('--is-ipv6-enabled', type=click.BOOL, help=u"""Whether IPv6 is enabled for the VCN. Default is `false`. If enabled, Oracle will assign the VCN a IPv6 /56 CIDR block.
+
+You may skip having Oracle allocate the VCN a IPv6 /56 CIDR block by setting isOracleGuaAllocationEnabled to `false`.
+
+For important details about IPv6 addressing in a VCN, see [IPv6 Addresses].
 
 Example: `true`""")
 @cli_util.option('--is-zpr-only', type=click.BOOL, help=u"""Indicates whether ZPR Only mode is enforced.""")
@@ -5035,13 +5078,16 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @cli_util.option('--gateway-id', help=u"""For private virtual circuits only. The [OCID] of the [dynamic routing gateway (DRG)] that this virtual circuit uses.""")
 @cli_util.option('--provider-name', help=u"""Deprecated. Instead use `providerServiceId`. To get a list of the provider names, see [ListFastConnectProviderServices].""")
 @cli_util.option('--provider-service-id', help=u"""The [OCID] of the service offered by the provider (if you're connecting via a provider). To get a list of the available service offerings, see [ListFastConnectProviderServices].""")
-@cli_util.option('--provider-service-key-name', help=u"""The service key name offered by the provider (if the customer is connecting via a provider).""")
+@cli_util.option('--provider-service-key-name', help=u"""The service key name or activation key offered by the provider (if the customer is connecting via a provider).""")
 @cli_util.option('--provider-service-name', help=u"""Deprecated. Instead use `providerServiceId`. To get a list of the provider names, see [ListFastConnectProviderServices].""")
 @cli_util.option('--public-prefixes', type=custom_types.CLI_COMPLEX_TYPE, help=u"""For a public virtual circuit. The public IP prefixes (CIDRs) the customer wants to advertise across the connection.
 
 This option is a JSON list with items of type CreateVirtualCircuitPublicPrefixDetails.  For documentation on CreateVirtualCircuitPublicPrefixDetails please see our API reference: https://docs.oracle.com/en-us/iaas/api/#/en/iaas/20160918/datatypes/CreateVirtualCircuitPublicPrefixDetails.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--region-parameterconflict', help=u"""The Oracle Cloud Infrastructure region where this virtual circuit is located. Example: `phx`""")
 @cli_util.option('--ip-mtu', type=custom_types.CliCaseInsensitiveChoice(["MTU_1500", "MTU_9000"]), help=u"""The layer 3 IP MTU to use with this virtual circuit.""")
+@cli_util.option('--provider-remote-region', help=u"""The OCI's FastConnect MultiCloud Provider/Partner remote region name associated with the OCI region. To get the list of associated provider remote region use the ListProviderRemoteRegions operation""")
+@cli_util.option('--remote-account-id', help=u"""Customer's account on Provider/Partner cloud (AWS, GCP or any other)""")
+@cli_util.option('--traffic-mode', type=custom_types.CliCaseInsensitiveChoice(["NORMAL", "DRAIN"]), help=u"""The traffic mode to be set with this Virtual Circuit. This controls whether the traffic is to be drained for the associated Virtual Circuit or not.""")
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["PENDING_PROVIDER", "VERIFYING", "PROVISIONING", "PROVISIONED", "FAILED", "INACTIVE", "TERMINATING", "TERMINATED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state PENDING_PROVIDER --wait-for-state TERMINATED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
 @cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the resource to reach the lifecycle state defined by --wait-for-state. Defaults to 1200 seconds.""")
 @cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the resource has reached the lifecycle state defined by --wait-for-state. Defaults to 30 seconds.""")
@@ -5050,7 +5096,7 @@ This option is a JSON list with items of type CreateVirtualCircuitPublicPrefixDe
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'cross-connect-mappings': {'module': 'core', 'class': 'list[CrossConnectMapping]'}, 'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}, 'public-prefixes': {'module': 'core', 'class': 'list[CreateVirtualCircuitPublicPrefixDetails]'}}, output_type={'module': 'core', 'class': 'VirtualCircuit'})
 @cli_util.wrap_exceptions
-def create_virtual_circuit(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, type, bandwidth_shape_name, cross_connect_mappings, routing_policy, bgp_admin_state, is_bfd_enabled, is_transport_mode, customer_bgp_asn, customer_asn, defined_tags, display_name, freeform_tags, gateway_id, provider_name, provider_service_id, provider_service_key_name, provider_service_name, public_prefixes, region_parameterconflict, ip_mtu):
+def create_virtual_circuit(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, compartment_id, type, bandwidth_shape_name, cross_connect_mappings, routing_policy, bgp_admin_state, is_bfd_enabled, is_transport_mode, customer_bgp_asn, customer_asn, defined_tags, display_name, freeform_tags, gateway_id, provider_name, provider_service_id, provider_service_key_name, provider_service_name, public_prefixes, region_parameterconflict, ip_mtu, provider_remote_region, remote_account_id, traffic_mode):
 
     kwargs = {}
 
@@ -5114,6 +5160,15 @@ def create_virtual_circuit(ctx, from_json, wait_for_state, max_wait_seconds, wai
 
     if ip_mtu is not None:
         _details['ipMtu'] = ip_mtu
+
+    if provider_remote_region is not None:
+        _details['providerRemoteRegion'] = provider_remote_region
+
+    if remote_account_id is not None:
+        _details['remoteAccountId'] = remote_account_id
+
+    if traffic_mode is not None:
+        _details['trafficMode'] = traffic_mode
 
     client = cli_util.build_client('core', 'virtual_network', ctx)
     result = client.create_virtual_circuit(
@@ -5264,7 +5319,7 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @cli_util.option('--is-vtap-enabled', type=click.BOOL, help=u"""Used to start or stop a `Vtap` resource.
 
 * `TRUE` directs the VTAP to start mirroring traffic. * `FALSE` (Default) directs the VTAP to stop mirroring traffic.""")
-@cli_util.option('--source-type', type=custom_types.CliCaseInsensitiveChoice(["VNIC", "SUBNET", "LOAD_BALANCER", "DB_SYSTEM", "EXADATA_VM_CLUSTER", "AUTONOMOUS_DATA_WAREHOUSE"]), help=u"""The source type for the VTAP.""")
+@cli_util.option('--source-type', type=custom_types.CliCaseInsensitiveChoice(["VNIC", "SUBNET", "LOAD_BALANCER", "DB_SYSTEM", "EXADATA_VM_CLUSTER", "AUTONOMOUS_DATA_WAREHOUSE", "NETWORK_FIREWALL"]), help=u"""The source type for the VTAP.""")
 @cli_util.option('--traffic-mode', type=custom_types.CliCaseInsensitiveChoice(["DEFAULT", "PRIORITY"]), help=u"""Used to control the priority of traffic. It is an optional field. If it not passed, the value is DEFAULT""")
 @cli_util.option('--max-packet-size', type=click.INT, help=u"""The maximum size of the packets to be included in the filter.""")
 @cli_util.option('--target-type', type=custom_types.CliCaseInsensitiveChoice(["VNIC", "NETWORK_LOAD_BALANCER", "IP_ADDRESS"]), help=u"""The target type for the VTAP.""")
@@ -7468,6 +7523,7 @@ def get_cross_connect_letter_of_authority(ctx, from_json, cross_connect_id):
         raise click.UsageError('Parameter --cross-connect-id cannot be whitespace or empty string')
 
     kwargs = {}
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
     client = cli_util.build_client('core', 'virtual_network', ctx)
     result = client.get_cross_connect_letter_of_authority(
         cross_connect_id=cross_connect_id,
@@ -10666,6 +10722,59 @@ def list_private_ips(ctx, from_json, all_pages, page_size, limit, page, ip_addre
     cli_util.render_response(result, ctx)
 
 
+@provider_remote_region_name_group.command(name=cli_util.override('virtual_network.list_provider_remote_regions.command_name', 'list-provider-remote-regions'), help=u"""The operation lists available OCI's FastConnect MultiCloud Provider/Partner remote region names associated with an OCI region. \n[Command Reference](listProviderRemoteRegions)""")
+@cli_util.option('--provider-service-id', required=True, help=u"""The [OCID] of the provider service.""")
+@cli_util.option('--limit', type=click.INT, help=u"""For list pagination. The maximum number of results per page, or items to return in a paginated \"List\" call. For important details about how pagination works, see [List Pagination].
+
+Example: `50`""")
+@cli_util.option('--page', help=u"""For list pagination. The value of the `opc-next-page` response header from the previous \"List\" call. For important details about how pagination works, see [List Pagination].""")
+@cli_util.option('--all', 'all_pages', is_flag=True, help="""Fetches all pages of results. If you provide this option, then you cannot provide the --limit option.""")
+@cli_util.option('--page-size', type=click.INT, help="""When fetching results, the number of results to fetch per call. Only valid when used with --all or --limit, and ignored otherwise.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'core', 'class': 'list[ProviderRemoteRegionName]'})
+@cli_util.wrap_exceptions
+def list_provider_remote_regions(ctx, from_json, all_pages, page_size, provider_service_id, limit, page):
+
+    if all_pages and limit:
+        raise click.UsageError('If you provide the --all option you cannot provide the --limit option')
+
+    if isinstance(provider_service_id, six.string_types) and len(provider_service_id.strip()) == 0:
+        raise click.UsageError('Parameter --provider-service-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if limit is not None:
+        kwargs['limit'] = limit
+    if page is not None:
+        kwargs['page'] = page
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+    client = cli_util.build_client('core', 'virtual_network', ctx)
+    if all_pages:
+        if page_size:
+            kwargs['limit'] = page_size
+
+        result = cli_util.list_call_get_all_results(
+            client.list_provider_remote_regions,
+            provider_service_id=provider_service_id,
+            **kwargs
+        )
+    elif limit is not None:
+        result = cli_util.list_call_get_up_to_limit(
+            client.list_provider_remote_regions,
+            limit,
+            page_size,
+            provider_service_id=provider_service_id,
+            **kwargs
+        )
+    else:
+        result = client.list_provider_remote_regions(
+            provider_service_id=provider_service_id,
+            **kwargs
+        )
+    cli_util.render_response(result, ctx)
+
+
 @public_ip_pool_group.command(name=cli_util.override('virtual_network.list_public_ip_pools.command_name', 'list'), help=u"""Lists the public IP pools in the specified compartment. You can filter the list using query parameters. \n[Command Reference](listPublicIpPools)""")
 @cli_util.option('--compartment-id', required=True, help=u"""The [OCID] of the compartment.""")
 @cli_util.option('--limit', type=click.INT, help=u"""For list pagination. The maximum number of results per page, or items to return in a paginated \"List\" call. For important details about how pagination works, see [List Pagination].
@@ -11714,6 +11823,144 @@ def modify_vcn_cidr(ctx, from_json, wait_for_state, max_wait_seconds, wait_inter
     cli_util.render_response(result, ctx)
 
 
+@subnet_group.command(name=cli_util.override('virtual_network.patch_subnet.command_name', 'patch'), help=u"""Updates a Subnet by evaluating a sequence of patch instructions (JSON List Patch). This operation is restricted to IPv6 CIDR-related fields only. Supported selections (exact match) are:   - ipv6CidrBlock   - ipv6CidrBlocks Only the REPLACE operation is supported. The request must include the If-Match header for optimistic concurrency control. This is an asynchronous operation. The subnet\u2019s lifecycleState is set to UPDATING while the patch work request is in progress, and changes back to AVAILABLE after the patch operation is complete. All patch instructions are applied atomically as a single operation; either all succeed or none are applied. \n[Command Reference](patchSubnet)""")
+@cli_util.option('--subnet-id', required=True, help=u"""Specify the [OCID] of the subnet.""")
+@cli_util.option('--patch-subnet-instructions', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""List of patch instructions for Subnet.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state SUCCEEDED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'patch-subnet-instructions': {'module': 'core', 'class': 'list[PatchSubnetInstruction]'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'patch-subnet-instructions': {'module': 'core', 'class': 'list[PatchSubnetInstruction]'}})
+@cli_util.wrap_exceptions
+def patch_subnet(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, subnet_id, patch_subnet_instructions, if_match):
+
+    if isinstance(subnet_id, six.string_types) and len(subnet_id.strip()) == 0:
+        raise click.UsageError('Parameter --subnet-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['patchSubnetInstructions'] = cli_util.parse_json_parameter("patch_subnet_instructions", patch_subnet_instructions)
+
+    client = cli_util.build_client('core', 'virtual_network', ctx)
+    result = client.patch_subnet(
+        subnet_id=subnet_id,
+        patch_subnet_details=_details,
+        **kwargs
+    )
+    work_request_client = cli_util.build_client('work_requests', 'work_request', ctx)
+    if wait_for_state:
+
+        if hasattr(work_request_client, 'get_work_request') and callable(getattr(work_request_client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(work_request_client, work_request_client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+                if hasattr(result, "data") and hasattr(result.data, "resources") and len(result.data.resources) == 1:
+                    entity_type = result.data.resources[0].entity_type
+                    identifier = result.data.resources[0].identifier
+                    get_operation = 'get_' + entity_type
+                    if hasattr(client, get_operation) and callable(getattr(client, get_operation)):
+                        result = getattr(client, get_operation)(identifier)
+
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@vcn_group.command(name=cli_util.override('virtual_network.patch_vcn.command_name', 'patch'), help=u"""Updates a VCN by evaluating a sequence of patch instructions (JSON List Patch). This operation is restricted to IPv6 CIDR-related fields only. Supported selections (exact match) are:   - ipv6CidrBlock   - ipv6PublicCidrBlock   - ipv6PrivateCidrBlocks   - byoipv6CidrDetails Only the REPLACE operation is supported. The request must include the If-Match header for optimistic concurrency control. This is an asynchronous operation. The VCN\u2019s lifecycleState is set to UPDATING while the patch work request is in progress, and changes back to AVAILABLE after the patch operation is complete. All patch instructions are applied atomically as a single operation; either all succeed or none are applied. NOTE: `ipv6PublicCidrBlock` represents Oracle provided GUA on VCN. With PATCH API, customer can only remove it if present. Since this is Oracle provided CIDR, there is no concept of replacing with customer provided CIDR. \n[Command Reference](patchVcn)""")
+@cli_util.option('--vcn-id', required=True, help=u"""Specify the [OCID] of the VCN.""")
+@cli_util.option('--patch-vcn-instructions', required=True, type=custom_types.CLI_COMPLEX_TYPE, help=u"""List of patch instructions for VCN.""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["ACCEPTED", "IN_PROGRESS", "FAILED", "SUCCEEDED"]), multiple=True, help="""This operation asynchronously creates, modifies or deletes a resource and uses a work request to track the progress of the operation. Specify this option to perform the action and then wait until the work request reaches a certain state. Multiple states can be specified, returning on the first state. For example, --wait-for-state ACCEPTED --wait-for-state SUCCEEDED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
+@cli_util.option('--max-wait-seconds', type=click.INT, help="""The maximum time to wait for the work request to reach the state defined by --wait-for-state. Defaults to 1200 seconds.""")
+@cli_util.option('--wait-interval-seconds', type=click.INT, help="""Check every --wait-interval-seconds to see whether the work request has reached the state defined by --wait-for-state. Defaults to 30 seconds.""")
+@json_skeleton_utils.get_cli_json_input_option({'patch-vcn-instructions': {'module': 'core', 'class': 'list[PatchVcnInstruction]'}})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'patch-vcn-instructions': {'module': 'core', 'class': 'list[PatchVcnInstruction]'}})
+@cli_util.wrap_exceptions
+def patch_vcn(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, vcn_id, patch_vcn_instructions, if_match):
+
+    if isinstance(vcn_id, six.string_types) and len(vcn_id.strip()) == 0:
+        raise click.UsageError('Parameter --vcn-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+    _details['patchVcnInstructions'] = cli_util.parse_json_parameter("patch_vcn_instructions", patch_vcn_instructions)
+
+    client = cli_util.build_client('core', 'virtual_network', ctx)
+    result = client.patch_vcn(
+        vcn_id=vcn_id,
+        patch_vcn_details=_details,
+        **kwargs
+    )
+    work_request_client = cli_util.build_client('work_requests', 'work_request', ctx)
+    if wait_for_state:
+
+        if hasattr(work_request_client, 'get_work_request') and callable(getattr(work_request_client, 'get_work_request')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+                if 'opc-work-request-id' not in result.headers:
+                    click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state')
+                    cli_util.render_response(result, ctx)
+                    return
+
+                click.echo('Action completed. Waiting until the work request has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(work_request_client, work_request_client.get_work_request(result.headers['opc-work-request-id']), 'status', wait_for_state, **wait_period_kwargs)
+                if hasattr(result, "data") and hasattr(result.data, "resources") and len(result.data.resources) == 1:
+                    entity_type = result.data.resources[0].entity_type
+                    identifier = result.data.resources[0].identifier
+                    get_operation = 'get_' + entity_type
+                    if hasattr(client, get_operation) and callable(getattr(client, get_operation)):
+                        result = getattr(client, get_operation)(identifier)
+
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                # If we fail, we should show an error, but we should still provide the information to the customer
+                click.echo('Failed to wait until the work request entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for work request to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the work request to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
 @private_ip_group.command(name=cli_util.override('virtual_network.private_ip_vnic_detach.command_name', 'private-ip-vnic-detach'), help=u"""Unassign the specified PrivateIP address from Virtual Network Interface Card (VNIC). You must specify the PrivateIP [OCID]. \n[Command Reference](privateIpVnicDetach)""")
 @cli_util.option('--private-ip-id', required=True, help=u"""The [OCID] of the private IP or IPv6.""")
 @cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
@@ -12679,6 +12926,8 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 Example: `true`""")
 @cli_util.option('--customer-reference-name', help=u"""A reference name or identifier for the physical fiber connection this cross-connect uses.""")
 @cli_util.option('--macsec-properties', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--is-interface-hold-timer-enabled', type=click.BOOL, help=u"""The flag to enable or disable the down timer for the interface.""")
+@cli_util.option('--interface-down-timer-value-in-milliseconds', type=click.INT, help=u"""The duration of the interface down timer in milliseconds between 0 and 3000 in multiples of 500.""")
 @cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
 @cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["PENDING_CUSTOMER", "PROVISIONING", "PROVISIONED", "INACTIVE", "TERMINATING", "TERMINATED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state PENDING_CUSTOMER --wait-for-state TERMINATED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
@@ -12689,7 +12938,7 @@ Example: `true`""")
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}, 'macsec-properties': {'module': 'core', 'class': 'UpdateMacsecProperties'}}, output_type={'module': 'core', 'class': 'CrossConnect'})
 @cli_util.wrap_exceptions
-def update_cross_connect(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, cross_connect_id, defined_tags, display_name, freeform_tags, is_active, customer_reference_name, macsec_properties, if_match):
+def update_cross_connect(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, cross_connect_id, defined_tags, display_name, freeform_tags, is_active, customer_reference_name, macsec_properties, is_interface_hold_timer_enabled, interface_down_timer_value_in_milliseconds, if_match):
 
     if isinstance(cross_connect_id, six.string_types) and len(cross_connect_id.strip()) == 0:
         raise click.UsageError('Parameter --cross-connect-id cannot be whitespace or empty string')
@@ -12721,6 +12970,12 @@ def update_cross_connect(ctx, from_json, force, wait_for_state, max_wait_seconds
 
     if macsec_properties is not None:
         _details['macsecProperties'] = cli_util.parse_json_parameter("macsec_properties", macsec_properties)
+
+    if is_interface_hold_timer_enabled is not None:
+        _details['isInterfaceHoldTimerEnabled'] = is_interface_hold_timer_enabled
+
+    if interface_down_timer_value_in_milliseconds is not None:
+        _details['interfaceDownTimerValueInMilliseconds'] = interface_down_timer_value_in_milliseconds
 
     client = cli_util.build_client('core', 'virtual_network', ctx)
     result = client.update_cross_connect(
@@ -12765,6 +13020,9 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--macsec-properties', type=custom_types.CLI_COMPLEX_TYPE, help=u"""""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--minimum-links', type=click.INT, help=u"""(Optional) Minimum number of active cross-connects required for the cross-connect group to be considered operational. If not specified, this value defaults to 1. Value must not exceed the total number of cross-connects in the cross-connect group.""")
+@cli_util.option('--is-interface-hold-timer-enabled', type=click.BOOL, help=u"""The flag to enable or disable the down timer for the interface.""")
+@cli_util.option('--interface-down-timer-value-in-milliseconds', type=click.INT, help=u"""The duration of the interface down timer in milliseconds between 0 and 3000 in multiples of 500.""")
 @cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
 @cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["PROVISIONING", "PROVISIONED", "INACTIVE", "TERMINATING", "TERMINATED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state PROVISIONING --wait-for-state TERMINATED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")
@@ -12775,7 +13033,7 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}, 'macsec-properties': {'module': 'core', 'class': 'UpdateMacsecProperties'}}, output_type={'module': 'core', 'class': 'CrossConnectGroup'})
 @cli_util.wrap_exceptions
-def update_cross_connect_group(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, cross_connect_group_id, defined_tags, display_name, customer_reference_name, freeform_tags, macsec_properties, if_match):
+def update_cross_connect_group(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, cross_connect_group_id, defined_tags, display_name, customer_reference_name, freeform_tags, macsec_properties, minimum_links, is_interface_hold_timer_enabled, interface_down_timer_value_in_milliseconds, if_match):
 
     if isinstance(cross_connect_group_id, six.string_types) and len(cross_connect_group_id.strip()) == 0:
         raise click.UsageError('Parameter --cross-connect-group-id cannot be whitespace or empty string')
@@ -12804,6 +13062,15 @@ def update_cross_connect_group(ctx, from_json, force, wait_for_state, max_wait_s
 
     if macsec_properties is not None:
         _details['macsecProperties'] = cli_util.parse_json_parameter("macsec_properties", macsec_properties)
+
+    if minimum_links is not None:
+        _details['minimumLinks'] = minimum_links
+
+    if is_interface_hold_timer_enabled is not None:
+        _details['isInterfaceHoldTimerEnabled'] = is_interface_hold_timer_enabled
+
+    if interface_down_timer_value_in_milliseconds is not None:
+        _details['interfaceDownTimerValueInMilliseconds'] = interface_down_timer_value_in_milliseconds
 
     client = cli_util.build_client('core', 'virtual_network', ctx)
     result = client.update_cross_connect_group(
@@ -12834,6 +13101,47 @@ def update_cross_connect_group(ctx, from_json, force, wait_for_state, max_wait_s
                 raise
         else:
             click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
+@letter_of_authority_group.command(name=cli_util.override('virtual_network.update_cross_connect_letter_of_authority.command_name', 'update-cross-connect'), help=u"""Updates the Letter of Authority for the specified cross-connect. \n[Command Reference](updateCrossConnectLetterOfAuthority)""")
+@cli_util.option('--cross-connect-id', required=True, help=u"""The [OCID] of the cross-connect.""")
+@cli_util.option('--should-extend', type=click.BOOL, help=u"""A boolean flag to indicate whether to extend the expiry of the associated LOA with the provided cross-connect. If un-set or set to false, it does not alter the existing expiry of the LOA. On extension an updated copy of the LOA will be provided with the new expiry date. An LOA cannot be extended more than 3 times.""")
+@cli_util.option('--should-remove-authorized-agent', type=click.BOOL, help=u"""A boolean flag to indicate whether to remove an attached Authorized Agent to the LOA. If this boolean flag is set, an attempt will be made to remove the attached authorized agent to the LOA, if any, and any value given in the field 'authorizedAgent' will be ignored. In case, of updating an existing Authorized Agent, keep this flag unset and set the expected value in 'authorizedAgent'.""")
+@cli_util.option('--authorized-agent', help=u"""Name of a customer authorized agent which will be appended to the LOA as the field 'Authorized Agent'. If the field is left un-set in the request body, no changes will be done on the LOA for Authorized Agent.""")
+@cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
+@json_skeleton_utils.get_cli_json_input_option({})
+@cli_util.help_option
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'core', 'class': 'LetterOfAuthority'})
+@cli_util.wrap_exceptions
+def update_cross_connect_letter_of_authority(ctx, from_json, cross_connect_id, should_extend, should_remove_authorized_agent, authorized_agent, if_match):
+
+    if isinstance(cross_connect_id, six.string_types) and len(cross_connect_id.strip()) == 0:
+        raise click.UsageError('Parameter --cross-connect-id cannot be whitespace or empty string')
+
+    kwargs = {}
+    if if_match is not None:
+        kwargs['if_match'] = if_match
+    kwargs['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    _details = {}
+
+    if should_extend is not None:
+        _details['shouldExtend'] = should_extend
+
+    if should_remove_authorized_agent is not None:
+        _details['shouldRemoveAuthorizedAgent'] = should_remove_authorized_agent
+
+    if authorized_agent is not None:
+        _details['authorizedAgent'] = authorized_agent
+
+    client = cli_util.build_client('core', 'virtual_network', ctx)
+    result = client.update_cross_connect_letter_of_authority(
+        cross_connect_id=cross_connect_id,
+        update_cross_connect_letter_of_authority_details=_details,
+        **kwargs
+    )
     cli_util.render_response(result, ctx)
 
 
@@ -13778,6 +14086,7 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--vnic-id', help=u"""The [OCID] of the VNIC to reassign the IPv6 to. The VNIC must be in the same subnet as the current VNIC.""")
+@cli_util.option('--hostname', help=u"""The hostname associated with the IPv6 address. Only the hostname label, not the FQDN.""")
 @cli_util.option('--route-table-id', help=u"""The [OCID] of the route table the IP address or VNIC will use. For more information, see [Per-resource Routing].""")
 @cli_util.option('--lifetime', type=custom_types.CliCaseInsensitiveChoice(["EPHEMERAL", "RESERVED"]), help=u"""Lifetime of the IP address. There are two types of IPs:  - Ephemeral  - Reserved""")
 @cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
@@ -13790,7 +14099,7 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}}, output_type={'module': 'core', 'class': 'Ipv6'})
 @cli_util.wrap_exceptions
-def update_ipv6(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, ipv6_id, defined_tags, display_name, freeform_tags, vnic_id, route_table_id, lifetime, if_match):
+def update_ipv6(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, ipv6_id, defined_tags, display_name, freeform_tags, vnic_id, hostname, route_table_id, lifetime, if_match):
 
     if isinstance(ipv6_id, six.string_types) and len(ipv6_id.strip()) == 0:
         raise click.UsageError('Parameter --ipv6-id cannot be whitespace or empty string')
@@ -13817,6 +14126,9 @@ def update_ipv6(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_in
 
     if vnic_id is not None:
         _details['vnicId'] = vnic_id
+
+    if hostname is not None:
+        _details['hostname'] = hostname
 
     if route_table_id is not None:
         _details['routeTableId'] = route_table_id
@@ -14998,6 +15310,7 @@ Example: `{\"Operations\": {\"CostCenter\": \"42\"}}`""" + custom_types.cli_comp
 @cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].
 
 Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--traffic-mode', type=custom_types.CliCaseInsensitiveChoice(["NORMAL", "DRAIN"]), help=u"""The traffic mode to be set with this Virtual Circuit. This controls whether the traffic is to be drained for the associated Virtual Circuit or not.""")
 @cli_util.option('--gateway-id', help=u"""The [OCID] of the [dynamic routing gateway (DRG)] that this private virtual circuit uses.
 
 To be updated only by the customer who owns the virtual circuit.""")
@@ -15019,7 +15332,7 @@ To be updated only by the provider.""")
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'cross-connect-mappings': {'module': 'core', 'class': 'list[CrossConnectMapping]'}, 'defined-tags': {'module': 'core', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'core', 'class': 'dict(str, string)'}}, output_type={'module': 'core', 'class': 'VirtualCircuit'})
 @cli_util.wrap_exceptions
-def update_virtual_circuit(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, virtual_circuit_id, bandwidth_shape_name, cross_connect_mappings, routing_policy, bgp_admin_state, is_bfd_enabled, is_transport_mode, customer_bgp_asn, customer_asn, defined_tags, display_name, freeform_tags, gateway_id, provider_state, provider_service_key_name, reference_comment, ip_mtu, if_match):
+def update_virtual_circuit(ctx, from_json, force, wait_for_state, max_wait_seconds, wait_interval_seconds, virtual_circuit_id, bandwidth_shape_name, cross_connect_mappings, routing_policy, bgp_admin_state, is_bfd_enabled, is_transport_mode, customer_bgp_asn, customer_asn, defined_tags, display_name, freeform_tags, traffic_mode, gateway_id, provider_state, provider_service_key_name, reference_comment, ip_mtu, if_match):
 
     if isinstance(virtual_circuit_id, six.string_types) and len(virtual_circuit_id.strip()) == 0:
         raise click.UsageError('Parameter --virtual-circuit-id cannot be whitespace or empty string')
@@ -15066,6 +15379,9 @@ def update_virtual_circuit(ctx, from_json, force, wait_for_state, max_wait_secon
 
     if freeform_tags is not None:
         _details['freeformTags'] = cli_util.parse_json_parameter("freeform_tags", freeform_tags)
+
+    if traffic_mode is not None:
+        _details['trafficMode'] = traffic_mode
 
     if gateway_id is not None:
         _details['gatewayId'] = gateway_id
@@ -15228,7 +15544,9 @@ If the VNIC belongs to a VLAN as part of the Oracle Cloud VMware Solution (inste
 For more information about NSGs, see [NetworkSecurityGroup].""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @cli_util.option('--skip-source-dest-check', type=click.BOOL, help=u"""Whether the source/destination check is disabled on the VNIC. Defaults to `false`, which means the check is performed. For information about why you would skip the source/destination check, see [Using a Private IP as a Route Target].
 
-If the VNIC belongs to a VLAN as part of the Oracle Cloud VMware Solution (instead of belonging to a subnet), the value of the `skipSourceDestCheck` attribute is ignored. This is because the source/destination check is always disabled for VNICs in a VLAN. Example: `true`""")
+If the VNIC belongs to a VLAN as part of the Oracle Cloud VMware Solution (instead of belonging to a subnet), the value of the `skipSourceDestCheck` attribute is ignored. This is because the source/destination check is always disabled for VNICs in a VLAN.
+
+Example: `true`""")
 @cli_util.option('--route-table-id', help=u"""The [OCID] of the route table the IP address or VNIC will use. For more information, see [Per-resource Routing].""")
 @cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
 @cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
@@ -15334,7 +15652,7 @@ Example: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMP
 @cli_util.option('--source-private-endpoint-ip', help=u"""The IP Address of the source private endpoint.""")
 @cli_util.option('--source-private-endpoint-subnet-id', help=u"""The [OCID] of the subnet that source private endpoint belongs to.""")
 @cli_util.option('--target-type', type=custom_types.CliCaseInsensitiveChoice(["VNIC", "NETWORK_LOAD_BALANCER", "IP_ADDRESS"]), help=u"""The target type for the VTAP.""")
-@cli_util.option('--source-type', type=custom_types.CliCaseInsensitiveChoice(["VNIC", "SUBNET", "LOAD_BALANCER", "DB_SYSTEM", "EXADATA_VM_CLUSTER", "AUTONOMOUS_DATA_WAREHOUSE"]), help=u"""The source type for the VTAP.""")
+@cli_util.option('--source-type', type=custom_types.CliCaseInsensitiveChoice(["VNIC", "SUBNET", "LOAD_BALANCER", "DB_SYSTEM", "EXADATA_VM_CLUSTER", "AUTONOMOUS_DATA_WAREHOUSE", "NETWORK_FIREWALL"]), help=u"""The source type for the VTAP.""")
 @cli_util.option('--if-match', help=u"""For optimistic concurrency control. In the PUT or DELETE call for a resource, set the `if-match` parameter to the value of the etag from a previous GET or POST response for that resource. The resource will be updated or deleted only if the etag you provide matches the resource's current etag value.""")
 @cli_util.option('--force', help="""Perform update without prompting for confirmation.""", is_flag=True)
 @cli_util.option('--wait-for-state', type=custom_types.CliCaseInsensitiveChoice(["PROVISIONING", "AVAILABLE", "UPDATING", "TERMINATING", "TERMINATED"]), multiple=True, help="""This operation creates, modifies or deletes a resource that has a defined lifecycle state. Specify this option to perform the action and then wait until the resource reaches a given lifecycle state. Multiple states can be specified, returning on the first state. For example, --wait-for-state PROVISIONING --wait-for-state TERMINATED would return on whichever lifecycle state is reached first. If timeout is reached, a return code of 2 is returned. For any other error, a return code of 1 is returned.""")

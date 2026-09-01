@@ -275,6 +275,13 @@ def get_instance_principal_signer(ctx, client_config):
         signer_kwargs = {}
         if ctx.obj['cert_bundle']:
             signer_kwargs['federation_client_cert_bundle_verify'] = ctx.obj['cert_bundle']
+
+        federation_endpoint = ctx.obj.get('federation_endpoint')
+        if isinstance(federation_endpoint, str):
+            federation_endpoint = federation_endpoint.strip()
+        if federation_endpoint:
+            signer_kwargs['federation_endpoint'] = federation_endpoint
+
         if ctx.obj['region']:
             # If we don't set this then constructed clients will try and pluck the region from the instance principals signer, which may
             # conflict with the caller intent (since they *DID* explicitly pass a region)
@@ -452,7 +459,7 @@ def create_config_and_signer_based_on_click_context(ctx):
     try:
         config.validate_config(client_config, **kwargs)
     except exceptions.InvalidConfig as bad_config:
-        if type(bad_config.errors) != str:
+        if type(bad_config.errors) is not str:
             table = render_config_errors(bad_config)
         else:
             table = bad_config.errors
@@ -489,6 +496,10 @@ def set_request_session_properties_from_context(session, ctx, uses_ssl=True):
 
 
 def build_raw_requests_session(ctx):
+
+    if 'OCI_CLI_USE_INSTANCE_METADATA_SERVICE' in os.environ:
+        oci.regions.enable_instance_metadata_service()
+
     config_and_signer = create_config_and_signer_based_on_click_context(ctx)
     signer = config_and_signer.signer
     client_config = config_and_signer.config
@@ -508,6 +519,7 @@ def build_raw_requests_session(ctx):
                 signer = oci.Signer.from_config(client_config)
 
         session = requests.Session()
+        session.trust_env = False
         session.auth = signer
         session.headers['opc-request-id'] = ctx.obj['request_id']
         session.headers['user-agent'] = oci.base_client.build_user_agent(extra=client_config[ADDITIONAL_USER_AGENT])
@@ -718,7 +730,17 @@ def render_response(response, ctx):
         last_event_time = time.time()
         try:
             for event in response.data.events():
-                render(json.loads(event.data), response.headers, ctx)
+                event_data = event.data.strip()
+                if not event_data:
+                    # event.data is not expected to be None, however, if the data is only whitespace characters, then,
+                    # event.data.strip() can be None. For such cases we simply skip printing/rendering it.
+                    continue
+                try:
+                    render(json.loads(event_data), response.headers, ctx)
+                except json.decoder.JSONDecodeError:
+                    # If text/event-stream is set, it doesn't guarantee the payload in event.data is JSON, it could be
+                    # arbitrary text.
+                    print(pretty_print_format(event_data))
                 elapsed_time = time.time() - last_event_time
                 if elapsed_time > event_read_timeout:
                     raise TimeoutError
@@ -1480,7 +1502,7 @@ def load_context_obj_values_from_defaults(ctx):
         if not ctx.obj['enable_dual_stack']:
             # False for enable-dual-stack means not provided, so just load it if there is a default value. If there's nothing there, then this'll be
             # None, which is still false-y
-            ctx.obj['realm_specific_endpoint'] = get_default_value_from_defaults_file(ctx, 'enable-dual-stack', click.BOOL, False)
+            ctx.obj['enable_dual_stack'] = get_default_value_from_defaults_file(ctx, 'enable-dual-stack', click.BOOL, False)
     else:
         populate_dict_key_with_default_value(ctx, 'enable_dual_stack', click.BOOL, param_name='enable-dual-stack')
 
@@ -2090,6 +2112,7 @@ def list_call_get_all_results(list_func_ref, ctx=None, is_json=False, stream_out
     aggregated_results = []
     aggregated_results_dict = {}
     wrapped_array_pagination = False
+    final_response = None
 
     page_index = 1
     has_stream_data = False
@@ -2149,7 +2172,8 @@ def list_call_get_all_results(list_func_ref, ctx=None, is_json=False, stream_out
                 headers = call_result.headers
                 request = call_result.request
             final_response = Response(status, headers, post_processed_results, request)
-            return final_response
+    if final_response is not None:
+        return final_response
     if ctx and ctx.obj['debug']:
         print("", file=sys.stderr)
 
@@ -2269,6 +2293,7 @@ def list_call_get_all_results_multiple_keys(list_func_ref, ctx=None, is_json=Fal
     aggregated_results = []
     aggregated_results_dict = {}
     wrapped_array_pagination = False
+    final_response = None
 
     page_index = 1
     has_stream_data = False
@@ -2333,7 +2358,8 @@ def list_call_get_all_results_multiple_keys(list_func_ref, ctx=None, is_json=Fal
                 headers = call_result.headers
                 request = call_result.request
             final_response = Response(status, headers, post_processed_results, request)
-            return final_response
+    if final_response is not None:
+        return final_response
     if ctx and ctx.obj['debug']:
         print("", file=sys.stderr)
 

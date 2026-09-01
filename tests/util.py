@@ -270,6 +270,22 @@ def remove_outer_quotes(text):
         return text
 
 
+def get_result_stdout(result):
+    # click 8.2+ exposes stdout and stderr separately; older versions only have merged output.
+    try:
+        return result.stdout
+    except (AttributeError, ValueError):
+        return result.output
+
+
+def get_result_stderr(result):
+    # keep callers compatible with Click versions that do not capture stderr separately.
+    try:
+        return result.stderr
+    except (AttributeError, ValueError):
+        return ''
+
+
 def validate_response(result, extra_validation=None, includes_debug_data=False, json_response_expected=True, expect_etag=False, progress_bar_expected=False):
     try:
         assert result.exit_code == 0 or result.exit_code is None
@@ -282,7 +298,9 @@ def validate_response(result, extra_validation=None, includes_debug_data=False, 
             assert '200' in result.output or '204' in result.output
         elif json_response_expected:
             if progress_bar_expected:
-                validate_json_response(result.output[result.output.find('{'):])
+                # object storage progress output may precede the JSON body (on newer click version), so parse from the first '{'.
+                stdout = get_result_stdout(result)
+                validate_json_response(stdout[stdout.find('{'):])
             else:
                 validate_json_response(result.output)
 
@@ -355,9 +373,12 @@ def target_config(request):
 def invoke_command(command, ** args):
 
     num_tries = 0
+    root_command_opts = ['--config-file', os.environ['OCI_CLI_CONFIG_FILE']]
+    if target_config_profile is not None:
+        root_command_opts.extend(['--profile', target_config_profile])
 
     while num_tries < NUM_INVOKE_COMMAND_RETRIES:
-        command_output = runner().invoke(oci_cli.cli, ['--config-file', os.environ['OCI_CLI_CONFIG_FILE'], '--profile', target_config_profile] + command, ** args)
+        command_output = runner().invoke(oci_cli.cli, root_command_opts + command, ** args)
 
         if command_output.exception:
             output_to_test = str(command_output.exception)

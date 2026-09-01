@@ -667,14 +667,28 @@ def launch_db_system_from_database_extended(ctx, **kwargs):
 @cli_util.option('--hsm-password', required=False, help=u"""Provide the HSM password as you would in RDBMS for External HSM.""")
 @cli_util.option('--data-storage-size-in-gbs', type=click.INT, help=u"""Provide the DATA storage size, in gigabytes, that is applicable for the database.""")
 @cli_util.option('--reco-storage-size-in-gbs', type=click.INT, help=u"""Provide the RECO storage size, in gigabytes, that is applicable for the database.""")
+@cli_util.option('--msu-details', type=custom_types.CLI_COMPLEX_TYPE, help="""This is a complex type whose value must be valid JSON. The value can be provided as a string on the command line or passed in as a file using
+the file://path/to/file syntax.
+The --generate-param-json-input option can be used to generate an example of the JSON which must be provided. We recommend storing this example
+in a file, modifying it as needed and then passing it back in via the file:// syntax.""")
 @cli_util.option('--zero-data-loss-enabled', required=False, type=click.BOOL, help=u"""Enable Zero Data loss feature""")
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'backup-destination': {'module': 'database', 'class': 'list[BackupDestinationDetails]'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'database', 'class': 'DatabaseSummary'})
 @cli_util.wrap_exceptions
 def create_database(ctx, wait_for_state, max_wait_seconds, wait_interval_seconds, **kwargs):
-    if kwargs['db_home_id'] is None and kwargs['db_version'] is None:
-        click.echo(message="Missing a required parameter. Either --db-home-id or --db-version must be specified.", file=sys.stderr)
-        sys.exit(1)
+    create_database_details = oci.database.models.CreateDatabaseDetails()
+    if 'msu_details' in kwargs and kwargs['msu_details']:
+        create_database_details.managed_software_update_details = kwargs['msu_details']
+        kwargs.pop('msu_details')
+        if 'vm_cluster_id' in kwargs and kwargs['vm_cluster_id']:
+            create_database_details.vm_cluster_id = kwargs['vm_cluster_id']
+        else:
+            click.echo(message="Missing a required parameter. --vm-cluster-id must be specified for managed software updates", file=sys.stderr)
+            sys.exit(1)
+    else:
+        if kwargs['db_home_id'] is None and kwargs['db_version'] is None:
+            click.echo(message="Missing a required parameter. Either --db-home-id or --db-version must be specified.", file=sys.stderr)
+            sys.exit(1)
 
     if 'db_system_id' in kwargs and kwargs['db_system_id']:
         create_db_home_details = oci.database.models.CreateDbHomeWithDbSystemIdDetails()
@@ -696,7 +710,6 @@ def create_database(ctx, wait_for_state, max_wait_seconds, wait_interval_seconds
 
     db_backup_config = oci.database.models.DbBackupConfig()
 
-    create_database_details = oci.database.models.CreateDatabaseDetails()
     if 'admin_password' in kwargs and kwargs['admin_password']:
         create_database_details.admin_password = kwargs['admin_password']
 
@@ -867,6 +880,10 @@ def create_database(ctx, wait_for_state, max_wait_seconds, wait_interval_seconds
 @cli_util.option('--sid-prefix', required=False, help="""Specifies a prefix for the `Oracle SID` of the database to be created.""")
 @cli_util.option('--data-storage-size-in-gbs', type=click.INT, help=u"""Provide the DATA storage size, in gigabytes, that is applicable for the database.""")
 @cli_util.option('--reco-storage-size-in-gbs', type=click.INT, help=u"""Provide the RECO storage size, in gigabytes, that is applicable for the database.""")
+@cli_util.option('--msu-details', type=custom_types.CLI_COMPLEX_TYPE, help="""This is a complex type whose value must be valid JSON. The value can be provided as a string on the command line or passed in as a file using
+the file://path/to/file syntax.
+The --generate-param-json-input option can be used to generate an example of the JSON which must be provided. We recommend storing this example
+in a file, modifying it as needed and then passing it back in via the file:// syntax.""")
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'database', 'class': 'DatabaseSummary'})
 @cli_util.wrap_exceptions
@@ -932,6 +949,12 @@ def create_database_from_backup(ctx, wait_for_state, max_wait_seconds, wait_inte
     if include_storage_details:
         create_database_details.storage_size_details = database_storage_size_details
 
+    if 'msu_details' in kwargs and kwargs['msu_details']:
+        create_database_details.managed_software_update_details = kwargs['msu_details']
+        kwargs.pop('msu_details')
+    if 'vm_cluster_id' in kwargs and kwargs['vm_cluster_id']:
+        create_database_details.vm_cluster_id = kwargs['vm_cluster_id']
+
     create_db_home_with_system_details.database = create_database_details
 
     client = cli_util.build_client('database', 'database', ctx)
@@ -970,7 +993,12 @@ def create_database_from_backup(ctx, wait_for_state, max_wait_seconds, wait_inte
     try:
         result = client.list_databases(db_home_id=db_home_id, compartment_id=compartment_id)
     except oci.exceptions.ServiceError:
-        click.echo("Failed retrieving database info after successfully creation.  You can view the status of databases in this DB system by executing: oci db database list -c {comp_id} --db-system-id {db_sys_id} ".format(comp_id=compartment_id, db_sys_id=kwargs['db_system_id']), file=sys.stderr)
+        target_option = '--db-system-id'
+        target_id = kwargs.get('db_system_id')
+        if not target_id:
+            target_option = '--vm-cluster-id'
+            target_id = kwargs.get('vm_cluster_id')
+        click.echo("Failed retrieving database info after successfully creation.  You can view the status of databases by executing: oci db database list -c {comp_id} {target_option} {target_id} ".format(comp_id=compartment_id, target_option=target_option, target_id=target_id), file=sys.stderr)
         sys.exit(1)
 
     # Return the first database in this newly created db-home
@@ -979,8 +1007,115 @@ def create_database_from_backup(ctx, wait_for_state, max_wait_seconds, wait_inte
     cli_util.render(database, None, ctx)
 
 
+@cli_util.copy_params_from_generated_command(database_cli.create_database, params_to_exclude=['source'])
+@database_cli.database_group.command(name='create-database-from-database', help="""Creates a new database in the specified Database Home from another database.""")
+@cli_util.option('--admin-password', required=True, help="""A strong password for SYS, SYSTEM, and PDB Admin. The password must be at least nine characters and contain at least two uppercase, two lowercase, two numbers, and two special characters. The special characters must be _, #, or -.""")
+@cli_util.option('--database-id', required=True, help="""The OCID of the source database.""")
+@cli_util.option('--backup-tde-password', required=False, help="""The password to open the TDE wallet.""")
+@cli_util.option('--db-name', required=False, help="""The display name of the database to be created. It must begin with an alphabetic character and can contain a maximum of eight alphanumeric characters. Special characters are not permitted.""")
+@cli_util.option('--sid-prefix', required=False, help="""Specifies a prefix for the Oracle SID of the database to be created.""")
+@cli_util.option('--recovery-appliance-vpc-password', required=False, help="""The password for the Recovery Appliance VPC administrator.""")
+@cli_util.option('--source-encryption-key-location-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The source encryption key location details for the database being created. Supported variants are:
+
+* AWS: `{\"awsEncryptionKeyId\": \"<key-ocid>\", \"providerType\": \"AWS\"}`
+* AZURE: `{\"azureEncryptionKeyId\": \"<key-ocid>\", \"providerType\": \"AZURE\"}`
+* EXTERNAL: `{\"hsmPassword\": \"<password>\", \"providerType\": \"EXTERNAL\"}`
+* GCP: `{\"googleCloudProviderEncryptionKeyId\": \"<key-ocid>\", \"providerType\": \"GCP\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--freeform-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Free-form tags for this resource. Each tag is a simple key-value pair with no predefined name, type, or namespace. For more information, see [Resource Tags].\n\nExample: `{\"Department\": \"Finance\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--defined-tags', type=custom_types.CLI_COMPLEX_TYPE, help=u"""Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags].""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
+@cli_util.option('--point-in-time-recovery-timestamp', required=False, help="""The point in time of the original database from which the new database is created. If not specified, the latest backup is used to create the database.""")
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'source-encryption-key-location-details': {'module': 'database', 'class': 'EncryptionKeyLocationDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'database', 'class': 'Database'})
+@cli_util.wrap_exceptions
+def create_database_create_database_from_database(ctx, from_json, wait_for_state, max_wait_seconds, wait_interval_seconds, **kwargs):
+    kwargs_for_client = {}
+    kwargs_for_client['opc_request_id'] = cli_util.use_or_generate_request_id(ctx.obj['request_id'])
+
+    create_database_details = oci.database.models.CreateDatabaseFromAnotherDatabaseDetails()
+    if 'admin_password' in kwargs and kwargs['admin_password']:
+        create_database_details.admin_password = kwargs['admin_password']
+
+    if 'database_id' in kwargs and kwargs['database_id']:
+        create_database_details.database_id = kwargs['database_id']
+
+    if 'backup_tde_password' in kwargs and kwargs['backup_tde_password']:
+        create_database_details.backup_tde_password = kwargs['backup_tde_password']
+
+    if 'db_name' in kwargs and kwargs['db_name']:
+        create_database_details.db_name = kwargs['db_name']
+
+    if 'sid_prefix' in kwargs and kwargs['sid_prefix']:
+        create_database_details.sid_prefix = kwargs['sid_prefix']
+
+    if 'freeform_tags' in kwargs and kwargs['freeform_tags']:
+        create_database_details.freeform_tags = cli_util.parse_json_parameter('freeform_tags', kwargs['freeform_tags'])
+
+    if 'defined_tags' in kwargs and kwargs['defined_tags']:
+        create_database_details.defined_tags = cli_util.parse_json_parameter('defined_tags', kwargs['defined_tags'])
+
+    if 'recovery_appliance_vpc_password' in kwargs and kwargs['recovery_appliance_vpc_password']:
+        create_database_details.recovery_appliance_vpc_password = kwargs['recovery_appliance_vpc_password']
+
+    if 'source_encryption_key_location_details' in kwargs and kwargs['source_encryption_key_location_details']:
+        create_database_details.source_encryption_key_location_details = cli_util.parse_json_parameter(
+            'source_encryption_key_location_details',
+            kwargs['source_encryption_key_location_details']
+        )
+
+    if 'point_in_time_recovery_timestamp' in kwargs and kwargs['point_in_time_recovery_timestamp']:
+        create_database_details.time_stamp_for_point_in_time_recovery = kwargs['point_in_time_recovery_timestamp']
+
+    _details = {
+        'dbHomeId': kwargs['db_home_id'],
+        'database': create_database_details,
+        'source': 'DATABASE'
+    }
+
+    if kwargs['db_version'] is not None:
+        _details['dbVersion'] = kwargs['db_version']
+
+    if kwargs['kms_key_id'] is not None:
+        _details['kmsKeyId'] = kwargs['kms_key_id']
+
+    if kwargs['kms_key_version_id'] is not None:
+        _details['kmsKeyVersionId'] = kwargs['kms_key_version_id']
+
+    client = cli_util.build_client('database', 'database', ctx)
+    result = client.create_database(
+        create_new_database_details=_details,
+        **kwargs_for_client
+    )
+
+    if wait_for_state:
+        if hasattr(client, 'get_database') and callable(getattr(client, 'get_database')):
+            try:
+                wait_period_kwargs = {}
+                if max_wait_seconds is not None:
+                    wait_period_kwargs['max_wait_seconds'] = max_wait_seconds
+                if wait_interval_seconds is not None:
+                    wait_period_kwargs['max_interval_seconds'] = wait_interval_seconds
+
+                click.echo('Action completed. Waiting until the resource has entered state: {}'.format(wait_for_state), file=sys.stderr)
+                result = oci.wait_until(client, client.get_database(result.data.id), 'lifecycle_state', wait_for_state, **wait_period_kwargs)
+            except oci.exceptions.MaximumWaitTimeExceeded as e:
+                click.echo('Failed to wait until the resource entered the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                sys.exit(2)
+            except Exception:
+                click.echo('Encountered error while waiting for resource to enter the specified state. Outputting last known resource state', file=sys.stderr)
+                cli_util.render_response(result, ctx)
+                raise
+        else:
+            click.echo('Unable to wait for the resource to enter the specified state', file=sys.stderr)
+    cli_util.render_response(result, ctx)
+
+
 @cli_util.copy_params_from_generated_command(database_cli.update_database, params_to_exclude=['db_backup_config'])
 @database_cli.database_group.command(name='update', help="""Update a Database based on the request parameters you provide.""")
+@cli_util.option('--msu-details', type=custom_types.CLI_COMPLEX_TYPE, help="""This is a complex type whose value must be valid JSON. The value can be provided as a string on the command line or passed in as a file using
+the file://path/to/file syntax.
+The --generate-param-json-input option can be used to generate an example of the JSON which must be provided. We recommend storing this example
+in a file, modifying it as needed and then passing it back in via the file:// syntax.""")
 @cli_util.option('--auto-backup-enabled', type=click.BOOL, help="""If set to true, schedules backups automatically. Default is false.""")
 @cli_util.option('--recovery-window-in-days', type=click.IntRange(1, 60), help="""The number of days between the current and the earliest point of recoverability covered by automatic backups (1 to 60).""")
 @cli_util.option('--auto-backup-window', required=False, help="""Specifying a two hour slot when the backup should kick in eg:- SLOT_ONE,SLOT_TWO. Default is anytime""")
@@ -988,10 +1123,29 @@ def create_database_from_backup(ctx, wait_for_state, max_wait_seconds, wait_inte
 @cli_util.option('--auto-full-backup-window', required=False, help="""Specifying a two hour slot when the full backup should kick in eg:- SLOT_ONE,SLOT_TWO. Default is anytime""")
 @cli_util.option('--backup-destination', required=False, type=custom_types.CLI_COMPLEX_TYPE, help="""backup destination list""")
 @cli_util.option('--zero-data-loss-enabled', required=False, type=click.BOOL, help=u"""Enable Zero Data loss feature""")
+@cli_util.option('--manage-auto-failover', type=custom_types.CliCaseInsensitiveChoice(["ENABLE", "DISABLE"]), help=u"""The value to assign to the managed_auto_failover property of the standby to be created.
+            Allowed values for this property are: "ENABLE", "DISABLE".""")
+@cli_util.option('--auto-failover-targets', type=click.STRING, help=u"""Defines auto failover targets for the current database. The value should be comma separated unique names of other data guard members.""")
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'backup-destination': {'module': 'database', 'class': 'list[BackupDestinationDetails]'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}}, output_type={'module': 'database', 'class': 'Database'})
 @cli_util.wrap_exceptions
 def update_database_extended(ctx, **kwargs):
+    if 'msu_details' in kwargs:
+        kwargs['managed_software_update_details'] = kwargs['msu_details']
+        kwargs.pop('msu_details')
+
+    database_auto_failover_details = {}
+    if 'manage_auto_failover' in kwargs and kwargs['manage_auto_failover']:
+        database_auto_failover_details['managed_auto_failover'] = kwargs['manage_auto_failover']
+    if 'auto_failover_targets' in kwargs and kwargs['auto_failover_targets'] is not None:
+        if kwargs['auto_failover_targets']:
+            database_auto_failover_details['failover_targets'] = kwargs['auto_failover_targets'].split(',')
+        else:
+            database_auto_failover_details['failover_targets'] = []
+
+    if database_auto_failover_details:
+        kwargs['auto_failover_configuration'] = json.dumps(database_auto_failover_details)
+
     if kwargs['auto_backup_enabled'] is not None or kwargs['recovery_window_in_days'] is not None:
         db_backup_config = {}
         if 'auto_backup_window' in kwargs and kwargs['auto_backup_window'] and kwargs['auto_backup_enabled'] is not None:
@@ -1026,6 +1180,8 @@ def update_database_extended(ctx, **kwargs):
     del kwargs['auto_full_backup_window']
     del kwargs['backup_destination']
     kwargs.pop('zero_data_loss_enabled', None)
+    del kwargs['manage_auto_failover']
+    del kwargs['auto_failover_targets']
 
     ctx.invoke(database_cli.update_database, **kwargs)
 
@@ -1035,19 +1191,40 @@ def update_database_extended(ctx, **kwargs):
 # This is similar to what was done for create_database_from_backup.
 # Db home is not exposed to the end user.
 @cli_util.copy_params_from_generated_command(database_cli.create_db_home, params_to_exclude=['database', 'display_name', 'db_version', 'source'])
-@database_cli.database_group.command(name='create-from-database', help="""Creates a new database in the given DB System from another database.""")
-@cli_util.option('--db-system-id', required=False, help="""The Db System Id to clone this database under.""")
+@database_cli.database_group.command(name='create-from-database', help="""Creates a new database in the given DB System or VM Cluster from another database.""")
+@cli_util.option('--vm-cluster-id', required=False, help="""The Vm Cluster Id to create this database under. Either --db-system-id or --vm-cluster-id must be specified, but if both are passed, --vm-cluster-id will be ignored.""")
+@cli_util.option('--db-system-id', required=False, help="""The Db System Id to clone this database under. Either --db-system-id or --vm-cluster-id must be specified, but if both are passed, --vm-cluster-id will be ignored.""")
 @cli_util.option('--admin-password', required=True, help="""A strong password for SYS, SYSTEM, and PDB Admin. The password must be at least nine characters and contain at least two uppercase, two lowercase, two numbers, and two special characters. The special characters must be _, #, or -.""")
 @cli_util.option('--database-id', required=True, help="""The OCID of the from-database.""")
 @cli_util.option('--backup-tde-password', required=False, help="""The password to open the TDE wallet.""")
 @cli_util.option('--point-in-time-recovery-timestamp', required=False, help="""The point in time of the original database from which the new database is created. If not specifed, the latest backup is used to create the database.""")
 @cli_util.option('--db-name', required=False, help="""The display name of the database to be created. It must begin with an alphabetic character and can contain a maximum of eight alphanumeric characters. Special characters are not permitted.""")
+@cli_util.option('--sid-prefix', required=False, help="""Specifies a prefix for the Oracle SID of the database to be created.""")
+@cli_util.option('--recovery-appliance-vpc-password', required=False, help="""The password for the Recovery Appliance VPC administrator.""")
+@cli_util.option('--source-encryption-key-location-details', type=custom_types.CLI_COMPLEX_TYPE, help=u"""The source encryption key location details for the database being created. Supported variants are:
+
+* AWS: `{\"awsEncryptionKeyId\": \"<key-ocid>\", \"providerType\": \"AWS\"}`
+* AZURE: `{\"azureEncryptionKeyId\": \"<key-ocid>\", \"providerType\": \"AZURE\"}`
+* EXTERNAL: `{\"hsmPassword\": \"<password>\", \"providerType\": \"EXTERNAL\"}`
+* GCP: `{\"googleCloudProviderEncryptionKeyId\": \"<key-ocid>\", \"providerType\": \"GCP\"}`""" + custom_types.cli_complex_type.COMPLEX_TYPE_HELP)
 @click.pass_context
-@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'database', 'class': 'DatabaseSummary'})
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'source-encryption-key-location-details': {'module': 'database', 'class': 'EncryptionKeyLocationDetails'}, 'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'database', 'class': 'DatabaseSummary'})
 @cli_util.wrap_exceptions
 def create_database_from_another_database(ctx, wait_for_state, max_wait_seconds, wait_interval_seconds, **kwargs):
-    create_db_home_with_system_details = oci.database.models.CreateDbHomeWithDbSystemIdFromDatabaseDetails()
     create_database_details = oci.database.models.CreateDatabaseFromAnotherDatabaseDetails()
+    if 'db_system_id' in kwargs and kwargs['db_system_id']:
+        create_db_home_with_system_details = oci.database.models.CreateDbHomeWithDbSystemIdFromDatabaseDetails()
+        create_db_home_with_system_details.db_system_id = kwargs['db_system_id']
+        source = 'DATABASE'
+    else:
+        if 'vm_cluster_id' in kwargs and kwargs['vm_cluster_id']:
+            create_db_home_with_system_details = oci.database.models.CreateDbHomeWithVmClusterIdFromDatabaseDetails()
+            create_db_home_with_system_details.vm_cluster_id = kwargs['vm_cluster_id']
+            source = 'VM_CLUSTER_DATABASE'
+        else:
+            click.echo(message="Missing a required parameter. Either --db-system-id or --vm-cluster-id must be specified.", file=sys.stderr)
+            sys.exit(1)
+
     if 'admin_password' in kwargs and kwargs['admin_password']:
         create_database_details.admin_password = kwargs['admin_password']
 
@@ -1060,25 +1237,49 @@ def create_database_from_another_database(ctx, wait_for_state, max_wait_seconds,
     if 'db_name' in kwargs and kwargs['db_name']:
         create_database_details.db_name = kwargs['db_name']
 
+    if 'sid_prefix' in kwargs and kwargs['sid_prefix']:
+        create_database_details.sid_prefix = kwargs['sid_prefix']
+
+    if 'recovery_appliance_vpc_password' in kwargs and kwargs['recovery_appliance_vpc_password']:
+        create_database_details.recovery_appliance_vpc_password = kwargs['recovery_appliance_vpc_password']
+
+    if 'source_encryption_key_location_details' in kwargs and kwargs['source_encryption_key_location_details']:
+        create_database_details.source_encryption_key_location_details = cli_util.parse_json_parameter(
+            'source_encryption_key_location_details',
+            kwargs['source_encryption_key_location_details']
+        )
+
     if 'point_in_time_recovery_timestamp' in kwargs and kwargs['point_in_time_recovery_timestamp']:
         create_database_details.time_stamp_for_point_in_time_recovery = kwargs['point_in_time_recovery_timestamp']
 
     create_db_home_with_system_details.database = create_database_details
 
-    if 'db_system_id' in kwargs and kwargs['db_system_id']:
-        create_db_home_with_system_details.db_system_id = kwargs['db_system_id']
-
     if 'database_software_image_id' in kwargs and kwargs['database_software_image_id']:
         create_db_home_with_system_details.database_software_image_id = kwargs['database_software_image_id']
+
+    if 'kms_key_id' in kwargs and kwargs['kms_key_id']:
+        create_db_home_with_system_details.kms_key_id = kwargs['kms_key_id']
+
+    if 'kms_key_version_id' in kwargs and kwargs['kms_key_version_id']:
+        create_db_home_with_system_details.kms_key_version_id = kwargs['kms_key_version_id']
+
+    if 'freeform_tags' in kwargs and kwargs['freeform_tags']:
+        create_db_home_with_system_details.freeform_tags = cli_util.parse_json_parameter("freeform_tags", kwargs['freeform_tags'])
+
+    if 'defined_tags' in kwargs and kwargs['defined_tags']:
+        create_db_home_with_system_details.defined_tags = cli_util.parse_json_parameter("defined_tags", kwargs['defined_tags'])
 
     if 'is_desupported_version' in kwargs and kwargs['is_desupported_version']:
         create_db_home_with_system_details.is_desupported_version = kwargs['is_desupported_version']
 
-    create_db_home_with_system_details.source = 'DATABASE'
+    if kwargs['is_unified_auditing_enabled'] is not None:
+        create_db_home_with_system_details.is_unified_auditing_enabled = kwargs['is_unified_auditing_enabled']
+
+    create_db_home_with_system_details.source = source
 
     client = cli_util.build_client('database', 'database', ctx)
 
-    result = client.create_db_home(create_db_home_with_system_details)
+    result = client.create_db_home(create_db_home_with_db_system_id_details=create_db_home_with_system_details)
 
     db_home_id = result.data.id
     compartment_id = result.data.compartment_id
@@ -1112,7 +1313,12 @@ def create_database_from_another_database(ctx, wait_for_state, max_wait_seconds,
     try:
         result = client.list_databases(db_home_id=db_home_id, compartment_id=compartment_id)
     except oci.exceptions.ServiceError:
-        click.echo("Failed retrieving database info after successfully creation.  You can view the status of databases in this DB system by executing: oci db database list -c {comp_id} --db-system-id {db_sys_id} ".format(comp_id=compartment_id, db_sys_id=kwargs['db_system_id']), file=sys.stderr)
+        target_option = '--db-system-id'
+        target_id = kwargs.get('db_system_id')
+        if not target_id:
+            target_option = '--vm-cluster-id'
+            target_id = kwargs.get('vm_cluster_id')
+        click.echo("Failed retrieving database info after successfully creation.  You can view the status of databases by executing: oci db database list -c {comp_id} {target_option} {target_id} ".format(comp_id=compartment_id, target_option=target_option, target_id=target_id), file=sys.stderr)
         sys.exit(1)
 
     # there is only one database per db-home
@@ -1303,6 +1509,16 @@ def db_node_stop(ctx, **kwargs):
 
 
 @cli_util.copy_params_from_generated_command(database_cli.db_node_action, params_to_exclude=['action'])
+@database_cli.db_node_group.command(name='force-stop', help="""Powers off the specified DB node forcefully.""")
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'database', 'class': 'DbNode'})
+@cli_util.wrap_exceptions
+def db_node_forcestop(ctx, **kwargs):
+    kwargs['action'] = 'forcestop'
+    ctx.invoke(database_cli.db_node_action, **kwargs)
+
+
+@cli_util.copy_params_from_generated_command(database_cli.db_node_action, params_to_exclude=['action'])
 @database_cli.db_node_group.command(name='soft-reset', help="""Performs an ACPI shutdown and powers on the specified DB node.""")
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'database', 'class': 'DbNode'})
@@ -1319,6 +1535,16 @@ def db_node_softreset(ctx, **kwargs):
 @cli_util.wrap_exceptions
 def db_node_reset(ctx, **kwargs):
     kwargs['action'] = 'reset'
+    ctx.invoke(database_cli.db_node_action, **kwargs)
+
+
+@cli_util.copy_params_from_generated_command(database_cli.db_node_action, params_to_exclude=['action'])
+@database_cli.db_node_group.command(name='force-reset', help="""Powers off and powers on the specified DB node forcefully.""")
+@click.pass_context
+@json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={}, output_type={'module': 'database', 'class': 'DbNode'})
+@cli_util.wrap_exceptions
+def db_node_forcereset(ctx, **kwargs):
+    kwargs['action'] = 'forcereset'
     ctx.invoke(database_cli.db_node_action, **kwargs)
 
 
@@ -1419,6 +1645,7 @@ database_cli.db_root_group.commands.pop(database_cli.vm_cluster_update_history_e
 @cli_util.option('--patch-action', help="""The action to perform on the patch.""")
 @cli_util.option('--patch-id', help="""The OCID of the patch.""")
 @cli_util.option('--update-action', help="""The action to perform on the update.""")
+@cli_util.option('--update-mode', help="""The update mode applicable to OS Update.""")
 @cli_util.option('--update-id', help="""The [OCID](/Content/General/Concepts/identifiers.htm) of the maintenance update.""")
 @cli_util.option('--gi-image-id', help="""The [OCID](/Content/General/Concepts/identifiers.htm) of the grid infrastructure software image. This is a database software image of type `GRID_IMAGE`.""")
 @cli_util.option('--data-collection-options', type=custom_types.CLI_COMPLEX_TYPE, help=DATA_COLLECTION_OPTIONS_HELP)
@@ -1439,6 +1666,7 @@ def update_vm_cluster_extended(ctx, **kwargs):
         }
 
     update_action = kwargs.get('update_action')
+    update_mode = kwargs.get('update_mode')
     update_id = kwargs.get('update_id')
     gi_image_id = kwargs.get('gi_image_id')
     if update_id and gi_image_id:
@@ -1447,11 +1675,15 @@ def update_vm_cluster_extended(ctx, **kwargs):
         raise click.UsageError('--update-id or --gi-image-id is required if --update-action is specified')
     elif (update_id or gi_image_id) and not update_action:
         raise click.UsageError('--update-action is required if --update-id or --gi-image-id is specified')
+    elif update_mode is not None and not update_id:
+        raise click.UsageError('--update-mode is only required if --update-id is specified to perform DomU OS Update')
     elif update_id and update_action:
         kwargs['update_details'] = {
             "updateAction": update_action,
             "updateId": update_id
         }
+        if update_mode is not None:
+            kwargs['update_details']['updateMode'] = update_mode
     elif gi_image_id and update_action:
         kwargs['update_details'] = {
             "updateAction": update_action,
@@ -1464,6 +1696,7 @@ def update_vm_cluster_extended(ctx, **kwargs):
     del kwargs['update_action']
     del kwargs['update_id']
     del kwargs['gi_image_id']
+    del kwargs['update_mode']
 
     ctx.invoke(database_cli.update_vm_cluster, **kwargs)
 
@@ -2075,6 +2308,7 @@ def list_cloud_vm_clusters(ctx, **kwargs):
 @cli_util.copy_params_from_generated_command(database_cli.update_cloud_vm_cluster, params_to_exclude=['ssh_public_keys', 'update_details', 'data_collection_options'])
 @database_cli.cloud_vm_cluster_group.command(name='update', help=database_cli.update_cloud_vm_cluster.help)
 @cli_util.option('--update-action', help="""The action to perform on the update.""")
+@cli_util.option('--update-mode', help="""The update mode applicable to OS Update.""")
 @cli_util.option('--update-id', help="""The [OCID](/Content/General/Concepts/identifiers.htm) of the maintenance update.""")
 @cli_util.option('--gi-image-id', help="""The [OCID](/Content/General/Concepts/identifiers.htm) of the grid infrastructure software image. This is a database software image of type `GRID_IMAGE`.""")
 @cli_util.option('--ssh-authorized-keys-file', type=click.File('r'), help="""A file containing one or more public SSH keys to use for SSH access to the cloud VM cluster. Use a newline character to separate multiple keys. The length of the combined keys cannot exceed 10,000 characters.""")
@@ -2088,6 +2322,7 @@ def update_cloud_vm_cluster(ctx, **kwargs):
         kwargs['ssh_public_keys'] = json.dumps(content)
 
     update_action = kwargs.get('update_action')
+    update_mode = kwargs.get('update_mode')
     update_id = kwargs.get('update_id')
     gi_image_id = kwargs.get('gi_image_id')
     if update_id and gi_image_id:
@@ -2096,11 +2331,15 @@ def update_cloud_vm_cluster(ctx, **kwargs):
         raise click.UsageError('--update-id or --gi-image-id is required if --update-action is specified')
     elif (update_id or gi_image_id) and not update_action:
         raise click.UsageError('--update-action is required if --update-id or --gi-image-id is specified')
+    elif update_mode is not None and not update_id:
+        raise click.UsageError('--update-mode is only required if --update-id is specified to perform DomU OS Update')
     elif update_id and update_action:
         kwargs['update_details'] = {
             "updateAction": update_action,
             "updateId": update_id
         }
+        if update_mode is not None:
+            kwargs['update_details']['updateMode'] = update_mode
     elif gi_image_id and update_action:
         kwargs['update_details'] = {
             "updateAction": update_action,
@@ -2112,6 +2351,7 @@ def update_cloud_vm_cluster(ctx, **kwargs):
     del kwargs['update_action']
     del kwargs['update_id']
     del kwargs['gi_image_id']
+    del kwargs['update_mode']
 
     ctx.invoke(database_cli.update_cloud_vm_cluster, **kwargs)
 
@@ -4133,6 +4373,9 @@ For more information, see [Redo Transport Services] in the Oracle Data Guard doc
 @cli_util.option('--hsm-password', help=u"""Provide the HSM password as you would in RDBMS for External HSM.""")
 @cli_util.option('--data-storage-size-in-gbs', type=click.INT, help=u"""Provide the DATA storage size, in gigabytes, that is applicable for the database.""")
 @cli_util.option('--reco-storage-size-in-gbs', type=click.INT, help=u"""Provide the RECO storage size, in gigabytes, that is applicable for the database.""")
+@cli_util.option('--manage-auto-failover', type=custom_types.CliCaseInsensitiveChoice(["ENABLE", "DISABLE"]), help=u"""The value to assign to the managed_auto_failover property of the standby to be created.
+            Allowed values for this property are: "ENABLE", "DISABLE".""")
+@cli_util.option('--auto-failover-targets', type=click.STRING, help=u"""Defines auto failover targets for the current database. The value should be comma separated unique names of other data guard members.""")
 @cli_util.help_option
 @click.pass_context
 @json_skeleton_utils.json_skeleton_generation_handler(input_params_to_complex_types={'freeform-tags': {'module': 'database', 'class': 'dict(str, string)'}, 'defined-tags': {'module': 'database', 'class': 'dict(str, dict(str, object))'}}, output_type={'module': 'database', 'class': 'DatabaseSummary'})
@@ -4189,6 +4432,18 @@ def create_standby_database_for_multiple_standby(ctx, wait_for_state, max_wait_s
 
     if include_storage_details:
         create_standby_details.storage_size_details = database_storage_size_details
+
+    database_auto_failover_details = oci.database.models.AutoFailoverConfiguration()
+    auto_failover_config_present = False
+    if 'manage_auto_failover' in kwargs and kwargs['manage_auto_failover']:
+        database_auto_failover_details.managed_auto_failover = kwargs['manage_auto_failover']
+        auto_failover_config_present = True
+    if 'auto_failover_targets' in kwargs and kwargs['auto_failover_targets']:
+        database_auto_failover_details.failover_targets = kwargs['auto_failover_targets'].split(',')
+        auto_failover_config_present = True
+
+    if auto_failover_config_present:
+        create_standby_details.auto_failover_configuration = database_auto_failover_details
 
     _details['database'] = create_standby_details
 
@@ -4302,6 +4557,9 @@ cli_util.rename_command(database_cli, database_cli.database_group, database_cli.
 
 # oci db autonomous-database list-estimate-cost-savings -> oci db autonomous-database list-elastic-pool-cost-savings
 cli_util.rename_command(database_cli, database_cli.autonomous_database_group, database_cli.list_estimate_cost_savings, "list-elastic-pool-cost-savings")
+
+# oci db database reschedule-managed-db-software-update -> oci db database reschedule-msu
+cli_util.rename_command(database_cli, database_cli.database_group, database_cli.reschedule_managed_db_software_update, "reschedule-msu")
 
 # oci db db-system-os-patch-history-entry-collection list-db-system-os-patch-history-entries -> oci db db-system-os-patch-history-entry-collection list
 cli_util.rename_command(database_cli, database_cli.db_system_os_patch_history_entry_collection_group, database_cli.list_db_system_os_patch_history_entries, "list")
